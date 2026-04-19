@@ -1,29 +1,54 @@
 import { useEffect, useState } from 'react';
+import { BookMarked, Film, Tv2, type LucideProps } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { BookList } from '../books/BookList';
 import { BookFormDialog } from '../books/BookFormDialog';
 import { BookDetailDrawer } from '../books/BookDetailDrawer';
+import { MediaList } from '../media/MediaList';
+import { MediaFormDialog } from '../media/MediaFormDialog';
+import { MediaDetailDrawer } from '../media/MediaDetailDrawer';
+import { MediaSidebar } from '../media/MediaSidebar';
 import { ImportDialog } from '../import/ImportDialog';
 import { ExportDialog } from '../export/ExportDialog';
 import { SettingsDialog } from '../settings/SettingsDialog';
 import { useBooks } from '../../store/booksStore';
+import { useMedia } from '../../store/mediaStore';
 import { useSettings } from '../../store/settingsStore';
 import { applyTheme } from '../../lib/theme';
+import { cn } from '../../lib/utils';
 import type { Book } from '../../types/book';
+import type { Media } from '../../types/media';
+
+export type Section = 'books' | 'movies' | 'tv';
+
+const SECTIONS: { value: Section; label: string; icon: React.ComponentType<LucideProps> }[] = [
+  { value: 'books', label: 'Kitaplar', icon: BookMarked },
+  { value: 'movies', label: 'Filmler', icon: Film },
+  { value: 'tv', label: 'Diziler', icon: Tv2 },
+];
 
 export function AppShell() {
-  const { load, add, update, remove } = useBooks();
+  const { load: loadBooks, add: addBook, update: updateBook, remove: removeBook } = useBooks();
+  const { load: loadMedia, add: addMedia, update: updateMedia, remove: removeMedia } = useMedia();
   const settings = useSettings();
+
+  const [section, setSection] = useState<Section>('books');
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Book | undefined>();
   const [detail, setDetail] = useState<Book | null>(null);
+
+  const [mediaFormOpen, setMediaFormOpen] = useState(false);
+  const [editingMedia, setEditingMedia] = useState<Media | undefined>();
+  const [mediaDetail, setMediaDetail] = useState<Media | null>(null);
+
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { loadBooks(); }, [loadBooks]);
+  useEffect(() => { loadMedia(); }, [loadMedia]);
   useEffect(() => { applyTheme(settings); }, [settings.theme, settings.accent, settings.fontFamily, settings.fontSize, settings.density, settings]);
 
   useEffect(() => {
@@ -34,34 +59,93 @@ export function AppShell() {
     return () => mq.removeEventListener('change', h);
   }, [settings]);
 
+  const mediaType = section === 'movies' ? 'film' as const : 'dizi' as const;
+
   return (
-    <div className="h-screen flex bg-bg text-text">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Topbar
-          onAdd={() => { setEditing(undefined); setFormOpen(true); }}
-          onImport={() => setImportOpen(true)}
-          onExport={() => setExportOpen(true)}
-          onSettings={() => setSettingsOpen(true)}
-        />
-        <BookList onOpen={setDetail} />
+    <div className="h-screen flex flex-col bg-bg text-text">
+      <Topbar
+        section={section}
+        onAdd={() => {
+          if (section === 'books') { setEditing(undefined); setFormOpen(true); }
+          else { setEditingMedia(undefined); setMediaFormOpen(true); }
+        }}
+        onImport={() => setImportOpen(true)}
+        onExport={() => setExportOpen(true)}
+        onSettings={() => setSettingsOpen(true)}
+      />
+
+      {/* Section navigation tabs */}
+      <nav className="h-10 border-b border-border bg-surface flex items-center px-4 gap-0.5 shrink-0">
+        {SECTIONS.map((s) => {
+          const Icon = s.icon;
+          const active = section === s.value;
+          return (
+            <button
+              key={s.value}
+              onClick={() => setSection(s.value)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
+                active
+                  ? 'bg-primary/15 text-primary'
+                  : 'text-muted hover:bg-surface2 hover:text-text',
+              )}
+            >
+              <Icon size={14} />
+              {s.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className="flex-1 flex min-h-0">
+        {section === 'books' ? (
+          <Sidebar />
+        ) : (
+          <MediaSidebar type={mediaType} />
+        )}
+
+        <div className="flex-1 flex flex-col min-w-0">
+          {section === 'books' ? (
+            <BookList onOpen={setDetail} />
+          ) : (
+            <MediaList type={mediaType} onOpen={setMediaDetail} />
+          )}
+        </div>
       </div>
 
+      {/* Book dialogs */}
       <BookFormDialog
         open={formOpen}
         onClose={() => setFormOpen(false)}
         initial={editing}
         onSave={async (b) => {
-          if (editing) await update(editing.id, b);
-          else await add(b);
+          if (editing) await updateBook(editing.id, b);
+          else await addBook(b);
         }}
       />
-
       <BookDetailDrawer
         book={detail}
         onClose={() => setDetail(null)}
         onEdit={(b) => { setEditing(b); setFormOpen(true); setDetail(null); }}
-        onDelete={(id) => remove([id])}
+        onDelete={(id) => removeBook([id])}
+      />
+
+      {/* Media dialogs */}
+      <MediaFormDialog
+        open={mediaFormOpen}
+        onClose={() => setMediaFormOpen(false)}
+        initial={editingMedia}
+        type={mediaType}
+        onSave={async (m) => {
+          if (editingMedia) await updateMedia(editingMedia.id, m);
+          else await addMedia(m);
+        }}
+      />
+      <MediaDetailDrawer
+        item={mediaDetail}
+        onClose={() => setMediaDetail(null)}
+        onEdit={(m) => { setEditingMedia(m); setMediaFormOpen(true); setMediaDetail(null); }}
+        onDelete={(id) => removeMedia([id])}
       />
 
       <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} />

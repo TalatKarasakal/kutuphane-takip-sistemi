@@ -1,0 +1,142 @@
+import { useMemo } from 'react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Film, Tv2, Trash2 } from 'lucide-react';
+import { useMedia, applyMediaFilters, type MediaSortKey } from '../../store/mediaStore';
+import { useSettings } from '../../store/settingsStore';
+import { MEDIA_STATUSES } from '../../constants/mediaStatuses';
+import { MediaStatusBadge } from '../ui/Badge';
+import { MediaCard } from './MediaCard';
+import type { Media, MediaStatus, MediaType } from '../../types/media';
+import { cn } from '../../lib/utils';
+
+interface Props {
+  type: MediaType;
+  onOpen: (m: Media) => void;
+}
+
+export function MediaList({ type, onOpen }: Props) {
+  const { media, search, statusFilter, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useMedia();
+  const { view, density } = useSettings();
+
+  const filtered = useMemo(
+    () => applyMediaFilters(media, type, { search, statusFilter, sortKey, sortDir }),
+    [media, type, search, statusFilter, sortKey, sortDir],
+  );
+
+  const allSelected = filtered.length > 0 && filtered.every((m) => selectedIds.has(m.id));
+  const hasSel = selectedIds.size > 0;
+
+  const typeLabel = type === 'film' ? 'film' : 'dizi';
+  const TypeIcon = type === 'film' ? Film : Tv2;
+
+  if (filtered.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center p-10">
+          <div className="w-14 h-14 mx-auto rounded-full bg-primary/15 text-primary flex items-center justify-center mb-4">
+            <TypeIcon size={24} />
+          </div>
+          <h3 className="font-semibold mb-1">Henüz {typeLabel} yok</h3>
+          <p className="text-sm text-muted max-w-xs">Sağ üstten {typeLabel} ekleyebilirsin.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 overflow-auto">
+      {hasSel && (
+        <BulkBar
+          count={selectedIds.size}
+          onClear={clearSelection}
+          onDelete={() => remove([...selectedIds])}
+          onStatus={(s) => setStatus([...selectedIds], s)}
+        />
+      )}
+
+      {view === 'card' ? (
+        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(240px,1fr))]">
+          {filtered.map((m) => (
+            <MediaCard key={m.id} item={m} onClick={() => onOpen(m)} />
+          ))}
+        </div>
+      ) : (
+        <div className="p-5">
+          <div className="card overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-surface2 text-muted text-xs tracking-wide">
+                <tr>
+                  <th className="w-10 px-3 py-3 text-left">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={() => (allSelected ? clearSelection() : selectAll(filtered.map((m) => m.id)))}
+                    />
+                  </th>
+                  <ThSort label="Başlık" k="title" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
+                  <ThSort label="Yönetmen" k="director" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
+                  <ThSort label="Çıkış Yılı" k="releaseYear" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
+                  <ThSort label="İzlenme Yılı" k="watchYear" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
+                  <ThSort label="Durum" k="status" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((m) => (
+                  <tr
+                    key={m.id}
+                    className={cn(
+                      'border-t border-border hover:bg-surface2/60 cursor-pointer transition-colors',
+                      density === 'compact' ? 'text-[13px]' : '',
+                    )}
+                    onClick={() => onOpen(m)}
+                  >
+                    <td className="px-3 py-2.5" onClick={(e) => e.stopPropagation()}>
+                      <input type="checkbox" checked={selectedIds.has(m.id)} onChange={() => toggleSelect(m.id)} />
+                    </td>
+                    <td className={cn('px-3', density === 'compact' ? 'py-1.5' : 'py-3', 'font-medium')}>{m.title}</td>
+                    <td className="px-3 text-muted">{m.director ?? '—'}</td>
+                    <td className="px-3 text-right tabular-nums">{m.releaseYear ?? '—'}</td>
+                    <td className="px-3 text-right tabular-nums">{m.watchYear ?? '—'}</td>
+                    <td className="px-3"><MediaStatusBadge status={m.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-2 text-xs text-muted">{filtered.length} {typeLabel} gösteriliyor</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ThSort({
+  label, k, sortKey, sortDir, onClick, align,
+}: { label: string; k: MediaSortKey; sortKey: MediaSortKey; sortDir: 'asc' | 'desc'; onClick: (k: MediaSortKey) => void; align?: 'right' }) {
+  const active = sortKey === k;
+  return (
+    <th className={cn('px-3 py-3 font-semibold', align === 'right' ? 'text-right' : 'text-left')}>
+      <button onClick={() => onClick(k)} className="inline-flex items-center gap-1 hover:text-text">
+        {label}
+        {active ? (sortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : <ArrowUpDown size={12} className="opacity-40" />}
+      </button>
+    </th>
+  );
+}
+
+function BulkBar({ count, onClear, onDelete, onStatus }: { count: number; onClear: () => void; onDelete: () => void; onStatus: (s: MediaStatus) => void }) {
+  return (
+    <div className="sticky top-0 z-10 bg-primary/10 border-b border-primary/20 px-5 py-2 flex items-center gap-2 text-sm">
+      <span className="font-medium text-primary">{count} seçili</span>
+      <div className="ml-4 flex items-center gap-1">
+        <span className="text-muted mr-1">Durum değiştir:</span>
+        {MEDIA_STATUSES.map((s) => (
+          <button key={s.value} className="chip hover:bg-primary/20" onClick={() => onStatus(s.value)}>{s.label}</button>
+        ))}
+      </div>
+      <div className="ml-auto flex items-center gap-2">
+        <button className="btn btn-ghost text-secondary" onClick={onDelete}><Trash2 size={14} /> Sil</button>
+        <button className="btn btn-ghost" onClick={onClear}>Temizle</button>
+      </div>
+    </div>
+  );
+}

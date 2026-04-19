@@ -1,27 +1,46 @@
 import { ArrowDownToLine, ArrowUpFromLine, LayoutGrid, Moon, Plus, Search, Settings, Sun, Table } from 'lucide-react';
 import { useBooks } from '../../store/booksStore';
+import { useMedia } from '../../store/mediaStore';
 import { useSettings } from '../../store/settingsStore';
+import type { Section } from './AppShell';
 
 interface Props {
+  section: Section;
   onAdd: () => void;
   onImport: () => void;
   onExport: () => void;
   onSettings: () => void;
 }
 
-export function Topbar({ onAdd, onImport, onExport, onSettings }: Props) {
-  const { search, setSearch } = useBooks();
+const ADD_LABEL: Record<Section, string> = {
+  books: 'Kitap Ekle',
+  movies: 'Film Ekle',
+  tv: 'Dizi Ekle',
+};
+
+const SEARCH_PLACEHOLDER: Record<Section, string> = {
+  books: 'Başlık, yazar, ISBN, not içinde ara…',
+  movies: 'Başlık, yönetmen, not içinde ara…',
+  tv: 'Başlık, yönetmen, not içinde ara…',
+};
+
+export function Topbar({ section, onAdd, onImport, onExport, onSettings }: Props) {
+  const books = useBooks();
+  const media = useMedia();
   const { theme, view, set } = useSettings();
   const isDark = theme === 'dark';
 
+  const search = section === 'books' ? books.search : media.search;
+  const setSearch = section === 'books' ? books.setSearch : media.setSearch;
+
   return (
-    <header className="h-16 border-b border-border bg-surface/80 backdrop-blur px-5 flex items-center gap-3">
+    <header className="h-16 border-b border-border bg-surface/80 backdrop-blur px-5 flex items-center gap-3 shrink-0">
       <div className="relative flex-1 max-w-xl">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={16} />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Başlık, yazar, ISBN, not içinde ara…"
+          placeholder={SEARCH_PLACEHOLDER[section]}
           className="input pl-9"
         />
       </div>
@@ -47,10 +66,14 @@ export function Topbar({ onAdd, onImport, onExport, onSettings }: Props) {
         <button className="btn btn-ghost" onClick={() => set('theme', isDark ? 'light' : 'dark')} title="Tema">
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
-        <button className="btn btn-outline" onClick={onImport}><ArrowDownToLine size={16} /> İçe Aktar</button>
-        <button className="btn btn-outline" onClick={onExport}><ArrowUpFromLine size={16} /> Dışa Aktar</button>
+        {section === 'books' && (
+          <>
+            <button className="btn btn-outline" onClick={onImport}><ArrowDownToLine size={16} /> İçe Aktar</button>
+            <button className="btn btn-outline" onClick={onExport}><ArrowUpFromLine size={16} /> Dışa Aktar</button>
+          </>
+        )}
         <button className="btn btn-ghost" onClick={onSettings} title="Ayarlar"><Settings size={16} /></button>
-        <button className="btn btn-primary" onClick={onAdd}><Plus size={16} /> Kitap Ekle</button>
+        <button className="btn btn-primary" onClick={onAdd}><Plus size={16} /> {ADD_LABEL[section]}</button>
       </div>
     </header>
   );
