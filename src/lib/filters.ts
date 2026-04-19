@@ -5,13 +5,43 @@ export interface FilterArgs {
   search: string;
   statusFilter: BookStatus[];
   genreFilter: string[];
+  duplicatesOnly?: boolean;
   sortKey: SortKey;
   sortDir: SortDir;
 }
 
+const normStr = (s?: string) => (s ?? '').trim().toLocaleLowerCase('tr').replace(/\s+/g, ' ');
+
+export function duplicateKey(b: Book): string | null {
+  const isbn = normStr(b.isbn).replace(/[-\s]/g, '');
+  if (isbn) return `isbn:${isbn}`;
+  const title = normStr(b.title);
+  const author = normStr(b.author);
+  if (title && author) return `ta:${title}|${author}`;
+  return null;
+}
+
+export function findDuplicateIds(books: Book[]): Set<string> {
+  const groups = new Map<string, string[]>();
+  for (const b of books) {
+    const k = duplicateKey(b);
+    if (!k) continue;
+    const arr = groups.get(k) ?? [];
+    arr.push(b.id);
+    groups.set(k, arr);
+  }
+  const dup = new Set<string>();
+  for (const ids of groups.values()) {
+    if (ids.length > 1) ids.forEach((id) => dup.add(id));
+  }
+  return dup;
+}
+
 export function applyFilters(books: Book[], args: FilterArgs): Book[] {
   const q = args.search.trim().toLocaleLowerCase('tr');
+  const dupIds = args.duplicatesOnly ? findDuplicateIds(books) : null;
   let out = books.filter((b) => {
+    if (dupIds && !dupIds.has(b.id)) return false;
     if (args.statusFilter.length && !args.statusFilter.includes(b.status)) return false;
     if (args.genreFilter.length && (!b.genre || !args.genreFilter.includes(b.genre))) return false;
     if (q) {

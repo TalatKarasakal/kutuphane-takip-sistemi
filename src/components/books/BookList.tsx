@@ -14,16 +14,22 @@ interface Props {
 }
 
 export function BookList({ onOpen }: Props) {
-  const { books, search, statusFilter, genreFilter, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useBooks();
+  const { books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useBooks();
   const { view, density } = useSettings();
 
   const filtered = useMemo(
-    () => applyFilters(books, { search, statusFilter, genreFilter, sortKey, sortDir }),
-    [books, search, statusFilter, genreFilter, sortKey, sortDir],
+    () => applyFilters(books, { search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir }),
+    [books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir],
   );
 
   const allSelected = filtered.length > 0 && filtered.every((b) => selectedIds.has(b.id));
   const hasSel = selectedIds.size > 0;
+
+  const visibleCols = useMemo(() => ({
+    publisher: filtered.some((b) => !!b.publisher),
+    genre: filtered.some((b) => !!b.genre),
+    pageCount: filtered.some((b) => b.pageCount != null && b.pageCount !== 0),
+  }), [filtered]);
 
   if (filtered.length === 0) {
     return (
@@ -64,9 +70,9 @@ export function BookList({ onOpen }: Props) {
                   </th>
                   <ThSort label="Başlık" k="title" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
                   <ThSort label="Yazar" k="author" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
-                  <ThSort label="Yayınevi" k="publisher" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
-                  <ThSort label="Tür" k="genre" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
-                  <ThSort label="Sayfa" k="pageCount" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
+                  {visibleCols.publisher && <ThSort label="Yayınevi" k="publisher" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />}
+                  {visibleCols.genre && <ThSort label="Tür" k="genre" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />}
+                  {visibleCols.pageCount && <ThSort label="Sayfa" k="pageCount" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />}
                   <ThSort label="Durum" k="status" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
                 </tr>
               </thead>
@@ -85,9 +91,9 @@ export function BookList({ onOpen }: Props) {
                     </td>
                     <td className={cn('px-3', density === 'compact' ? 'py-1.5' : 'py-3', 'font-medium')}>{b.title}</td>
                     <td className="px-3">{b.author}</td>
-                    <td className="px-3 text-muted">{b.publisher ?? '—'}</td>
-                    <td className="px-3">{b.genre ? <span className="chip">{b.genre}</span> : <span className="text-muted">—</span>}</td>
-                    <td className="px-3 text-right tabular-nums">{b.pageCount ?? '—'}</td>
+                    {visibleCols.publisher && <td className="px-3 text-muted">{b.publisher ?? '—'}</td>}
+                    {visibleCols.genre && <td className="px-3">{b.genre ? <span className="chip">{b.genre}</span> : <span className="text-muted">—</span>}</td>}
+                    {visibleCols.pageCount && <td className="px-3 text-right tabular-nums">{b.pageCount ?? '—'}</td>}
                     <td className="px-3"><StatusBadge status={b.status} /></td>
                   </tr>
                 ))}

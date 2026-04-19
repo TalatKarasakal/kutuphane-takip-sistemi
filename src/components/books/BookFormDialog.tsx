@@ -58,7 +58,8 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
     setForm((f) => ({ ...f, [k]: smartTitleCase((f[k] as string) ?? '', v) }));
   };
 
-  const submit = () => {
+  const submit = (ev?: React.FormEvent) => {
+    ev?.preventDefault();
     const e: typeof errors = {};
     if (!form.title.trim()) e.title = 'Başlık zorunlu';
     if (!form.author.trim()) e.author = 'Yazar zorunlu';
@@ -80,12 +81,12 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
       size="lg"
       footer={
         <>
-          <button className="btn btn-ghost" onClick={onClose}>Vazgeç</button>
-          <button className="btn btn-primary" onClick={submit}>{initial ? 'Kaydet' : 'Ekle'}</button>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Vazgeç</button>
+          <button type="submit" form="book-form" className="btn btn-primary">{initial ? 'Kaydet' : 'Ekle'}</button>
         </>
       }
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <form id="book-form" onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Field label="Başlık *" error={errors.title}>
           <input className="input" value={form.title} onChange={(e) => updateText('title', e.target.value)} autoFocus />
         </Field>
@@ -132,7 +133,7 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
             <textarea className="input min-h-[88px]" value={form.notes ?? ''} onChange={(e) => update('notes', e.target.value)} />
           </Field>
         </div>
-      </div>
+      </form>
     </Modal>
   );
 }

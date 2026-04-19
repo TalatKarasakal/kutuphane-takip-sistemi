@@ -9,14 +9,14 @@ type Format = 'xlsx' | 'csv' | 'json';
 type Scope = 'all' | 'filtered' | 'selected';
 
 export function ExportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { books, search, statusFilter, genreFilter, sortKey, sortDir, selectedIds } = useBooks();
+  const { books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir, selectedIds } = useBooks();
   const [format, setFormat] = useState<Format>('xlsx');
   const [scope, setScope] = useState<Scope>('all');
   const [fields, setFields] = useState<(keyof Book)[]>(EXPORT_FIELDS.map((f) => f.key));
 
   const filtered = useMemo(
-    () => applyFilters(books, { search, statusFilter, genreFilter, sortKey, sortDir }),
-    [books, search, statusFilter, genreFilter, sortKey, sortDir],
+    () => applyFilters(books, { search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir }),
+    [books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir],
   );
 
   const target: Book[] = scope === 'all'

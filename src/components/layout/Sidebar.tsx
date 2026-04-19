@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
-import { BookMarked, Filter, X } from 'lucide-react';
+import { BookMarked, Filter, X, Copy } from 'lucide-react';
 import { useBooks } from '../../store/booksStore';
 import { STATUSES } from '../../constants/statuses';
+import { findDuplicateIds } from '../../lib/filters';
 import { cn } from '../../lib/utils';
 
 export function Sidebar() {
-  const { books, statusFilter, genreFilter, toggleStatusFilter, toggleGenreFilter, clearFilters } = useBooks();
+  const { books, statusFilter, genreFilter, duplicatesOnly, toggleStatusFilter, toggleGenreFilter, toggleDuplicatesOnly, clearFilters } = useBooks();
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: books.length };
@@ -19,7 +20,9 @@ export function Sidebar() {
     return Object.entries(c).sort((a, b) => a[0].localeCompare(b[0], 'tr'));
   }, [books]);
 
-  const hasActive = statusFilter.length > 0 || genreFilter.length > 0;
+  const duplicateCount = useMemo(() => findDuplicateIds(books).size, [books]);
+
+  const hasActive = statusFilter.length > 0 || genreFilter.length > 0 || duplicatesOnly;
 
   return (
     <aside className="w-64 shrink-0 border-r border-border bg-surface flex flex-col">
@@ -33,62 +36,111 @@ export function Sidebar() {
         </div>
       </div>
 
-      <div className="px-5 py-4 flex-1 overflow-auto space-y-6">
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted">Durum</div>
-            {hasActive && (
-              <button className="text-xs text-primary hover:underline flex items-center gap-1" onClick={clearFilters}>
-                <X size={12} /> temizle
-              </button>
-            )}
+      <div className="px-4 py-4 flex-1 overflow-auto space-y-3">
+        {hasActive && (
+          <div className="flex justify-end">
+            <button className="text-xs text-primary hover:underline flex items-center gap-1" onClick={clearFilters}>
+              <X size={12} /> filtreleri temizle
+            </button>
           </div>
-          <div className="space-y-1">
-            {STATUSES.map((s) => {
-              const active = statusFilter.includes(s.value);
-              return (
-                <button
-                  key={s.value}
-                  onClick={() => toggleStatusFilter(s.value)}
-                  className={cn(
-                    'w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors',
-                    active ? 'bg-primary/15 text-primary font-medium' : 'hover:bg-surface2 text-text',
-                  )}
-                >
-                  <span>{s.label}</span>
-                  <span className="text-xs text-muted">{counts[s.value] ?? 0}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        )}
 
-        {activeGenres.length > 0 && (
-          <div>
-            <div className="flex items-center gap-2 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-              <Filter size={12} /> Tür
-            </div>
-            <div className="space-y-1">
-              {activeGenres.map(([g, count]) => {
-                const active = genreFilter.includes(g);
-                return (
-                  <button
-                    key={g}
-                    onClick={() => toggleGenreFilter(g)}
-                    className={cn(
-                      'w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm transition-colors',
-                      active ? 'bg-secondary/15 text-secondary font-medium' : 'hover:bg-surface2 text-text',
-                    )}
-                  >
-                    <span>{g}</span>
-                    <span className="text-xs text-muted">{count}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+        <FilterCard title="Durum">
+          {STATUSES.map((s, i) => {
+            const active = statusFilter.includes(s.value);
+            return (
+              <FilterRow
+                key={s.value}
+                first={i === 0}
+                active={active}
+                accent="primary"
+                onClick={() => toggleStatusFilter(s.value)}
+                label={s.label}
+                count={counts[s.value] ?? 0}
+              />
+            );
+          })}
+        </FilterCard>
+
+        <FilterCard title="Tür" icon={<Filter size={12} />}>
+          {activeGenres.length === 0 ? (
+            <div className="px-3 py-2 text-xs text-muted italic">Henüz tür eklenmemiş</div>
+          ) : (
+            activeGenres.map(([g, count], i) => {
+              const active = genreFilter.includes(g);
+              return (
+                <FilterRow
+                  key={g}
+                  first={i === 0}
+                  active={active}
+                  accent="secondary"
+                  onClick={() => toggleGenreFilter(g)}
+                  label={g}
+                  count={count}
+                />
+              );
+            })
+          )}
+        </FilterCard>
+
+        {duplicateCount > 0 && (
+          <FilterCard title="Tekrar Edenler" icon={<Copy size={12} />}>
+            <FilterRow
+              first
+              active={duplicatesOnly}
+              accent="secondary"
+              onClick={toggleDuplicatesOnly}
+              label="Yalnızca tekrarları göster"
+              count={duplicateCount}
+              title="ISBN eşleşmesi, yoksa başlık + yazar eşleşmesiyle belirlenir"
+            />
+          </FilterCard>
         )}
       </div>
     </aside>
+  );
+}
+
+function FilterCard({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="rounded-xl border border-border bg-surface2/40 overflow-hidden">
+      <div className="px-3 pt-2.5 pb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted">
+        {icon}
+        <span>{title}</span>
+      </div>
+      <div className="border-t border-border/70" />
+      <div className="p-1">{children}</div>
+    </section>
+  );
+}
+
+function FilterRow({
+  first, active, accent, onClick, label, count, title,
+}: {
+  first?: boolean;
+  active: boolean;
+  accent: 'primary' | 'secondary';
+  onClick: () => void;
+  label: string;
+  count: number;
+  title?: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      className={cn(
+        'w-full flex items-center justify-between px-3 py-2 text-sm transition-colors',
+        !first && 'border-t border-border/60',
+        active
+          ? accent === 'primary'
+            ? 'bg-primary/10 text-primary font-medium'
+            : 'bg-secondary/10 text-secondary font-medium'
+          : 'hover:bg-surface2 text-text',
+      )}
+    >
+      <span>{label}</span>
+      <span className="text-xs text-muted">{count}</span>
+    </button>
   );
 }

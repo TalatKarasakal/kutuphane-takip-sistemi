@@ -12,6 +12,7 @@ interface BooksState {
   search: string;
   statusFilter: BookStatus[];
   genreFilter: string[];
+  duplicatesOnly: boolean;
   sortKey: SortKey;
   sortDir: SortDir;
   selectedIds: Set<string>;
@@ -26,6 +27,7 @@ interface BooksState {
   setSearch: (v: string) => void;
   toggleStatusFilter: (s: BookStatus) => void;
   toggleGenreFilter: (g: string) => void;
+  toggleDuplicatesOnly: () => void;
   clearFilters: () => void;
   setSort: (key: SortKey, dir?: SortDir) => void;
 
@@ -40,6 +42,7 @@ export const useBooks = create<BooksState>((set, get) => ({
   search: '',
   statusFilter: [],
   genreFilter: [],
+  duplicatesOnly: false,
   sortKey: 'addedAt',
   sortDir: 'desc',
   selectedIds: new Set(),
@@ -101,7 +104,8 @@ export const useBooks = create<BooksState>((set, get) => ({
     const cur = get().genreFilter;
     set({ genreFilter: cur.includes(g) ? cur.filter((x) => x !== g) : [...cur, g] });
   },
-  clearFilters: () => set({ statusFilter: [], genreFilter: [], search: '' }),
+  toggleDuplicatesOnly: () => set({ duplicatesOnly: !get().duplicatesOnly }),
+  clearFilters: () => set({ statusFilter: [], genreFilter: [], search: '', duplicatesOnly: false }),
   setSort: (key, dir) => set({ sortKey: key, sortDir: dir ?? (get().sortKey === key && get().sortDir === 'asc' ? 'desc' : 'asc') }),
 
   toggleSelect: (id) => {
