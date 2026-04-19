@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { db } from '../db/database';
 import type { Book, BookStatus } from '../types/book';
 
-export type SortKey = 'addedAt' | 'title' | 'author' | 'pageCount' | 'rating' | 'publicationYear';
+export type SortKey = 'addedAt' | 'title' | 'author' | 'publisher' | 'genre' | 'pageCount' | 'status' | 'publicationYear';
 export type SortDir = 'asc' | 'desc';
 
 interface BooksState {

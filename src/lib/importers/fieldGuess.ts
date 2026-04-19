@@ -11,9 +11,7 @@ export type MappableField =
   | 'language'
   | 'translator'
   | 'status'
-  | 'rating'
   | 'notes'
-  | 'tags'
   | 'readStartDate'
   | 'readEndDate'
   | '__ignore__';
@@ -29,9 +27,7 @@ export const FIELD_LABELS: Record<MappableField, string> = {
   language: 'Dil',
   translator: 'Çevirmen',
   status: 'Durum',
-  rating: 'Puan',
   notes: 'Notlar',
-  tags: 'Etiketler',
   readStartDate: 'Okumaya Başlama',
   readEndDate: 'Okumayı Bitirme',
   __ignore__: '— Yoksay —',
@@ -48,9 +44,7 @@ const CANDIDATES: Record<Exclude<MappableField, '__ignore__'>, string[]> = {
   language: ['language', 'dil', 'lang'],
   translator: ['translator', 'çevirmen', 'cevirmen', 'çeviren', 'ceviren'],
   status: ['status', 'durum', 'state', 'okuma durumu', 'okundu mu'],
-  rating: ['rating', 'puan', 'score', 'not', 'yıldız', 'yildiz', 'stars'],
   notes: ['notes', 'not', 'notlar', 'yorum', 'yorumlar', 'comment'],
-  tags: ['tags', 'etiket', 'etiketler', 'labels'],
   readStartDate: ['start', 'başlangıç', 'baslangic', 'okumaya başlama', 'okumaya baslama', 'read start'],
   readEndDate: ['end', 'bitiş', 'bitis', 'okumayı bitirme', 'okumayi bitirme', 'read end', 'bitirme'],
 };

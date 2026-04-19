@@ -53,7 +53,7 @@ export function BookList({ onOpen }: Props) {
         <div className="p-5">
           <div className="card overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-surface2 text-muted text-xs uppercase tracking-wide">
+              <thead className="bg-surface2 text-muted text-xs tracking-wide">
                 <tr>
                   <th className="w-10 px-3 py-3 text-left">
                     <input
@@ -64,11 +64,10 @@ export function BookList({ onOpen }: Props) {
                   </th>
                   <ThSort label="Başlık" k="title" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
                   <ThSort label="Yazar" k="author" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
-                  <th className="px-3 py-3 text-left">Yayınevi</th>
-                  <th className="px-3 py-3 text-left">Tür</th>
+                  <ThSort label="Yayınevi" k="publisher" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
+                  <ThSort label="Tür" k="genre" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
                   <ThSort label="Sayfa" k="pageCount" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
-                  <th className="px-3 py-3 text-left">Durum</th>
-                  <ThSort label="Puan" k="rating" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
+                  <ThSort label="Durum" k="status" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
                 </tr>
               </thead>
               <tbody>
@@ -90,7 +89,6 @@ export function BookList({ onOpen }: Props) {
                     <td className="px-3">{b.genre ? <span className="chip">{b.genre}</span> : <span className="text-muted">—</span>}</td>
                     <td className="px-3 text-right tabular-nums">{b.pageCount ?? '—'}</td>
                     <td className="px-3"><StatusBadge status={b.status} /></td>
-                    <td className="px-3 text-right tabular-nums">{b.rating ?? '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -108,7 +106,7 @@ function ThSort({
 }: { label: string; k: SortKey; sortKey: SortKey; sortDir: 'asc' | 'desc'; onClick: (k: SortKey) => void; align?: 'right' }) {
   const active = sortKey === k;
   return (
-    <th className={cn('px-3 py-3', align === 'right' ? 'text-right' : 'text-left')}>
+    <th className={cn('px-3 py-3 font-semibold', align === 'right' ? 'text-right' : 'text-left')}>
       <button onClick={() => onClick(k)} className="inline-flex items-center gap-1 hover:text-text">
         {label}
         {active ? (sortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : <ArrowUpDown size={12} className="opacity-40" />}

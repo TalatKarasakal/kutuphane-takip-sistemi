@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { BookMarked, Filter, X } from 'lucide-react';
 import { useBooks } from '../../store/booksStore';
 import { STATUSES } from '../../constants/statuses';
-import { GENRES } from '../../constants/genres';
 import { cn } from '../../lib/utils';
 
 export function Sidebar() {
@@ -14,10 +13,10 @@ export function Sidebar() {
     return c;
   }, [books]);
 
-  const genreCounts = useMemo(() => {
+  const activeGenres = useMemo(() => {
     const c: Record<string, number> = {};
     books.forEach((b) => { if (b.genre) c[b.genre] = (c[b.genre] ?? 0) + 1; });
-    return c;
+    return Object.entries(c).sort((a, b) => a[0].localeCompare(b[0], 'tr'));
   }, [books]);
 
   const hasActive = statusFilter.length > 0 || genreFilter.length > 0;
@@ -64,30 +63,31 @@ export function Sidebar() {
           </div>
         </div>
 
-        <div>
-          <div className="flex items-center gap-2 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-            <Filter size={12} /> Tür
+        {activeGenres.length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+              <Filter size={12} /> Tür
+            </div>
+            <div className="space-y-1">
+              {activeGenres.map(([g, count]) => {
+                const active = genreFilter.includes(g);
+                return (
+                  <button
+                    key={g}
+                    onClick={() => toggleGenreFilter(g)}
+                    className={cn(
+                      'w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm transition-colors',
+                      active ? 'bg-secondary/15 text-secondary font-medium' : 'hover:bg-surface2 text-text',
+                    )}
+                  >
+                    <span>{g}</span>
+                    <span className="text-xs text-muted">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <div className="space-y-1 max-h-[360px] overflow-auto pr-1">
-            {GENRES.map((g) => {
-              const active = genreFilter.includes(g);
-              const count = genreCounts[g] ?? 0;
-              return (
-                <button
-                  key={g}
-                  onClick={() => toggleGenreFilter(g)}
-                  className={cn(
-                    'w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-sm transition-colors',
-                    active ? 'bg-secondary/15 text-secondary font-medium' : 'hover:bg-surface2 text-text',
-                  )}
-                >
-                  <span>{g}</span>
-                  <span className="text-xs text-muted">{count}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        )}
       </div>
     </aside>
   );

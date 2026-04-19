@@ -5,7 +5,7 @@ import { parseCsv } from '../../lib/importers/csv';
 import { parseJson } from '../../lib/importers/json';
 import { guessField, FIELD_LABELS, MAPPABLE_FIELDS, type MappableField } from '../../lib/importers/fieldGuess';
 import { normalizeStatus, STATUSES } from '../../constants/statuses';
-import { parseNumber, parseTags } from '../../lib/utils';
+import { parseNumber } from '../../lib/utils';
 import { useBooks } from '../../store/booksStore';
 import type { Book, BookStatus } from '../../types/book';
 import { FileSpreadsheet, FileJson, FileText, Upload, AlertTriangle, CheckCircle2 } from 'lucide-react';
@@ -99,12 +99,8 @@ export function ImportDialog({ open, onClose }: Props) {
         if (raw == null || raw === '') return;
         switch (field) {
           case 'pageCount':
-          case 'rating':
           case 'publicationYear':
             book[field] = parseNumber(raw);
-            break;
-          case 'tags':
-            book.tags = parseTags(raw);
             break;
           case 'status': {
             const key = String(raw).trim();
@@ -174,11 +170,22 @@ export function ImportDialog({ open, onClose }: Props) {
 }
 
 function PickStep({ onFile }: { onFile: (f: File) => void }) {
+  const [dragging, setDragging] = useState(false);
   return (
     <div className="py-6">
-      <label className="block border-2 border-dashed border-border rounded-xl p-10 text-center cursor-pointer hover:bg-surface2 transition-colors">
+      <label
+        className={`block border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${dragging ? 'border-primary bg-primary/10' : 'border-border hover:bg-surface2'}`}
+        onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setDragging(true); }}
+        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragging(true); }}
+        onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setDragging(false); }}
+        onDrop={(e) => {
+          e.preventDefault(); e.stopPropagation(); setDragging(false);
+          const f = e.dataTransfer.files?.[0];
+          if (f) onFile(f);
+        }}
+      >
         <Upload size={28} className="mx-auto mb-3 text-primary" />
-        <div className="font-medium mb-1">Dosya seç ya da sürükle-bırak</div>
+        <div className="font-medium mb-1">Dosya seç ya da buraya sürükle-bırak</div>
         <div className="text-sm text-muted mb-4">.xlsx · .xls · .ods · .csv · .tsv · .json</div>
         <input
           type="file"

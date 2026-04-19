@@ -1,6 +1,6 @@
 import { Drawer } from '../ui/Drawer';
 import { StatusBadge } from '../ui/Badge';
-import { Pencil, Trash2, Star } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import type { Book } from '../../types/book';
 
 interface Props {
@@ -37,14 +37,6 @@ export function BookDetailDrawer({ book, onClose, onEdit, onDelete }: Props) {
             <StatusBadge status={book.status} />
           </div>
 
-          {book.rating != null && (
-            <div className="flex items-center gap-1 text-amber-500">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} size={16} fill={i < book.rating! ? 'currentColor' : 'none'} />
-              ))}
-            </div>
-          )}
-
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <Info label="Yayınevi" value={book.publisher} />
             <Info label="Tür" value={book.genre} />
@@ -55,15 +47,6 @@ export function BookDetailDrawer({ book, onClose, onEdit, onDelete }: Props) {
             <Info label="Çevirmen" value={book.translator} />
             <Info label="Okuma" value={[book.readStartDate, book.readEndDate].filter(Boolean).join(' → ')} />
           </dl>
-
-          {book.tags && book.tags.length > 0 && (
-            <div>
-              <div className="label">Etiketler</div>
-              <div className="flex flex-wrap gap-1.5">
-                {book.tags.map((t) => <span key={t} className="chip">{t}</span>)}
-              </div>
-            </div>
-          )}
 
           {book.notes && (
             <div>

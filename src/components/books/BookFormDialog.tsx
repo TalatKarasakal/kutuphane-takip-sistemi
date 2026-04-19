@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { STATUSES } from '../../constants/statuses';
 import { GENRES } from '../../constants/genres';
+import { useBooks } from '../../store/booksStore';
+import { smartTitleCase } from '../../lib/utils';
 import type { Book, BookStatus } from '../../types/book';
 
 interface Props {
@@ -24,16 +26,24 @@ const EMPTY: FormState = {
   language: '',
   translator: '',
   status: 'mevcut',
-  rating: undefined,
   notes: '',
-  tags: [],
   readStartDate: '',
   readEndDate: '',
 };
 
 export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
+  const { books } = useBooks();
   const [form, setForm] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
+
+  const authors = useMemo(
+    () => [...new Set(books.map((b) => b.author).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'tr')),
+    [books],
+  );
+  const publishers = useMemo(
+    () => [...new Set(books.map((b) => b.publisher).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, 'tr')),
+    [books],
+  );
 
   useEffect(() => {
     if (open) {
@@ -43,6 +53,10 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
   }, [open, initial]);
 
   const update = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
+
+  const updateText = (k: 'title' | 'author' | 'publisher', v: string) => {
+    setForm((f) => ({ ...f, [k]: smartTitleCase((f[k] as string) ?? '', v) }));
+  };
 
   const submit = () => {
     const e: typeof errors = {};
@@ -54,7 +68,6 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
       ...form,
       title: form.title.trim(),
       author: form.author.trim(),
-      tags: form.tags?.filter(Boolean) ?? [],
     });
     onClose();
   };
@@ -74,13 +87,15 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Field label="Başlık *" error={errors.title}>
-          <input className="input" value={form.title} onChange={(e) => update('title', e.target.value)} autoFocus />
+          <input className="input" value={form.title} onChange={(e) => updateText('title', e.target.value)} autoFocus />
         </Field>
         <Field label="Yazar *" error={errors.author}>
-          <input className="input" value={form.author} onChange={(e) => update('author', e.target.value)} />
+          <input list="author-list" className="input" value={form.author} onChange={(e) => updateText('author', e.target.value)} />
+          <datalist id="author-list">{authors.map((a) => <option key={a} value={a} />)}</datalist>
         </Field>
         <Field label="Yayınevi">
-          <input className="input" value={form.publisher ?? ''} onChange={(e) => update('publisher', e.target.value)} />
+          <input list="publisher-list" className="input" value={form.publisher ?? ''} onChange={(e) => updateText('publisher', e.target.value)} />
+          <datalist id="publisher-list">{publishers.map((p) => <option key={p} value={p} />)}</datalist>
         </Field>
         <Field label="Tür">
           <input list="genre-list" className="input" value={form.genre ?? ''} onChange={(e) => update('genre', e.target.value)} />
@@ -105,12 +120,6 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
           <select className="input" value={form.status} onChange={(e) => update('status', e.target.value as BookStatus)}>
             {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
           </select>
-        </Field>
-        <Field label="Puan (1-5)">
-          <input type="number" min={1} max={5} className="input" value={form.rating ?? ''} onChange={(e) => update('rating', e.target.value ? Number(e.target.value) : undefined)} />
-        </Field>
-        <Field label="Etiketler (virgülle)">
-          <input className="input" value={(form.tags ?? []).join(', ')} onChange={(e) => update('tags', e.target.value.split(',').map((s) => s.trim()).filter(Boolean))} />
         </Field>
         <Field label="Okumaya Başlama">
           <input type="date" className="input" value={form.readStartDate ?? ''} onChange={(e) => update('readStartDate', e.target.value)} />

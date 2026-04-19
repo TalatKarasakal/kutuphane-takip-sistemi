@@ -25,3 +25,13 @@ export function parseTags(v: unknown): string[] | undefined {
   if (Array.isArray(v)) return v.map(String);
   return String(v).split(/[,;|]/).map((s) => s.trim()).filter(Boolean);
 }
+
+export function smartTitleCase(prev: string, next: string): string {
+  if (next.length !== prev.length + 1) return next;
+  if (!next.startsWith(prev)) return next;
+  const i = next.length - 1;
+  const ch = next[i];
+  const prevCh = i > 0 ? next[i - 1] : '';
+  const shouldCap = (i === 0 || /\s/.test(prevCh)) && /\p{L}/u.test(ch);
+  return shouldCap ? next.slice(0, i) + ch.toLocaleUpperCase('tr') : next;
+}

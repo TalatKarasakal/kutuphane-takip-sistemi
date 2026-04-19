@@ -15,8 +15,6 @@ const ALL_FIELDS: { key: keyof Book; label: string }[] = [
   { key: 'publicationYear', label: 'Yayın Yılı' },
   { key: 'language', label: 'Dil' },
   { key: 'translator', label: 'Çevirmen' },
-  { key: 'rating', label: 'Puan' },
-  { key: 'tags', label: 'Etiketler' },
   { key: 'notes', label: 'Notlar' },
   { key: 'readStartDate', label: 'Okumaya Başlama' },
   { key: 'readEndDate', label: 'Okumayı Bitirme' },
@@ -32,7 +30,6 @@ function toRow(b: Book, fields: (keyof Book)[]) {
     const label = ALL_FIELDS.find((x) => x.key === f)?.label ?? f;
     let v: unknown = b[f];
     if (f === 'status') v = STATUS_LABEL[b.status];
-    if (f === 'tags' && Array.isArray(v)) v = (v as string[]).join(', ');
     r[label] = v ?? '';
   });
   return r;

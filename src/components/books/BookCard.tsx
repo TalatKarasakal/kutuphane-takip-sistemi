@@ -1,4 +1,3 @@
-import { Star } from 'lucide-react';
 import type { Book } from '../../types/book';
 import { StatusBadge } from '../ui/Badge';
 
@@ -18,13 +17,6 @@ export function BookCard({ book, onClick }: { book: Book; onClick: () => void })
         {book.publisher && <span className="chip">{book.publisher}</span>}
         {book.pageCount && <span className="chip">{book.pageCount} sy</span>}
       </div>
-      {book.rating != null && (
-        <div className="mt-3 flex items-center gap-0.5 text-amber-500">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} size={13} fill={i < book.rating! ? 'currentColor' : 'none'} />
-          ))}
-        </div>
-      )}
     </button>
   );
 }
