@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --accent-turkuaz: 20 184 166;
+  --accent-turkuaz-soft: 153 246 228;
+  --accent-kirmizi: 220 38 38;
+  --accent-kirmizi-soft: 254 202 202;
+
+  --primary: var(--accent-turkuaz);
+  --primary-soft: var(--accent-turkuaz-soft);
+  --primary-foreground: 255 255 255;
+  --secondary: var(--accent-kirmizi);
+  --secondary-soft: var(--accent-kirmizi-soft);
+  --secondary-foreground: 255 255 255;
+
+  --bg: 248 250 252;
+  --surface: 255 255 255;
+  --surface-2: 241 245 249;
+  --border: 226 232 240;
+  --text: 15 23 42;
+  --muted: 100 116 139;
+
+  --font-app: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-size-app: 15px;
+}
+
+html[data-theme='dark'] {
+  --bg: 9 14 26;
+  --surface: 17 24 39;
+  --surface-2: 30 41 59;
+  --border: 51 65 85;
+  --text: 226 232 240;
+  --muted: 148 163 184;
+}
+
+html[data-accent='kirmizi'] {
+  --primary: var(--accent-kirmizi);
+  --primary-soft: var(--accent-kirmizi-soft);
+  --secondary: var(--accent-turkuaz);
+  --secondary-soft: var(--accent-turkuaz-soft);
+}
+
+html {
+  font-family: var(--font-app);
+  font-size: var(--font-size-app);
+}
+
+body {
+  @apply bg-bg text-text antialiased;
+  margin: 0;
+  min-height: 100vh;
+}
+
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: rgb(var(--border)); border-radius: 8px; }
+*::-webkit-scrollbar-thumb:hover { background: rgb(var(--muted)); }
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-transparent disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary { @apply bg-primary text-primary-foreground hover:brightness-110; }
+  .btn-secondary { @apply bg-secondary text-secondary-foreground hover:brightness-110; }
+  .btn-ghost { @apply bg-transparent hover:bg-surface2 text-text; }
+  .btn-outline { @apply border-border bg-surface hover:bg-surface2 text-text; }
+  .input {
+    @apply w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium border border-border bg-surface2 text-text;
+  }
+  .card {
+    @apply rounded-xl border border-border bg-surface shadow-soft;
+  }
+  .label {
+    @apply block text-xs font-medium text-muted mb-1;
+  }
+}

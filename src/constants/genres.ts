@@ -1,0 +1,27 @@
+export const GENRES = [
+  'Roman',
+  'Hikâye',
+  'Şiir',
+  'Tarih',
+  'Biyografi',
+  'Otobiyografi',
+  'Felsefe',
+  'Psikoloji',
+  'Bilim',
+  'Bilim Kurgu',
+  'Fantastik',
+  'Polisiye',
+  'Deneme',
+  'Anı',
+  'Çocuk',
+  'Gençlik',
+  'Din',
+  'Siyaset',
+  'Ekonomi',
+  'Sanat',
+  'Referans',
+  'Eğitim',
+  'Diğer',
+] as const;
+
+export type Genre = (typeof GENRES)[number];
