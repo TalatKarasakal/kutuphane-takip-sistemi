@@ -48,8 +48,8 @@ export function Topbar({ section, onSection, onAdd, onImport, onExport, onSettin
 
   return (
     <header className="h-14 border-b border-border bg-surface/80 backdrop-blur px-5 flex items-center gap-4 shrink-0">
-      {/* Arama — esnek genişlik */}
-      <div className="relative flex-1">
+      {/* Arama */}
+      <div className="relative w-72">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={15} />
         <input
           value={search}
