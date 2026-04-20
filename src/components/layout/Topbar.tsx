@@ -50,7 +50,7 @@ export function Topbar({ section, onSection, onAdd, onImport, onExport, onSettin
     <header className="h-14 border-b border-border bg-surface/80 backdrop-blur px-5 flex items-center shrink-0">
       {/* Sol — arama */}
       <div className="flex-1 flex items-center">
-        <div className="relative w-64">
+        <div className="relative w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={15} />
           <input
             value={search}
