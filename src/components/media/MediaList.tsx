@@ -13,6 +13,19 @@ interface Props {
   onOpen: (m: Media) => void;
 }
 
+const MEDIA_STATUS_DOT: Record<MediaStatus, string> = {
+  izlendi: 'bg-emerald-500',
+  izlenecek: 'bg-sky-500',
+};
+
+const NEXT_STATUS: Partial<Record<MediaStatus, MediaStatus>> = {
+  izlenecek: 'izlendi',
+};
+
+const NEXT_LABEL: Partial<Record<MediaStatus, string>> = {
+  izlenecek: '→ İzlendi ✓',
+};
+
 export function MediaList({ type, onOpen }: Props) {
   const { media, search, statusFilter, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useMedia();
   const { view, density, filmColumns, tvColumns } = useSettings();
@@ -56,7 +69,7 @@ export function MediaList({ type, onOpen }: Props) {
       )}
 
       {view === 'card' ? (
-        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(240px,1fr))]">
+        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
           {filtered.map((m) => (
             <MediaCard key={m.id} item={m} onClick={() => onOpen(m)} />
           ))}
@@ -85,6 +98,7 @@ export function MediaList({ type, onOpen }: Props) {
                       align={['releaseYear', 'watchYear', 'duration', 'seasons', 'episodeDuration'].includes(col.key) ? 'right' : undefined}
                     />
                   ))}
+                  <th className="w-0" />
                 </tr>
               </thead>
               <tbody>
@@ -92,7 +106,7 @@ export function MediaList({ type, onOpen }: Props) {
                   <tr
                     key={m.id}
                     className={cn(
-                      'border-t border-border hover:bg-surface2/60 cursor-pointer transition-colors',
+                      'group border-t border-border hover:bg-surface2/60 cursor-pointer transition-colors',
                       density === 'compact' ? 'text-[13px]' : '',
                     )}
                     onClick={() => onOpen(m)}
@@ -101,6 +115,16 @@ export function MediaList({ type, onOpen }: Props) {
                       <input type="checkbox" checked={selectedIds.has(m.id)} onChange={() => toggleSelect(m.id)} />
                     </td>
                     {visibleCols.map((col) => renderCell(m, col.key, density))}
+                    <td className="pr-3" onClick={(e) => e.stopPropagation()}>
+                      {NEXT_STATUS[m.status] && (
+                        <button
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-md bg-surface2 hover:bg-primary/15 hover:text-primary whitespace-nowrap"
+                          onClick={() => setStatus([m.id], NEXT_STATUS[m.status]!)}
+                        >
+                          {NEXT_LABEL[m.status]}
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -127,7 +151,14 @@ const MEDIA_COL_LABEL: Record<string, string> = {
 function renderCell(m: Media, key: string, density: string) {
   const py = density === 'compact' ? 'py-1.5' : 'py-3';
   switch (key) {
-    case 'title': return <td key={key} className={cn('px-3', py, 'font-medium')}>{m.title}</td>;
+    case 'title': return (
+      <td key={key} className={cn('px-3', py, 'font-medium')}>
+        <div className="flex items-center gap-2">
+          <div className={cn('w-1 h-4 rounded-full shrink-0', MEDIA_STATUS_DOT[m.status])} />
+          {m.title}
+        </div>
+      </td>
+    );
     case 'director': return <td key={key} className="px-3 text-muted">{m.director ?? '—'}</td>;
     case 'releaseYear': return <td key={key} className="px-3 text-right tabular-nums">{m.releaseYear ?? '—'}</td>;
     case 'duration': return <td key={key} className="px-3 text-right tabular-nums">{m.duration ? `${m.duration} dk` : '—'}</td>;

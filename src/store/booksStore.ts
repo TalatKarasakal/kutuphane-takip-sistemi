@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import { db } from '../db/database';
+import { useToast } from './toastStore';
 import type { Book, BookStatus } from '../types/book';
 
 export type SortKey = 'addedAt' | 'title' | 'author' | 'publisher' | 'genre' | 'pageCount' | 'status' | 'publicationYear';
@@ -57,6 +58,7 @@ export const useBooks = create<BooksState>((set, get) => ({
     const book: Book = { ...b, id: nanoid(), addedAt: now, updatedAt: now };
     await db.books.add(book);
     set({ books: [...get().books, book] });
+    useToast.getState().show(`"${book.title}" eklendi`);
     return book;
   },
 
@@ -65,23 +67,35 @@ export const useBooks = create<BooksState>((set, get) => ({
     const books: Book[] = rows.map((r) => ({ ...r, id: nanoid(), addedAt: now, updatedAt: now }));
     await db.books.bulkAdd(books);
     set({ books: [...get().books, ...books] });
+    useToast.getState().show(`${books.length} kitap içe aktarıldı`);
   },
 
   update: async (id, patch) => {
+    const title = get().books.find((b) => b.id === id)?.title ?? '';
     const updated: Partial<Book> = { ...patch, updatedAt: new Date().toISOString() };
     await db.books.update(id, updated);
     set({
       books: get().books.map((b) => (b.id === id ? { ...b, ...updated } as Book : b)),
     });
+    useToast.getState().show(`"${title}" güncellendi`);
   },
 
   remove: async (ids) => {
+    const deleted = get().books.filter((b) => ids.includes(b.id));
     await db.books.bulkDelete(ids);
     const set0 = new Set(ids);
     set({
       books: get().books.filter((b) => !set0.has(b.id)),
       selectedIds: new Set([...get().selectedIds].filter((x) => !set0.has(x))),
     });
+    useToast.getState().show(
+      `${ids.length} kitap silindi`,
+      'success',
+      async () => {
+        await db.books.bulkAdd(deleted);
+        set({ books: [...get().books, ...deleted] });
+      },
+    );
   },
 
   setStatus: async (ids, status) => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { BookList } from '../books/BookList';
@@ -11,6 +11,7 @@ import { MediaSidebar } from '../media/MediaSidebar';
 import { ImportDialog } from '../import/ImportDialog';
 import { ExportDialog } from '../export/ExportDialog';
 import { SettingsDialog } from '../settings/SettingsDialog';
+import { ToastContainer } from '../ui/Toast';
 import { useBooks } from '../../store/booksStore';
 import { useMedia } from '../../store/mediaStore';
 import { useSettings } from '../../store/settingsStore';
@@ -39,6 +40,10 @@ export function AppShell() {
   const [exportOpen, setExportOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  const searchRef = useRef<HTMLInputElement>(null) as React.RefObject<HTMLInputElement>;
+  const sectionRef = useRef(section);
+  sectionRef.current = section;
+
   useEffect(() => { loadBooks(); }, [loadBooks]);
   useEffect(() => { loadMedia(); }, [loadMedia]);
   useEffect(() => { applyTheme(settings); }, [settings.theme, settings.accent, settings.fontFamily, settings.fontSize, settings.density, settings]);
@@ -51,6 +56,31 @@ export function AppShell() {
     return () => mq.removeEventListener('change', h);
   }, [settings]);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      const isEditable = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag);
+
+      if (e.key === '1' && !isEditable) { setSection('books'); return; }
+      if (e.key === '2' && !isEditable) { setSection('movies'); return; }
+      if (e.key === '3' && !isEditable) { setSection('tv'); return; }
+
+      if (e.key === 'n' && !isEditable && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        if (sectionRef.current === 'books') { setEditing(undefined); setFormOpen(true); }
+        else { setEditingMedia(undefined); setMediaFormOpen(true); }
+        return;
+      }
+
+      if (e.key === '/' && !isEditable) {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   const mediaType = section === 'movies' ? 'film' as const : 'dizi' as const;
 
   return (
@@ -58,6 +88,7 @@ export function AppShell() {
       <Topbar
         section={section}
         onSection={setSection}
+        searchRef={searchRef}
         onAdd={() => {
           if (section === 'books') { setEditing(undefined); setFormOpen(true); }
           else { setEditingMedia(undefined); setMediaFormOpen(true); }
@@ -112,6 +143,8 @@ export function AppShell() {
       <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} />
       <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+
+      <ToastContainer />
     </div>
   );
 }

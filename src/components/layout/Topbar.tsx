@@ -10,6 +10,7 @@ import type { Section } from './AppShell';
 interface Props {
   section: Section;
   onSection: (s: Section) => void;
+  searchRef?: React.RefObject<HTMLInputElement>;
   onAdd: () => void;
   onImport: () => void;
   onExport: () => void;
@@ -34,7 +35,7 @@ const SEARCH_PLACEHOLDER: Record<Section, string> = {
   tv: 'Başlık, yönetmen, not içinde ara…',
 };
 
-export function Topbar({ section, onSection, onAdd, onImport, onExport, onSettings }: Props) {
+export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExport, onSettings }: Props) {
   const books = useBooks();
   const media = useMedia();
   const { view, set, setColumns, bookColumns, filmColumns, tvColumns } = useSettings();
@@ -53,6 +54,7 @@ export function Topbar({ section, onSection, onAdd, onImport, onExport, onSettin
         <div className="relative w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={15} />
           <input
+            ref={searchRef}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={SEARCH_PLACEHOLDER[section]}

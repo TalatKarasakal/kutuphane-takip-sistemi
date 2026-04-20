@@ -4,7 +4,7 @@ import { useBooks, type SortKey } from '../../store/booksStore';
 import { useSettings } from '../../store/settingsStore';
 import { applyFilters } from '../../lib/filters';
 import { STATUSES } from '../../constants/statuses';
-import { StatusBadge } from '../ui/Badge';
+import { StatusBadge, GenreChip } from '../ui/Badge';
 import { BookCard } from './BookCard';
 import type { Book, BookStatus } from '../../types/book';
 import { cn } from '../../lib/utils';
@@ -12,6 +12,25 @@ import { cn } from '../../lib/utils';
 interface Props {
   onOpen: (b: Book) => void;
 }
+
+const STATUS_DOT: Record<BookStatus, string> = {
+  okundu: 'bg-emerald-500',
+  okunacak: 'bg-sky-500',
+  mevcut: 'bg-amber-500',
+  'satin-alinacak': 'bg-rose-500',
+};
+
+const NEXT_STATUS: Partial<Record<BookStatus, BookStatus>> = {
+  'satin-alinacak': 'mevcut',
+  mevcut: 'okunacak',
+  okunacak: 'okundu',
+};
+
+const NEXT_LABEL: Partial<Record<BookStatus, string>> = {
+  'satin-alinacak': '→ Mevcut',
+  mevcut: '→ Okunacak',
+  okunacak: '→ Okundu ✓',
+};
 
 export function BookList({ onOpen }: Props) {
   const { books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useBooks();
@@ -45,7 +64,7 @@ export function BookList({ onOpen }: Props) {
       {hasSel && <BulkBar count={selectedIds.size} onClear={clearSelection} onDelete={() => remove([...selectedIds])} onStatus={(s) => setStatus([...selectedIds], s)} />}
 
       {view === 'card' ? (
-        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(240px,1fr))]">
+        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
           {filtered.map((b) => (
             <BookCard key={b.id} book={b} onClick={() => onOpen(b)} />
           ))}
@@ -74,6 +93,7 @@ export function BookList({ onOpen }: Props) {
                       align={['pageCount', 'publicationYear'].includes(col.key) ? 'right' : undefined}
                     />
                   ))}
+                  <th className="w-0" />
                 </tr>
               </thead>
               <tbody>
@@ -81,7 +101,7 @@ export function BookList({ onOpen }: Props) {
                   <tr
                     key={b.id}
                     className={cn(
-                      'border-t border-border hover:bg-surface2/60 cursor-pointer transition-colors',
+                      'group border-t border-border hover:bg-surface2/60 cursor-pointer transition-colors',
                       density === 'compact' ? 'text-[13px]' : '',
                     )}
                     onClick={() => onOpen(b)}
@@ -90,6 +110,16 @@ export function BookList({ onOpen }: Props) {
                       <input type="checkbox" checked={selectedIds.has(b.id)} onChange={() => toggleSelect(b.id)} />
                     </td>
                     {visibleCols.map((col) => renderCell(b, col.key, density))}
+                    <td className="pr-3" onClick={(e) => e.stopPropagation()}>
+                      {NEXT_STATUS[b.status] && (
+                        <button
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-md bg-surface2 hover:bg-primary/15 hover:text-primary whitespace-nowrap"
+                          onClick={() => setStatus([b.id], NEXT_STATUS[b.status]!)}
+                        >
+                          {NEXT_LABEL[b.status]}
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -115,10 +145,21 @@ const BOOK_COL_LABEL: Record<string, string> = {
 function renderCell(b: Book, key: string, density: string) {
   const py = density === 'compact' ? 'py-1.5' : 'py-3';
   switch (key) {
-    case 'title': return <td key={key} className={cn('px-3', py, 'font-medium')}>{b.title}</td>;
+    case 'title': return (
+      <td key={key} className={cn('px-3', py, 'font-medium')}>
+        <div className="flex items-center gap-2">
+          <div className={cn('w-1 h-4 rounded-full shrink-0', STATUS_DOT[b.status])} />
+          {b.title}
+        </div>
+      </td>
+    );
     case 'author': return <td key={key} className="px-3">{b.author}</td>;
     case 'publisher': return <td key={key} className="px-3 text-muted">{b.publisher ?? '—'}</td>;
-    case 'genre': return <td key={key} className="px-3">{b.genre ? <span className="chip">{b.genre}</span> : <span className="text-muted">—</span>}</td>;
+    case 'genre': return (
+      <td key={key} className="px-3">
+        {b.genre ? <GenreChip genre={b.genre} /> : <span className="text-muted">—</span>}
+      </td>
+    );
     case 'pageCount': return <td key={key} className="px-3 text-right tabular-nums">{b.pageCount ?? '—'}</td>;
     case 'publicationYear': return <td key={key} className="px-3 text-right tabular-nums">{b.publicationYear ?? '—'}</td>;
     case 'status': return <td key={key} className="px-3"><StatusBadge status={b.status} /></td>;

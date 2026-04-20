@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import { db } from '../db/database';
+import { useToast } from './toastStore';
 import type { Media, MediaStatus, MediaType } from '../types/media';
 
 export type MediaSortKey = 'addedAt' | 'title' | 'director' | 'releaseYear' | 'watchYear' | 'status' | 'duration' | 'seasons' | 'episodeDuration';
@@ -50,24 +51,37 @@ export const useMedia = create<MediaState>((set, get) => ({
     const item: Media = { ...m, id: nanoid(), addedAt: now, updatedAt: now };
     await db.media.add(item);
     set({ media: [...get().media, item] });
+    const typeLabel = item.type === 'film' ? 'Film' : 'Dizi';
+    useToast.getState().show(`"${item.title}" eklendi (${typeLabel})`);
     return item;
   },
 
   update: async (id, patch) => {
+    const title = get().media.find((m) => m.id === id)?.title ?? '';
     const updated: Partial<Media> = { ...patch, updatedAt: new Date().toISOString() };
     await db.media.update(id, updated);
     set({
       media: get().media.map((m) => (m.id === id ? { ...m, ...updated } as Media : m)),
     });
+    useToast.getState().show(`"${title}" güncellendi`);
   },
 
   remove: async (ids) => {
+    const deleted = get().media.filter((m) => ids.includes(m.id));
     await db.media.bulkDelete(ids);
     const set0 = new Set(ids);
     set({
       media: get().media.filter((m) => !set0.has(m.id)),
       selectedIds: new Set([...get().selectedIds].filter((x) => !set0.has(x))),
     });
+    useToast.getState().show(
+      `${ids.length} öğe silindi`,
+      'success',
+      async () => {
+        await db.media.bulkAdd(deleted);
+        set({ media: [...get().media, ...deleted] });
+      },
+    );
   },
 
   setStatus: async (ids, status) => {
