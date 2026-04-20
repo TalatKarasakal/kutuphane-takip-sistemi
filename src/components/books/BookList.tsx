@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, ChevronDown, Trash2, X } from 'lucide-react';
 import { useBooks, type SortKey } from '../../store/booksStore';
 import { useSettings } from '../../store/settingsStore';
 import { applyFilters } from '../../lib/filters';
@@ -33,7 +33,7 @@ const NEXT_LABEL: Partial<Record<BookStatus, string>> = {
 };
 
 export function BookList({ onOpen }: Props) {
-  const { books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useBooks();
+  const { books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus, setGenre, setPublisher } = useBooks();
   const { view, density, bookColumns } = useSettings();
 
   const filtered = useMemo(
@@ -44,6 +44,9 @@ export function BookList({ onOpen }: Props) {
   const allSelected = filtered.length > 0 && filtered.every((b) => selectedIds.has(b.id));
   const hasSel = selectedIds.size > 0;
   const visibleCols = useMemo(() => bookColumns.filter((c) => c.visible), [bookColumns]);
+
+  const allGenres = useMemo(() => [...new Set(books.map((b) => b.genre).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, 'tr')), [books]);
+  const allPublishers = useMemo(() => [...new Set(books.map((b) => b.publisher).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, 'tr')), [books]);
 
   if (filtered.length === 0) {
     return (
@@ -61,7 +64,18 @@ export function BookList({ onOpen }: Props) {
 
   return (
     <div className="flex-1 overflow-auto">
-      {hasSel && <BulkBar count={selectedIds.size} onClear={clearSelection} onDelete={() => remove([...selectedIds])} onStatus={(s) => setStatus([...selectedIds], s)} />}
+      {hasSel && (
+        <BulkBar
+          count={selectedIds.size}
+          onClear={clearSelection}
+          onDelete={() => remove([...selectedIds])}
+          onStatus={(s) => setStatus([...selectedIds], s)}
+          onGenre={(g) => setGenre([...selectedIds], g)}
+          onPublisher={(p) => setPublisher([...selectedIds], p)}
+          genres={allGenres}
+          publishers={allPublishers}
+        />
+      )}
 
       {view === 'card' ? (
         <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
@@ -181,20 +195,110 @@ function ThSort({
   );
 }
 
-function BulkBar({ count, onClear, onDelete, onStatus }: { count: number; onClear: () => void; onDelete: () => void; onStatus: (s: BookStatus) => void }) {
+function BulkBar({
+  count, onClear, onDelete, onStatus, onGenre, onPublisher, genres, publishers,
+}: {
+  count: number;
+  onClear: () => void;
+  onDelete: () => void;
+  onStatus: (s: BookStatus) => void;
+  onGenre: (g: string | undefined) => void;
+  onPublisher: (p: string | undefined) => void;
+  genres: string[];
+  publishers: string[];
+}) {
   return (
-    <div className="sticky top-0 z-10 bg-primary/10 border-b border-primary/20 px-5 py-2 flex items-center gap-2 text-sm">
-      <span className="font-medium text-primary">{count} seçili</span>
-      <div className="ml-4 flex items-center gap-1">
-        <span className="text-muted mr-1">Durum değiştir:</span>
+    <div className="sticky top-0 z-10 bg-primary/10 border-b border-primary/20 px-5 py-2 flex items-center gap-3 text-sm flex-wrap">
+      <span className="font-medium text-primary shrink-0">{count} seçili</span>
+
+      <div className="w-px h-4 bg-primary/20 shrink-0" />
+
+      <div className="flex items-center gap-1 flex-wrap">
+        <span className="text-muted text-xs shrink-0">Durum:</span>
         {STATUSES.map((s) => (
-          <button key={s.value} className="chip hover:bg-primary/20" onClick={() => onStatus(s.value)}>{s.label}</button>
+          <button key={s.value} className="chip hover:bg-primary/20 text-xs" onClick={() => onStatus(s.value)}>{s.label}</button>
         ))}
       </div>
+
+      <div className="w-px h-4 bg-primary/20 shrink-0" />
+
+      <BulkPicker label="Tür" options={genres} onPick={onGenre} />
+      <BulkPicker label="Yayınevi" options={publishers} onPick={onPublisher} />
+
       <div className="ml-auto flex items-center gap-2">
         <button className="btn btn-ghost text-secondary" onClick={onDelete}><Trash2 size={14} /> Sil</button>
-        <button className="btn btn-ghost" onClick={onClear}>Temizle</button>
+        <button className="btn btn-ghost" onClick={onClear}>Seçimi Kaldır</button>
       </div>
+    </div>
+  );
+}
+
+function BulkPicker({ label, options, onPick }: { label: string; options: string[]; onPick: (v: string | undefined) => void }) {
+  const [open, setOpen] = useState(false);
+  const [custom, setCustom] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  const pick = (v: string | undefined) => { onPick(v); setOpen(false); setCustom(''); };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        className="chip hover:bg-primary/20 text-xs flex items-center gap-1"
+        onClick={() => setOpen((o) => !o)}
+      >
+        {label} <ChevronDown size={11} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-20 bg-surface border border-border rounded-xl shadow-lg min-w-[180px] py-1 text-sm">
+          <div className="px-3 py-1.5 border-b border-border">
+            <div className="flex items-center gap-1">
+              <input
+                autoFocus
+                className="input text-xs py-1 flex-1"
+                placeholder={`Yeni ${label.toLowerCase()}…`}
+                value={custom}
+                onChange={(e) => setCustom(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && custom.trim()) pick(custom.trim()); }}
+              />
+              {custom.trim() && (
+                <button className="btn btn-primary text-xs py-1 px-2 shrink-0" onClick={() => pick(custom.trim())}>
+                  Uygula
+                </button>
+              )}
+            </div>
+          </div>
+          {options.length > 0 && (
+            <div className="max-h-48 overflow-y-auto">
+              {options.map((o) => (
+                <button
+                  key={o}
+                  className="w-full text-left px-3 py-2 hover:bg-surface2 transition-colors text-xs"
+                  onClick={() => pick(o)}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="border-t border-border">
+            <button
+              className="w-full text-left px-3 py-2 hover:bg-surface2 transition-colors text-xs text-muted flex items-center gap-1"
+              onClick={() => pick(undefined)}
+            >
+              <X size={11} /> Temizle (boş bırak)
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

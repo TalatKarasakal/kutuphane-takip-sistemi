@@ -24,6 +24,8 @@ interface BooksState {
   update: (id: string, patch: Partial<Book>) => Promise<void>;
   remove: (ids: string[]) => Promise<void>;
   setStatus: (ids: string[], status: BookStatus) => Promise<void>;
+  setGenre: (ids: string[], genre: string | undefined) => Promise<void>;
+  setPublisher: (ids: string[], publisher: string | undefined) => Promise<void>;
 
   setSearch: (v: string) => void;
   toggleStatusFilter: (s: BookStatus) => void;
@@ -107,6 +109,28 @@ export const useBooks = create<BooksState>((set, get) => ({
     set({
       books: get().books.map((b) => (set0.has(b.id) ? { ...b, status, updatedAt: now } : b)),
     });
+  },
+
+  setGenre: async (ids, genre) => {
+    const now = new Date().toISOString();
+    await db.transaction('rw', db.books, async () => {
+      await Promise.all(ids.map((id) => db.books.update(id, { genre, updatedAt: now })));
+    });
+    const set0 = new Set(ids);
+    set({ books: get().books.map((b) => (set0.has(b.id) ? { ...b, genre, updatedAt: now } : b)) });
+    const label = genre ? `"${genre}"` : 'boş';
+    useToast.getState().show(`${ids.length} kitabın türü ${label} olarak güncellendi`);
+  },
+
+  setPublisher: async (ids, publisher) => {
+    const now = new Date().toISOString();
+    await db.transaction('rw', db.books, async () => {
+      await Promise.all(ids.map((id) => db.books.update(id, { publisher, updatedAt: now })));
+    });
+    const set0 = new Set(ids);
+    set({ books: get().books.map((b) => (set0.has(b.id) ? { ...b, publisher, updatedAt: now } : b)) });
+    const label = publisher ? `"${publisher}"` : 'boş';
+    useToast.getState().show(`${ids.length} kitabın yayınevi ${label} olarak güncellendi`);
   },
 
   setSearch: (v) => set({ search: v }),
