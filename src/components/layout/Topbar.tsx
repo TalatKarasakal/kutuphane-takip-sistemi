@@ -1,4 +1,4 @@
-import { BookMarked, Film, Tv2, ArrowDownToLine, ArrowUpFromLine, LayoutGrid, Moon, Plus, Search, Settings, Sun, Table, type LucideProps } from 'lucide-react';
+import { BookMarked, Film, Tv2, ArrowDownToLine, ArrowUpFromLine, LayoutGrid, Plus, Search, Settings, Table, type LucideProps } from 'lucide-react';
 import { useBooks } from '../../store/booksStore';
 import { useMedia } from '../../store/mediaStore';
 import { useSettings } from '../../store/settingsStore';
@@ -37,8 +37,7 @@ const SEARCH_PLACEHOLDER: Record<Section, string> = {
 export function Topbar({ section, onSection, onAdd, onImport, onExport, onSettings }: Props) {
   const books = useBooks();
   const media = useMedia();
-  const { theme, view, set, setColumns, bookColumns, filmColumns, tvColumns } = useSettings();
-  const isDark = theme === 'dark';
+  const { view, set, setColumns, bookColumns, filmColumns, tvColumns } = useSettings();
 
   const search = section === 'books' ? books.search : media.search;
   const setSearch = section === 'books' ? books.setSearch : media.setSearch;
@@ -48,9 +47,9 @@ export function Topbar({ section, onSection, onAdd, onImport, onExport, onSettin
   const colSection = section === 'books' ? 'book' : section === 'movies' ? 'film' : 'tv';
 
   return (
-    <header className="h-14 border-b border-border bg-surface/80 backdrop-blur px-4 flex items-center gap-2 shrink-0">
-      {/* Arama */}
-      <div className="relative flex-1 max-w-sm">
+    <header className="h-14 border-b border-border bg-surface/80 backdrop-blur px-5 flex items-center gap-4 shrink-0">
+      {/* Arama — esnek genişlik */}
+      <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={15} />
         <input
           value={search}
@@ -60,63 +59,66 @@ export function Topbar({ section, onSection, onAdd, onImport, onExport, onSettin
         />
       </div>
 
-      {/* Bölüm sekmeleri — sadece ikon */}
-      <div className="flex items-center border border-border rounded-lg bg-surface overflow-hidden">
-        {SECTIONS.map(({ value, icon: Icon, title }) => (
+      {/* Sağ taraf kontroller */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Bölüm sekmeleri */}
+        <div className="flex items-center border border-border rounded-lg bg-surface overflow-hidden">
+          {SECTIONS.map(({ value, icon: Icon, title }) => (
+            <button
+              key={value}
+              onClick={() => onSection(value)}
+              title={title}
+              className={cn(
+                'px-3 py-2',
+                section === value ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-surface2',
+              )}
+            >
+              <Icon size={15} />
+            </button>
+          ))}
+        </div>
+
+        <div className="w-px h-5 bg-border" />
+
+        {/* Görünüm toggle */}
+        <div className="flex items-center border border-border rounded-lg bg-surface overflow-hidden">
           <button
-            key={value}
-            onClick={() => onSection(value)}
-            title={title}
-            className={cn(
-              'px-2.5 py-2',
-              section === value ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-surface2',
-            )}
+            onClick={() => set('view', 'table')}
+            className={cn('px-3 py-2', view === 'table' ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-surface2')}
+            title="Tablo"
           >
-            <Icon size={16} />
+            <Table size={15} />
           </button>
-        ))}
+          <button
+            onClick={() => set('view', 'card')}
+            className={cn('px-3 py-2', view === 'card' ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-surface2')}
+            title="Kart"
+          >
+            <LayoutGrid size={15} />
+          </button>
+        </div>
+
+        {/* Sütun yöneticisi */}
+        {view === 'table' && (
+          <ColumnManager
+            columns={colConfig}
+            labels={colLabels}
+            onChange={(cols) => setColumns(colSection, cols)}
+          />
+        )}
+
+        <div className="w-px h-5 bg-border" />
+
+        {section === 'books' && (
+          <>
+            <button className="btn btn-outline" onClick={onImport}><ArrowDownToLine size={15} /> İçe Aktar</button>
+            <button className="btn btn-outline" onClick={onExport}><ArrowUpFromLine size={15} /> Dışa Aktar</button>
+          </>
+        )}
+
+        <button className="btn btn-ghost" onClick={onSettings} title="Ayarlar"><Settings size={15} /></button>
+        <button className="btn btn-primary" onClick={onAdd}><Plus size={15} /> {ADD_LABEL[section]}</button>
       </div>
-
-      {/* Görünüm toggle */}
-      <div className="hidden sm:flex items-center border border-border rounded-lg bg-surface overflow-hidden">
-        <button
-          onClick={() => set('view', 'table')}
-          className={cn('px-2.5 py-2', view === 'table' ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-surface2')}
-          title="Tablo"
-        >
-          <Table size={16} />
-        </button>
-        <button
-          onClick={() => set('view', 'card')}
-          className={cn('px-2.5 py-2', view === 'card' ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-surface2')}
-          title="Kart"
-        >
-          <LayoutGrid size={16} />
-        </button>
-      </div>
-
-      {/* Sütun yöneticisi — sadece tablo görünümünde */}
-      {view === 'table' && (
-        <ColumnManager
-          columns={colConfig}
-          labels={colLabels}
-          onChange={(cols) => setColumns(colSection, cols)}
-        />
-      )}
-
-      <button className="btn btn-ghost" onClick={() => set('theme', isDark ? 'light' : 'dark')} title="Tema">
-        {isDark ? <Sun size={16} /> : <Moon size={16} />}
-      </button>
-
-      {section === 'books' && (
-        <>
-          <button className="btn btn-outline" onClick={onImport}><ArrowDownToLine size={16} /> İçe Aktar</button>
-          <button className="btn btn-outline" onClick={onExport}><ArrowUpFromLine size={16} /> Dışa Aktar</button>
-        </>
-      )}
-
-      <button className="btn btn-ghost" onClick={onSettings} title="Ayarlar"><Settings size={16} /></button>
-      <button className="btn btn-primary" onClick={onAdd}><Plus size={16} /> {ADD_LABEL[section]}</button>
     </header>
   );
 }
