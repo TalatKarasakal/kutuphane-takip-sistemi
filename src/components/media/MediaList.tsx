@@ -78,9 +78,9 @@ export function MediaList({ type, onOpen }: Props) {
         <div className="p-5">
           <div className="card overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-surface2 text-muted text-xs tracking-wide">
+              <thead className="bg-surface2 text-muted text-xs uppercase tracking-wider border-b border-border">
                 <tr>
-                  <th className="w-10 px-3 py-3 text-left">
+                  <th className="w-10 px-3 py-3.5 text-left">
                     <input
                       type="checkbox"
                       checked={allSelected}
@@ -106,7 +106,7 @@ export function MediaList({ type, onOpen }: Props) {
                   <tr
                     key={m.id}
                     className={cn(
-                      'group border-t border-border hover:bg-surface2/60 cursor-pointer transition-colors',
+                      'group border-t border-border/50 hover:bg-primary/5 cursor-pointer transition-colors',
                       density === 'compact' ? 'text-[13px]' : '',
                     )}
                     onClick={() => onOpen(m)}
@@ -148,24 +148,26 @@ const MEDIA_COL_LABEL: Record<string, string> = {
   status: 'Durum',
 };
 
+const EMPTY = <span className="text-muted/30 select-none">—</span>;
+
 function renderCell(m: Media, key: string, density: string) {
-  const py = density === 'compact' ? 'py-1.5' : 'py-3';
+  const py = density === 'compact' ? 'py-2' : 'py-3.5';
   switch (key) {
     case 'title': return (
-      <td key={key} className={cn('px-3', py, 'font-medium')}>
-        <div className="flex items-center gap-2">
-          <div className={cn('w-1 h-4 rounded-full shrink-0', MEDIA_STATUS_DOT[m.status])} />
+      <td key={key} className={cn('px-4', py, 'font-medium')}>
+        <div className="flex items-center gap-2.5">
+          <div className={cn('w-[3px] h-4 rounded-full shrink-0', MEDIA_STATUS_DOT[m.status])} />
           {m.title}
         </div>
       </td>
     );
-    case 'director': return <td key={key} className="px-3 text-muted">{m.director ?? '—'}</td>;
-    case 'releaseYear': return <td key={key} className="px-3 text-right tabular-nums">{m.releaseYear ?? '—'}</td>;
-    case 'duration': return <td key={key} className="px-3 text-right tabular-nums">{m.duration ? `${m.duration} dk` : '—'}</td>;
-    case 'seasons': return <td key={key} className="px-3 text-right tabular-nums">{m.seasons ?? '—'}</td>;
-    case 'episodeDuration': return <td key={key} className="px-3 text-right tabular-nums">{m.episodeDuration ? `${m.episodeDuration} dk` : '—'}</td>;
-    case 'watchYear': return <td key={key} className="px-3 text-right tabular-nums">{m.watchYear ?? '—'}</td>;
-    case 'status': return <td key={key} className="px-3"><MediaStatusBadge status={m.status} /></td>;
+    case 'director': return <td key={key} className={cn('px-4', py, 'text-muted')}>{m.director ?? EMPTY}</td>;
+    case 'releaseYear': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.releaseYear ?? EMPTY}</td>;
+    case 'duration': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.duration ? `${m.duration} dk` : EMPTY}</td>;
+    case 'seasons': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.seasons ?? EMPTY}</td>;
+    case 'episodeDuration': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.episodeDuration ? `${m.episodeDuration} dk` : EMPTY}</td>;
+    case 'watchYear': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.watchYear ?? EMPTY}</td>;
+    case 'status': return <td key={key} className={cn('px-4', py)}><MediaStatusBadge status={m.status} /></td>;
     default: return null;
   }
 }
@@ -175,7 +177,7 @@ function ThSort({
 }: { label: string; k: MediaSortKey; sortKey: MediaSortKey; sortDir: 'asc' | 'desc'; onClick: (k: MediaSortKey) => void; align?: 'right' }) {
   const active = sortKey === k;
   return (
-    <th className={cn('px-3 py-3 font-semibold', align === 'right' ? 'text-right' : 'text-left')}>
+    <th className={cn('px-4 py-3.5 font-semibold', align === 'right' ? 'text-right' : 'text-left')}>
       <button onClick={() => onClick(k)} className="inline-flex items-center gap-1 hover:text-text">
         {label}
         {active ? (sortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : <ArrowUpDown size={12} className="opacity-40" />}
