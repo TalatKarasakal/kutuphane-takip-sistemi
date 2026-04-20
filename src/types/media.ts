@@ -8,6 +8,9 @@ export interface Media {
   director?: string;
   releaseYear?: number;
   watchYear?: number;
+  duration?: number;
+  seasons?: number;
+  episodeDuration?: number;
   status: MediaStatus;
   notes?: string;
   addedAt: string;

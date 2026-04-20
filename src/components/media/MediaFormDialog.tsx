@@ -21,6 +21,9 @@ function empty(type: MediaType): FormState {
     director: '',
     releaseYear: undefined,
     watchYear: undefined,
+    duration: undefined,
+    seasons: undefined,
+    episodeDuration: undefined,
     status: 'izlenecek',
     notes: '',
   };
@@ -78,6 +81,7 @@ export function MediaFormDialog({ open, onClose, onSave, initial, type }: Props)
             />
           </Field>
         </div>
+
         <Field label="Yönetmen">
           <input
             className="input"
@@ -85,17 +89,15 @@ export function MediaFormDialog({ open, onClose, onSave, initial, type }: Props)
             onChange={(e) => setForm((f) => ({ ...f, director: smartTitleCase(f.director ?? '', e.target.value) }))}
           />
         </Field>
+
         <Field label="Durum">
-          <select
-            className="input"
-            value={form.status}
-            onChange={(e) => update('status', e.target.value as MediaStatus)}
-          >
+          <select className="input" value={form.status} onChange={(e) => update('status', e.target.value as MediaStatus)}>
             {MEDIA_STATUSES.map((s) => (
               <option key={s.value} value={s.value}>{s.label}</option>
             ))}
           </select>
         </Field>
+
         <Field label="Çıkış Yılı">
           <input
             type="number"
@@ -104,6 +106,7 @@ export function MediaFormDialog({ open, onClose, onSave, initial, type }: Props)
             onChange={(e) => update('releaseYear', e.target.value ? Number(e.target.value) : undefined)}
           />
         </Field>
+
         <Field label="İzlenme Yılı">
           <input
             type="number"
@@ -112,6 +115,37 @@ export function MediaFormDialog({ open, onClose, onSave, initial, type }: Props)
             onChange={(e) => update('watchYear', e.target.value ? Number(e.target.value) : undefined)}
           />
         </Field>
+
+        {type === 'film' ? (
+          <Field label="Süre (dakika)">
+            <input
+              type="number"
+              className="input"
+              value={form.duration ?? ''}
+              onChange={(e) => update('duration', e.target.value ? Number(e.target.value) : undefined)}
+            />
+          </Field>
+        ) : (
+          <>
+            <Field label="Sezon Sayısı">
+              <input
+                type="number"
+                className="input"
+                value={form.seasons ?? ''}
+                onChange={(e) => update('seasons', e.target.value ? Number(e.target.value) : undefined)}
+              />
+            </Field>
+            <Field label="Ortalama Bölüm Süresi (dk)">
+              <input
+                type="number"
+                className="input"
+                value={form.episodeDuration ?? ''}
+                onChange={(e) => update('episodeDuration', e.target.value ? Number(e.target.value) : undefined)}
+              />
+            </Field>
+          </>
+        )}
+
         <div className="sm:col-span-2">
           <Field label="Notlar">
             <textarea

@@ -38,6 +38,9 @@ export function MediaDetailDrawer({ item, onClose, onEdit, onDelete }: Props) {
             <Info label="Yönetmen" value={item.director} />
             <Info label="Çıkış Yılı" value={item.releaseYear} />
             <Info label="İzlenme Yılı" value={item.watchYear} />
+            {item.type === 'film' && <Info label="Süre" value={item.duration != null ? `${item.duration} dakika` : undefined} />}
+            {item.type === 'dizi' && <Info label="Sezon" value={item.seasons} />}
+            {item.type === 'dizi' && <Info label="Bölüm Süresi" value={item.episodeDuration != null ? `${item.episodeDuration} dakika` : undefined} />}
           </dl>
 
           {item.notes && (

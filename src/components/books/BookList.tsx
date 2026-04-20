@@ -15,7 +15,7 @@ interface Props {
 
 export function BookList({ onOpen }: Props) {
   const { books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useBooks();
-  const { view, density } = useSettings();
+  const { view, density, bookColumns } = useSettings();
 
   const filtered = useMemo(
     () => applyFilters(books, { search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir }),
@@ -24,12 +24,7 @@ export function BookList({ onOpen }: Props) {
 
   const allSelected = filtered.length > 0 && filtered.every((b) => selectedIds.has(b.id));
   const hasSel = selectedIds.size > 0;
-
-  const visibleCols = useMemo(() => ({
-    publisher: filtered.some((b) => !!b.publisher),
-    genre: filtered.some((b) => !!b.genre),
-    pageCount: filtered.some((b) => b.pageCount != null && b.pageCount !== 0),
-  }), [filtered]);
+  const visibleCols = useMemo(() => bookColumns.filter((c) => c.visible), [bookColumns]);
 
   if (filtered.length === 0) {
     return (
@@ -68,12 +63,17 @@ export function BookList({ onOpen }: Props) {
                       onChange={() => (allSelected ? clearSelection() : selectAll(filtered.map((b) => b.id)))}
                     />
                   </th>
-                  <ThSort label="Başlık" k="title" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
-                  <ThSort label="Yazar" k="author" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
-                  {visibleCols.publisher && <ThSort label="Yayınevi" k="publisher" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />}
-                  {visibleCols.genre && <ThSort label="Tür" k="genre" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />}
-                  {visibleCols.pageCount && <ThSort label="Sayfa" k="pageCount" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />}
-                  <ThSort label="Durum" k="status" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
+                  {visibleCols.map((col) => (
+                    <ThSort
+                      key={col.key}
+                      label={BOOK_COL_LABEL[col.key] ?? col.key}
+                      k={col.key as SortKey}
+                      sortKey={sortKey}
+                      sortDir={sortDir}
+                      onClick={setSort}
+                      align={['pageCount', 'publicationYear'].includes(col.key) ? 'right' : undefined}
+                    />
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -89,12 +89,7 @@ export function BookList({ onOpen }: Props) {
                     <td className="px-3 py-2.5" onClick={(e) => e.stopPropagation()}>
                       <input type="checkbox" checked={selectedIds.has(b.id)} onChange={() => toggleSelect(b.id)} />
                     </td>
-                    <td className={cn('px-3', density === 'compact' ? 'py-1.5' : 'py-3', 'font-medium')}>{b.title}</td>
-                    <td className="px-3">{b.author}</td>
-                    {visibleCols.publisher && <td className="px-3 text-muted">{b.publisher ?? '—'}</td>}
-                    {visibleCols.genre && <td className="px-3">{b.genre ? <span className="chip">{b.genre}</span> : <span className="text-muted">—</span>}</td>}
-                    {visibleCols.pageCount && <td className="px-3 text-right tabular-nums">{b.pageCount ?? '—'}</td>}
-                    <td className="px-3"><StatusBadge status={b.status} /></td>
+                    {visibleCols.map((col) => renderCell(b, col.key, density))}
                   </tr>
                 ))}
               </tbody>
@@ -105,6 +100,30 @@ export function BookList({ onOpen }: Props) {
       )}
     </div>
   );
+}
+
+const BOOK_COL_LABEL: Record<string, string> = {
+  title: 'Başlık',
+  author: 'Yazar',
+  publisher: 'Yayınevi',
+  genre: 'Tür',
+  pageCount: 'Sayfa',
+  publicationYear: 'Yayın Yılı',
+  status: 'Durum',
+};
+
+function renderCell(b: Book, key: string, density: string) {
+  const py = density === 'compact' ? 'py-1.5' : 'py-3';
+  switch (key) {
+    case 'title': return <td key={key} className={cn('px-3', py, 'font-medium')}>{b.title}</td>;
+    case 'author': return <td key={key} className="px-3">{b.author}</td>;
+    case 'publisher': return <td key={key} className="px-3 text-muted">{b.publisher ?? '—'}</td>;
+    case 'genre': return <td key={key} className="px-3">{b.genre ? <span className="chip">{b.genre}</span> : <span className="text-muted">—</span>}</td>;
+    case 'pageCount': return <td key={key} className="px-3 text-right tabular-nums">{b.pageCount ?? '—'}</td>;
+    case 'publicationYear': return <td key={key} className="px-3 text-right tabular-nums">{b.publicationYear ?? '—'}</td>;
+    case 'status': return <td key={key} className="px-3"><StatusBadge status={b.status} /></td>;
+    default: return null;
+  }
 }
 
 function ThSort({

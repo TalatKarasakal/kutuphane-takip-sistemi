@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid';
 import { db } from '../db/database';
 import type { Media, MediaStatus, MediaType } from '../types/media';
 
-export type MediaSortKey = 'addedAt' | 'title' | 'director' | 'releaseYear' | 'watchYear' | 'status';
+export type MediaSortKey = 'addedAt' | 'title' | 'director' | 'releaseYear' | 'watchYear' | 'status' | 'duration' | 'seasons' | 'episodeDuration';
 export type SortDir = 'asc' | 'desc';
 
 interface MediaState {

@@ -15,7 +15,10 @@ interface Props {
 
 export function MediaList({ type, onOpen }: Props) {
   const { media, search, statusFilter, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useMedia();
-  const { view, density } = useSettings();
+  const { view, density, filmColumns, tvColumns } = useSettings();
+
+  const columns = type === 'film' ? filmColumns : tvColumns;
+  const visibleCols = useMemo(() => columns.filter((c) => c.visible), [columns]);
 
   const filtered = useMemo(
     () => applyMediaFilters(media, type, { search, statusFilter, sortKey, sortDir }),
@@ -24,7 +27,6 @@ export function MediaList({ type, onOpen }: Props) {
 
   const allSelected = filtered.length > 0 && filtered.every((m) => selectedIds.has(m.id));
   const hasSel = selectedIds.size > 0;
-
   const typeLabel = type === 'film' ? 'film' : 'dizi';
   const TypeIcon = type === 'film' ? Film : Tv2;
 
@@ -72,11 +74,17 @@ export function MediaList({ type, onOpen }: Props) {
                       onChange={() => (allSelected ? clearSelection() : selectAll(filtered.map((m) => m.id)))}
                     />
                   </th>
-                  <ThSort label="Başlık" k="title" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
-                  <ThSort label="Yönetmen" k="director" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
-                  <ThSort label="Çıkış Yılı" k="releaseYear" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
-                  <ThSort label="İzlenme Yılı" k="watchYear" sortKey={sortKey} sortDir={sortDir} onClick={setSort} align="right" />
-                  <ThSort label="Durum" k="status" sortKey={sortKey} sortDir={sortDir} onClick={setSort} />
+                  {visibleCols.map((col) => (
+                    <ThSort
+                      key={col.key}
+                      label={MEDIA_COL_LABEL[col.key] ?? col.key}
+                      k={col.key as MediaSortKey}
+                      sortKey={sortKey}
+                      sortDir={sortDir}
+                      onClick={setSort}
+                      align={['releaseYear', 'watchYear', 'duration', 'seasons', 'episodeDuration'].includes(col.key) ? 'right' : undefined}
+                    />
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -92,11 +100,7 @@ export function MediaList({ type, onOpen }: Props) {
                     <td className="px-3 py-2.5" onClick={(e) => e.stopPropagation()}>
                       <input type="checkbox" checked={selectedIds.has(m.id)} onChange={() => toggleSelect(m.id)} />
                     </td>
-                    <td className={cn('px-3', density === 'compact' ? 'py-1.5' : 'py-3', 'font-medium')}>{m.title}</td>
-                    <td className="px-3 text-muted">{m.director ?? '—'}</td>
-                    <td className="px-3 text-right tabular-nums">{m.releaseYear ?? '—'}</td>
-                    <td className="px-3 text-right tabular-nums">{m.watchYear ?? '—'}</td>
-                    <td className="px-3"><MediaStatusBadge status={m.status} /></td>
+                    {visibleCols.map((col) => renderCell(m, col.key, density))}
                   </tr>
                 ))}
               </tbody>
@@ -107,6 +111,32 @@ export function MediaList({ type, onOpen }: Props) {
       )}
     </div>
   );
+}
+
+const MEDIA_COL_LABEL: Record<string, string> = {
+  title: 'Başlık',
+  director: 'Yönetmen',
+  releaseYear: 'Çıkış Yılı',
+  duration: 'Süre (dk)',
+  seasons: 'Sezon',
+  episodeDuration: 'Bölüm Süresi (dk)',
+  watchYear: 'İzlenme Yılı',
+  status: 'Durum',
+};
+
+function renderCell(m: Media, key: string, density: string) {
+  const py = density === 'compact' ? 'py-1.5' : 'py-3';
+  switch (key) {
+    case 'title': return <td key={key} className={cn('px-3', py, 'font-medium')}>{m.title}</td>;
+    case 'director': return <td key={key} className="px-3 text-muted">{m.director ?? '—'}</td>;
+    case 'releaseYear': return <td key={key} className="px-3 text-right tabular-nums">{m.releaseYear ?? '—'}</td>;
+    case 'duration': return <td key={key} className="px-3 text-right tabular-nums">{m.duration ? `${m.duration} dk` : '—'}</td>;
+    case 'seasons': return <td key={key} className="px-3 text-right tabular-nums">{m.seasons ?? '—'}</td>;
+    case 'episodeDuration': return <td key={key} className="px-3 text-right tabular-nums">{m.episodeDuration ? `${m.episodeDuration} dk` : '—'}</td>;
+    case 'watchYear': return <td key={key} className="px-3 text-right tabular-nums">{m.watchYear ?? '—'}</td>;
+    case 'status': return <td key={key} className="px-3"><MediaStatusBadge status={m.status} /></td>;
+    default: return null;
+  }
 }
 
 function ThSort({
