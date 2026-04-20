@@ -78,7 +78,7 @@ export function BookList({ onOpen }: Props) {
       )}
 
       {view === 'card' ? (
-        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
+        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
           {filtered.map((b) => (
             <BookCard key={b.id} book={b} onClick={() => onOpen(b)} />
           ))}

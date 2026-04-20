@@ -69,7 +69,7 @@ export function MediaList({ type, onOpen }: Props) {
       )}
 
       {view === 'card' ? (
-        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(200px,1fr))]">
+        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
           {filtered.map((m) => (
             <MediaCard key={m.id} item={m} onClick={() => onOpen(m)} />
           ))}

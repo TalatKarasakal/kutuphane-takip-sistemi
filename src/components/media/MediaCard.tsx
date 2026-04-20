@@ -23,13 +23,11 @@ export function MediaCard({ item, onClick }: { item: Media; onClick: () => void 
     >
       <div className={`h-1 w-full shrink-0 ${MEDIA_STATUS_STRIPE[item.status]}`} />
 
-      <div className="p-3 flex flex-col gap-1.5 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <div className="font-semibold leading-snug line-clamp-2 text-sm flex-1">{item.title}</div>
-          <MediaStatusBadge status={item.status} />
-        </div>
+      <div className="p-3 flex flex-col gap-2 flex-1">
+        <div className="font-semibold leading-snug line-clamp-2">{item.title}</div>
         {item.director && <div className="text-xs text-muted line-clamp-1">{item.director}</div>}
-        <div className="flex flex-wrap items-center gap-1 mt-auto pt-2">
+        <div className="flex flex-wrap items-center gap-1 mt-auto pt-1">
+          <MediaStatusBadge status={item.status} />
           <span
             className="chip text-[11px] flex items-center gap-1"
             style={{ background: `linear-gradient(135deg, hsl(${hue},40%,55%), hsl(${(hue + 45) % 360},40%,45%))`, color: 'white', borderColor: 'transparent' }}

@@ -34,13 +34,11 @@ export function BookCard({ book, onClick }: { book: Book; onClick: () => void })
         <div className={`h-1 w-full shrink-0 ${STATUS_STRIPE[book.status]}`} />
       )}
 
-      <div className="p-3 flex flex-col gap-1.5 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <div className="font-semibold leading-snug line-clamp-2 text-sm flex-1">{book.title}</div>
-          {!cover && <StatusBadge status={book.status} />}
-        </div>
+      <div className="p-3 flex flex-col gap-2 flex-1">
+        <div className="font-semibold leading-snug line-clamp-2">{book.title}</div>
         {book.author && <div className="text-xs text-muted line-clamp-1">{book.author}</div>}
-        <div className="flex flex-wrap items-center gap-1 mt-auto pt-2">
+        <div className="flex flex-wrap items-center gap-1 mt-auto pt-1">
+          {!cover && <StatusBadge status={book.status} />}
           {book.genre && <GenreChip genre={book.genre} />}
           {book.pageCount && <span className="chip text-[11px]">{book.pageCount} sy</span>}
         </div>
