@@ -140,8 +140,8 @@ export function AppShell() {
         onDelete={(id) => removeMedia([id])}
       />
 
-      <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} />
-      <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} />
+      <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} section={section} />
+      <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} section={section} />
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
 
       <ToastContainer />

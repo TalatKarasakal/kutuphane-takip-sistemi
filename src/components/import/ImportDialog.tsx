@@ -3,12 +3,19 @@ import { Modal } from '../ui/Modal';
 import { parseXlsx } from '../../lib/importers/xlsx';
 import { parseCsv } from '../../lib/importers/csv';
 import { parseJson } from '../../lib/importers/json';
-import { guessField, FIELD_LABELS, MAPPABLE_FIELDS, type MappableField } from '../../lib/importers/fieldGuess';
+import {
+  guessField, FIELD_LABELS, MAPPABLE_FIELDS, type MappableField,
+  guessMediaField, MEDIA_FIELD_LABELS, MAPPABLE_MEDIA_FIELDS, type MediaMappableField,
+} from '../../lib/importers/fieldGuess';
 import { normalizeStatus, STATUSES } from '../../constants/statuses';
+import { MEDIA_STATUSES } from '../../constants/mediaStatuses';
 import { parseNumber } from '../../lib/utils';
 import { useBooks } from '../../store/booksStore';
+import { useMedia } from '../../store/mediaStore';
 import type { Book, BookStatus } from '../../types/book';
+import type { Media, MediaStatus, MediaType } from '../../types/media';
 import { FileSpreadsheet, FileJson, FileText, Upload, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import type { Section } from '../layout/AppShell';
 
 type Step = 'pick' | 'sheet' | 'map' | 'preview';
 
@@ -20,17 +27,22 @@ interface SheetData {
 interface Props {
   open: boolean;
   onClose: () => void;
+  section: Section;
 }
 
-export function ImportDialog({ open, onClose }: Props) {
-  const { addMany } = useBooks();
+export function ImportDialog({ open, onClose, section }: Props) {
+  const { addMany: addManyBooks } = useBooks();
+  const { addMany: addManyMedia } = useMedia();
+  const isMedia = section !== 'books';
+  const mediaType: MediaType = section === 'movies' ? 'film' : 'dizi';
+
   const [step, setStep] = useState<Step>('pick');
   const [fileName, setFileName] = useState('');
   const [sheets, setSheets] = useState<SheetData[]>([]);
   const [sheetIdx, setSheetIdx] = useState(0);
   const [headerRowIdx, setHeaderRowIdx] = useState(0);
-  const [mapping, setMapping] = useState<Record<number, MappableField>>({});
-  const [statusMap, setStatusMap] = useState<Record<string, BookStatus>>({});
+  const [mapping, setMapping] = useState<Record<number, string>>({});
+  const [statusMap, setStatusMap] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState<string>('');
 
   const reset = () => {
@@ -67,8 +79,10 @@ export function ImportDialog({ open, onClose }: Props) {
 
   const initMapping = (rows: unknown[][], headerIdx: number) => {
     const headers = (rows[headerIdx] ?? []) as string[];
-    const m: Record<number, MappableField> = {};
-    headers.forEach((h, i) => { m[i] = guessField(String(h ?? '')); });
+    const m: Record<number, string> = {};
+    headers.forEach((h, i) => {
+      m[i] = isMedia ? guessMediaField(String(h ?? '')) : guessField(String(h ?? ''));
+    });
     setMapping(m);
   };
 
@@ -97,14 +111,14 @@ export function ImportDialog({ open, onClose }: Props) {
         const col = Number(colStr);
         const raw = row[col];
         if (raw == null || raw === '') return;
-        switch (field) {
+        switch (field as MappableField) {
           case 'pageCount':
           case 'publicationYear':
-            book[field] = parseNumber(raw);
+            (book as Record<string, unknown>)[field] = parseNumber(raw);
             break;
           case 'status': {
             const key = String(raw).trim();
-            const mapped = statusMap[key] ?? normalizeStatus(raw);
+            const mapped = (statusMap[key] as BookStatus | undefined) ?? normalizeStatus(raw);
             if (mapped) book.status = mapped;
             break;
           }
@@ -121,11 +135,60 @@ export function ImportDialog({ open, onClose }: Props) {
     return { rows: result, errors };
   };
 
+  const buildMedia = (): { rows: Omit<Media, 'id' | 'addedAt' | 'updatedAt'>[]; errors: { row: number; reason: string }[] } => {
+    const result: Omit<Media, 'id' | 'addedAt' | 'updatedAt'>[] = [];
+    const errors: { row: number; reason: string }[] = [];
+    dataRows.forEach((r, i) => {
+      const row = r as unknown[];
+      const item: Partial<Media> = { type: mediaType, status: 'izlenecek' };
+      Object.entries(mapping).forEach(([colStr, field]) => {
+        if (field === '__ignore__') return;
+        const col = Number(colStr);
+        const raw = row[col];
+        if (raw == null || raw === '') return;
+        switch (field as MediaMappableField) {
+          case 'releaseYear':
+          case 'watchYear':
+          case 'duration':
+          case 'seasons':
+          case 'episodeDuration':
+            (item as Record<string, unknown>)[field] = parseNumber(raw);
+            break;
+          case 'status': {
+            const key = String(raw).trim();
+            const mapped = (statusMap[key] as MediaStatus | undefined) ?? normalizeMediaStatus(raw);
+            if (mapped) item.status = mapped;
+            break;
+          }
+          default:
+            (item as Record<string, unknown>)[field] = String(raw);
+        }
+      });
+      if (!item.title) {
+        errors.push({ row: i + 1, reason: 'Başlık eksik' });
+        return;
+      }
+      result.push(item as Omit<Media, 'id' | 'addedAt' | 'updatedAt'>);
+    });
+    return { rows: result, errors };
+  };
+
   const doImport = async () => {
-    const { rows } = buildBooks();
-    await addMany(rows);
+    if (isMedia) {
+      const { rows } = buildMedia();
+      await addManyMedia(rows);
+    } else {
+      const { rows } = buildBooks();
+      await addManyBooks(rows);
+    }
     close();
   };
+
+  const currentResult = isMedia ? buildMedia() : buildBooks();
+
+  const mappableFields = isMedia ? MAPPABLE_MEDIA_FIELDS : MAPPABLE_FIELDS;
+  const fieldLabels = isMedia ? MEDIA_FIELD_LABELS : FIELD_LABELS;
+  const statusOptions = isMedia ? MEDIA_STATUSES : STATUSES;
 
   return (
     <Modal
@@ -159,14 +222,25 @@ export function ImportDialog({ open, onClose }: Props) {
           headerRowIdx={headerRowIdx}
           setHeaderRowIdx={(i) => { setHeaderRowIdx(i); initMapping(sheets[sheetIdx].rows, i); }}
           allRows={sheets[sheetIdx]?.rows ?? []}
+          mappableFields={mappableFields as string[]}
+          fieldLabels={fieldLabels as Record<string, string>}
           statusRawValues={statusRawValues}
+          statusOptions={statusOptions}
           statusMap={statusMap}
           setStatusMap={setStatusMap}
         />
       )}
-      {step === 'preview' && <PreviewStep result={buildBooks()} />}
+      {step === 'preview' && <PreviewStep result={currentResult} isMedia={isMedia} />}
     </Modal>
   );
+}
+
+function normalizeMediaStatus(raw: unknown): MediaStatus | undefined {
+  if (!raw) return undefined;
+  const s = String(raw).trim().toLowerCase();
+  if (['izlendi', 'watched', 'bitti', 'tamamlandı', 'tamamlandi', 'done', 'finished', 'viewed'].includes(s)) return 'izlendi';
+  if (['izlenecek', 'to watch', 'to-watch', 'watchlist', 'izlemedim', 'bekliyor'].includes(s)) return 'izlenecek';
+  return undefined;
 }
 
 function PickStep({ onFile }: { onFile: (f: File) => void }) {
@@ -231,18 +305,21 @@ function SheetStep({ sheets, onPick }: { sheets: SheetData[]; onPick: (i: number
 
 function MapStep({
   headers, dataRows, mapping, setMapping, headerRowIdx, setHeaderRowIdx, allRows,
-  statusRawValues, statusMap, setStatusMap,
+  mappableFields, fieldLabels, statusRawValues, statusOptions, statusMap, setStatusMap,
 }: {
   headers: string[];
   dataRows: unknown[][];
-  mapping: Record<number, MappableField>;
-  setMapping: (m: Record<number, MappableField>) => void;
+  mapping: Record<number, string>;
+  setMapping: (m: Record<number, string>) => void;
   headerRowIdx: number;
   setHeaderRowIdx: (i: number) => void;
   allRows: unknown[][];
+  mappableFields: string[];
+  fieldLabels: Record<string, string>;
   statusRawValues: string[];
-  statusMap: Record<string, BookStatus>;
-  setStatusMap: (m: Record<string, BookStatus>) => void;
+  statusOptions: { value: string; label: string }[];
+  statusMap: Record<string, string>;
+  setStatusMap: (m: Record<string, string>) => void;
 }) {
   const maxRow = Math.min(allRows.length, 10);
   return (
@@ -269,9 +346,9 @@ function MapStep({
               <select
                 className="input max-w-xs"
                 value={mapping[i] ?? '__ignore__'}
-                onChange={(e) => setMapping({ ...mapping, [i]: e.target.value as MappableField })}
+                onChange={(e) => setMapping({ ...mapping, [i]: e.target.value })}
               >
-                {MAPPABLE_FIELDS.map((f) => <option key={f} value={f}>{FIELD_LABELS[f]}</option>)}
+                {mappableFields.map((f) => <option key={f} value={f}>{fieldLabels[f]}</option>)}
               </select>
             </div>
           ))}
@@ -288,10 +365,10 @@ function MapStep({
                 <span className="text-muted text-xs">→</span>
                 <select
                   className="input max-w-xs"
-                  value={statusMap[v] ?? (normalizeStatusOrDefault(v))}
-                  onChange={(e) => setStatusMap({ ...statusMap, [v]: e.target.value as BookStatus })}
+                  value={statusMap[v] ?? statusOptions[0]?.value ?? ''}
+                  onChange={(e) => setStatusMap({ ...statusMap, [v]: e.target.value })}
                 >
-                  {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  {statusOptions.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                 </select>
               </div>
             ))}
@@ -302,11 +379,12 @@ function MapStep({
   );
 }
 
-function normalizeStatusOrDefault(v: string): BookStatus {
-  return normalizeStatus(v) ?? 'mevcut';
-}
-
-function PreviewStep({ result }: { result: { rows: Omit<Book, 'id' | 'addedAt' | 'updatedAt'>[]; errors: { row: number; reason: string }[] } }) {
+function PreviewStep({
+  result, isMedia,
+}: {
+  result: { rows: Omit<Book, 'id' | 'addedAt' | 'updatedAt'>[] | Omit<Media, 'id' | 'addedAt' | 'updatedAt'>[]; errors: { row: number; reason: string }[] };
+  isMedia: boolean;
+}) {
   const { rows, errors } = result;
   return (
     <div className="space-y-3">
@@ -323,25 +401,47 @@ function PreviewStep({ result }: { result: { rows: Omit<Book, 'id' | 'addedAt' |
         <table className="w-full text-sm">
           <thead className="bg-surface2 text-xs uppercase text-muted">
             <tr>
-              <th className="px-3 py-2 text-left">Başlık</th>
-              <th className="px-3 py-2 text-left">Yazar</th>
-              <th className="px-3 py-2 text-left">Yayınevi</th>
-              <th className="px-3 py-2 text-left">Tür</th>
-              <th className="px-3 py-2 text-left">Durum</th>
-              <th className="px-3 py-2 text-right">Sayfa</th>
+              {isMedia ? (
+                <>
+                  <th className="px-3 py-2 text-left">Başlık</th>
+                  <th className="px-3 py-2 text-left">Yönetmen</th>
+                  <th className="px-3 py-2 text-left">Durum</th>
+                  <th className="px-3 py-2 text-right">Çıkış Yılı</th>
+                  <th className="px-3 py-2 text-right">Süre/Sezon</th>
+                </>
+              ) : (
+                <>
+                  <th className="px-3 py-2 text-left">Başlık</th>
+                  <th className="px-3 py-2 text-left">Yazar</th>
+                  <th className="px-3 py-2 text-left">Yayınevi</th>
+                  <th className="px-3 py-2 text-left">Tür</th>
+                  <th className="px-3 py-2 text-left">Durum</th>
+                  <th className="px-3 py-2 text-right">Sayfa</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
-            {rows.slice(0, 20).map((r, i) => (
-              <tr key={i} className="border-t border-border">
-                <td className="px-3 py-2 font-medium">{r.title}</td>
-                <td className="px-3 py-2">{r.author}</td>
-                <td className="px-3 py-2 text-muted">{r.publisher ?? '—'}</td>
-                <td className="px-3 py-2">{r.genre ?? '—'}</td>
-                <td className="px-3 py-2">{r.status}</td>
-                <td className="px-3 py-2 text-right">{r.pageCount ?? '—'}</td>
-              </tr>
-            ))}
+            {isMedia
+              ? (rows as Omit<Media, 'id' | 'addedAt' | 'updatedAt'>[]).slice(0, 20).map((r, i) => (
+                <tr key={i} className="border-t border-border">
+                  <td className="px-3 py-2 font-medium">{r.title}</td>
+                  <td className="px-3 py-2 text-muted">{r.director ?? '—'}</td>
+                  <td className="px-3 py-2">{r.status}</td>
+                  <td className="px-3 py-2 text-right">{r.releaseYear ?? '—'}</td>
+                  <td className="px-3 py-2 text-right">{r.duration ? `${r.duration} dk` : r.seasons ? `${r.seasons} sez.` : '—'}</td>
+                </tr>
+              ))
+              : (rows as Omit<Book, 'id' | 'addedAt' | 'updatedAt'>[]).slice(0, 20).map((r, i) => (
+                <tr key={i} className="border-t border-border">
+                  <td className="px-3 py-2 font-medium">{r.title}</td>
+                  <td className="px-3 py-2">{r.author}</td>
+                  <td className="px-3 py-2 text-muted">{r.publisher ?? '—'}</td>
+                  <td className="px-3 py-2">{r.genre ?? '—'}</td>
+                  <td className="px-3 py-2">{r.status}</td>
+                  <td className="px-3 py-2 text-right">{r.pageCount ?? '—'}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

@@ -18,6 +18,7 @@ interface MediaState {
 
   load: () => Promise<void>;
   add: (m: Omit<Media, 'id' | 'addedAt' | 'updatedAt'>) => Promise<Media>;
+  addMany: (items: Omit<Media, 'id' | 'addedAt' | 'updatedAt'>[]) => Promise<void>;
   update: (id: string, patch: Partial<Media>) => Promise<void>;
   remove: (ids: string[]) => Promise<void>;
   setStatus: (ids: string[], status: MediaStatus) => Promise<void>;
@@ -54,6 +55,14 @@ export const useMedia = create<MediaState>((set, get) => ({
     const typeLabel = item.type === 'film' ? 'Film' : 'Dizi';
     useToast.getState().show(`"${item.title}" eklendi (${typeLabel})`);
     return item;
+  },
+
+  addMany: async (items) => {
+    const now = new Date().toISOString();
+    const toInsert: Media[] = items.map((m) => ({ ...m, id: nanoid(), addedAt: now, updatedAt: now }));
+    await db.media.bulkAdd(toInsert);
+    set({ media: [...get().media, ...toInsert] });
+    useToast.getState().show(`${toInsert.length} öğe içe aktarıldı`);
   },
 
   update: async (id, patch) => {

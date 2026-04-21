@@ -96,12 +96,8 @@ export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExpor
 
       {/* Sağ — import/export/ayarlar/ekle */}
       <div className="flex-1 flex items-center justify-end gap-2">
-        {section === 'books' && (
-          <>
-            <button className="btn btn-outline" onClick={onImport}><ArrowDownToLine size={15} /> İçe Aktar</button>
-            <button className="btn btn-outline" onClick={onExport}><ArrowUpFromLine size={15} /> Dışa Aktar</button>
-          </>
-        )}
+        <button className="btn btn-outline" onClick={onImport}><ArrowDownToLine size={15} /> İçe Aktar</button>
+        <button className="btn btn-outline" onClick={onExport}><ArrowUpFromLine size={15} /> Dışa Aktar</button>
         <button className="btn btn-ghost" onClick={onSettings} title="Ayarlar"><Settings size={15} /></button>
         <button className="btn btn-primary" onClick={onAdd}><Plus size={15} /> {ADD_LABEL[section]}</button>
       </div>

@@ -1,5 +1,57 @@
 import type { BookField } from '../../types/book';
 
+const norm = (s: string) => s.trim().toLocaleLowerCase('tr').replace(/[._\-]+/g, ' ').replace(/\s+/g, ' ');
+
+export type MediaMappableField =
+  | 'title'
+  | 'director'
+  | 'releaseYear'
+  | 'watchYear'
+  | 'duration'
+  | 'seasons'
+  | 'episodeDuration'
+  | 'status'
+  | 'notes'
+  | '__ignore__';
+
+export const MEDIA_FIELD_LABELS: Record<MediaMappableField, string> = {
+  title: 'Başlık',
+  director: 'Yönetmen',
+  releaseYear: 'Çıkış Yılı',
+  watchYear: 'İzlenme Yılı',
+  duration: 'Süre (dk)',
+  seasons: 'Sezon',
+  episodeDuration: 'Bölüm Süresi (dk)',
+  status: 'Durum',
+  notes: 'Notlar',
+  __ignore__: '— Yoksay —',
+};
+
+const MEDIA_CANDIDATES: Record<Exclude<MediaMappableField, '__ignore__'>, string[]> = {
+  title: ['title', 'başlık', 'baslik', 'film', 'dizi', 'ad', 'name', 'film adı', 'dizi adı'],
+  director: ['director', 'yönetmen', 'yonetmen', 'yöneten', 'yoneten'],
+  releaseYear: ['year', 'yıl', 'yil', 'çıkış yılı', 'cikis yili', 'release year', 'yapım yılı', 'yapim yili'],
+  watchYear: ['watch year', 'izlenme yılı', 'izlenme yili', 'watched year', 'izledim yılı'],
+  duration: ['duration', 'süre', 'sure', 'dakika', 'minutes', 'runtime', 'length', 'süre (dk)'],
+  seasons: ['seasons', 'sezon', 'season count', 'sezon sayısı', 'sezon sayisi'],
+  episodeDuration: ['episode duration', 'bölüm süresi', 'bolum suresi', 'episode length', 'bölüm dk', 'bolum dk'],
+  status: ['status', 'durum', 'izleme durumu', 'state'],
+  notes: ['notes', 'not', 'notlar', 'yorum', 'yorumlar', 'comment'],
+};
+
+export function guessMediaField(header: string): MediaMappableField {
+  const n = norm(header);
+  for (const [field, list] of Object.entries(MEDIA_CANDIDATES)) {
+    if (list.some((c) => norm(c) === n)) return field as MediaMappableField;
+  }
+  for (const [field, list] of Object.entries(MEDIA_CANDIDATES)) {
+    if (list.some((c) => n.includes(norm(c)) || norm(c).includes(n))) return field as MediaMappableField;
+  }
+  return '__ignore__';
+}
+
+export const MAPPABLE_MEDIA_FIELDS = Object.keys(MEDIA_FIELD_LABELS) as MediaMappableField[];
+
 export type MappableField =
   | 'title'
   | 'author'
@@ -48,8 +100,6 @@ const CANDIDATES: Record<Exclude<MappableField, '__ignore__'>, string[]> = {
   readStartDate: ['start', 'başlangıç', 'baslangic', 'okumaya başlama', 'okumaya baslama', 'read start'],
   readEndDate: ['end', 'bitiş', 'bitis', 'okumayı bitirme', 'okumayi bitirme', 'read end', 'bitirme'],
 };
-
-const norm = (s: string) => s.trim().toLocaleLowerCase('tr').replace(/[._\-]+/g, ' ').replace(/\s+/g, ' ');
 
 export function guessField(header: string): MappableField {
   const n = norm(header);
