@@ -25,3 +25,29 @@ export const GENRES = [
 ] as const;
 
 export type Genre = (typeof GENRES)[number];
+
+export const MEDIA_GENRES = [
+  'Aksiyon',
+  'Macera',
+  'Animasyon',
+  'Belgesel',
+  'Bilim Kurgu',
+  'Biyografi',
+  'Dram',
+  'Fantastik',
+  'Gerilim',
+  'Gizem',
+  'Komedi',
+  'Korku',
+  'Müzikal',
+  'Polisiye',
+  'Romantik',
+  'Savaş',
+  'Suç',
+  'Tarih',
+  'Western',
+  'Aile',
+  'Diğer',
+] as const;
+
+export type MediaGenre = (typeof MEDIA_GENRES)[number];

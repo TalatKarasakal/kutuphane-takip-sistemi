@@ -1,4 +1,4 @@
-import { BookMarked, Film, Tv2, ArrowDownToLine, ArrowUpFromLine, LayoutGrid, Plus, Search, Settings, Table, type LucideProps } from 'lucide-react';
+import { BookMarked, Film, Tv2, ArrowDownToLine, ArrowUpFromLine, Camera, LayoutGrid, Plus, Search, Settings, Table, type LucideProps } from 'lucide-react';
 import { useBooks } from '../../store/booksStore';
 import { useMedia } from '../../store/mediaStore';
 import { useSettings } from '../../store/settingsStore';
@@ -15,6 +15,7 @@ interface Props {
   onImport: () => void;
   onExport: () => void;
   onSettings: () => void;
+  onPhotoImport: () => void;
 }
 
 const SECTIONS: { value: Section; icon: React.ComponentType<LucideProps>; title: string }[] = [
@@ -35,7 +36,7 @@ const SEARCH_PLACEHOLDER: Record<Section, string> = {
   tv: 'Başlık, yönetmen, not içinde ara…',
 };
 
-export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExport, onSettings }: Props) {
+export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExport, onSettings, onPhotoImport }: Props) {
   const books = useBooks();
   const media = useMedia();
   const { view, set, setColumns, bookColumns, filmColumns, tvColumns } = useSettings();
@@ -96,6 +97,11 @@ export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExpor
 
       {/* Sağ — import/export/ayarlar/ekle */}
       <div className="flex-1 flex items-center justify-end gap-2">
+        {section === 'books' && (
+          <button className="btn btn-outline" onClick={onPhotoImport} title="Fotoğraftan kitap ekle">
+            <Camera size={15} /> Fotoğraftan Ekle
+          </button>
+        )}
         <button className="btn btn-outline" onClick={onImport}><ArrowDownToLine size={15} /> İçe Aktar</button>
         <button className="btn btn-outline" onClick={onExport}><ArrowUpFromLine size={15} /> Dışa Aktar</button>
         <button className="btn btn-ghost" onClick={onSettings} title="Ayarlar"><Settings size={15} /></button>

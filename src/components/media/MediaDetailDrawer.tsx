@@ -36,6 +36,7 @@ export function MediaDetailDrawer({ item, onClose, onEdit, onDelete }: Props) {
 
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <Info label="Yönetmen" value={item.director} />
+            <Info label="Tür" value={item.genre} />
             <Info label="Çıkış Yılı" value={item.releaseYear} />
             <Info label="İzlenme Yılı" value={item.watchYear} />
             {item.type === 'film' && <Info label="Süre" value={item.duration != null ? `${item.duration} dakika` : undefined} />}

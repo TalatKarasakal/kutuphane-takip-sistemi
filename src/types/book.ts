@@ -29,6 +29,8 @@ export interface Book {
 
 export type BookField = keyof Book;
 
+export type BackupFrequency = 'launch' | 'daily' | 'weekly';
+
 export interface AppSettings {
   theme: 'light' | 'dark' | 'system';
   accent: 'turkuaz' | 'kirmizi';
@@ -39,6 +41,11 @@ export interface AppSettings {
   bookColumns: ColumnConfig[];
   filmColumns: ColumnConfig[];
   tvColumns: ColumnConfig[];
+  autoBackup: boolean;
+  backupFrequency: BackupFrequency;
+  lastBackupAt?: string;
+  /** Google Gemini ücretsiz API anahtarı — "Fotoğraftan Ekle" için. Yalnızca yerelde saklanır. */
+  geminiApiKey?: string;
 }
 
 export const DEFAULT_BOOK_COLS: ColumnConfig[] = [
@@ -54,6 +61,7 @@ export const DEFAULT_BOOK_COLS: ColumnConfig[] = [
 export const DEFAULT_FILM_COLS: ColumnConfig[] = [
   { key: 'title', visible: true },
   { key: 'director', visible: true },
+  { key: 'genre', visible: true },
   { key: 'releaseYear', visible: true },
   { key: 'duration', visible: true },
   { key: 'watchYear', visible: true },
@@ -63,6 +71,7 @@ export const DEFAULT_FILM_COLS: ColumnConfig[] = [
 export const DEFAULT_TV_COLS: ColumnConfig[] = [
   { key: 'title', visible: true },
   { key: 'director', visible: true },
+  { key: 'genre', visible: true },
   { key: 'releaseYear', visible: true },
   { key: 'seasons', visible: true },
   { key: 'episodeDuration', visible: true },
@@ -80,4 +89,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   bookColumns: DEFAULT_BOOK_COLS,
   filmColumns: DEFAULT_FILM_COLS,
   tvColumns: DEFAULT_TV_COLS,
+  autoBackup: true,
+  backupFrequency: 'daily',
+  lastBackupAt: undefined,
+  geminiApiKey: undefined,
 };

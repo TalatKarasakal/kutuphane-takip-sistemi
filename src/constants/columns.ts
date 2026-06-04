@@ -11,6 +11,7 @@ export const BOOK_COLUMN_LABELS: Record<string, string> = {
 export const FILM_COLUMN_LABELS: Record<string, string> = {
   title: 'Başlık',
   director: 'Yönetmen',
+  genre: 'Tür',
   releaseYear: 'Çıkış Yılı',
   duration: 'Süre (dk)',
   watchYear: 'İzlenme Yılı',
@@ -20,6 +21,7 @@ export const FILM_COLUMN_LABELS: Record<string, string> = {
 export const TV_COLUMN_LABELS: Record<string, string> = {
   title: 'Başlık',
   director: 'Yönetmen',
+  genre: 'Tür',
   releaseYear: 'Çıkış Yılı',
   seasons: 'Sezon',
   episodeDuration: 'Bölüm Süresi (dk)',

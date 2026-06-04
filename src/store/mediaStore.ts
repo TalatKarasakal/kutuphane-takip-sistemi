@@ -4,7 +4,7 @@ import { db } from '../db/database';
 import { useToast } from './toastStore';
 import type { Media, MediaStatus, MediaType } from '../types/media';
 
-export type MediaSortKey = 'addedAt' | 'title' | 'director' | 'releaseYear' | 'watchYear' | 'status' | 'duration' | 'seasons' | 'episodeDuration';
+export type MediaSortKey = 'addedAt' | 'title' | 'director' | 'genre' | 'releaseYear' | 'watchYear' | 'status' | 'duration' | 'seasons' | 'episodeDuration';
 export type SortDir = 'asc' | 'desc';
 
 interface MediaState {
@@ -12,6 +12,7 @@ interface MediaState {
   media: Media[];
   search: string;
   statusFilter: MediaStatus[];
+  genreFilter: string[];
   sortKey: MediaSortKey;
   sortDir: SortDir;
   selectedIds: Set<string>;
@@ -25,6 +26,7 @@ interface MediaState {
 
   setSearch: (v: string) => void;
   toggleStatusFilter: (s: MediaStatus) => void;
+  toggleGenreFilter: (g: string) => void;
   clearFilters: () => void;
   setSort: (key: MediaSortKey, dir?: SortDir) => void;
 
@@ -38,6 +40,7 @@ export const useMedia = create<MediaState>((set, get) => ({
   media: [],
   search: '',
   statusFilter: [],
+  genreFilter: [],
   sortKey: 'addedAt',
   sortDir: 'desc',
   selectedIds: new Set(),
@@ -109,7 +112,11 @@ export const useMedia = create<MediaState>((set, get) => ({
     const cur = get().statusFilter;
     set({ statusFilter: cur.includes(s) ? cur.filter((x) => x !== s) : [...cur, s] });
   },
-  clearFilters: () => set({ statusFilter: [], search: '' }),
+  toggleGenreFilter: (g) => {
+    const cur = get().genreFilter;
+    set({ genreFilter: cur.includes(g) ? cur.filter((x) => x !== g) : [...cur, g] });
+  },
+  clearFilters: () => set({ statusFilter: [], genreFilter: [], search: '' }),
   setSort: (key, dir) => set({ sortKey: key, sortDir: dir ?? (get().sortKey === key && get().sortDir === 'asc' ? 'desc' : 'asc') }),
 
   toggleSelect: (id) => {
@@ -125,7 +132,7 @@ export const useMedia = create<MediaState>((set, get) => ({
 export function applyMediaFilters(
   items: Media[],
   type: MediaType,
-  opts: { search: string; statusFilter: MediaStatus[]; sortKey: MediaSortKey; sortDir: SortDir },
+  opts: { search: string; statusFilter: MediaStatus[]; genreFilter: string[]; sortKey: MediaSortKey; sortDir: SortDir },
 ): Media[] {
   let result = items.filter((m) => m.type === type);
 
@@ -135,12 +142,17 @@ export function applyMediaFilters(
       (m) =>
         m.title.toLowerCase().includes(q) ||
         (m.director ?? '').toLowerCase().includes(q) ||
+        (m.genre ?? '').toLowerCase().includes(q) ||
         (m.notes ?? '').toLowerCase().includes(q),
     );
   }
 
   if (opts.statusFilter.length > 0) {
     result = result.filter((m) => opts.statusFilter.includes(m.status));
+  }
+
+  if (opts.genreFilter.length > 0) {
+    result = result.filter((m) => m.genre != null && opts.genreFilter.includes(m.genre));
   }
 
   result.sort((a, b) => {

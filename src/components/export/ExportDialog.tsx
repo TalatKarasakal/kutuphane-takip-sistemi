@@ -36,8 +36,8 @@ export function ExportDialog({ open, onClose, section }: Props) {
   );
 
   const filteredMedia = useMemo(
-    () => applyMediaFilters(media.media, mediaType, { search: media.search, statusFilter: media.statusFilter, sortKey: media.sortKey, sortDir: media.sortDir }),
-    [media.media, mediaType, media.search, media.statusFilter, media.sortKey, media.sortDir],
+    () => applyMediaFilters(media.media, mediaType, { search: media.search, statusFilter: media.statusFilter, genreFilter: media.genreFilter, sortKey: media.sortKey, sortDir: media.sortDir }),
+    [media.media, mediaType, media.search, media.statusFilter, media.genreFilter, media.sortKey, media.sortDir],
   );
 
   const allMedia = useMemo(() => media.media.filter((m) => m.type === mediaType), [media.media, mediaType]);

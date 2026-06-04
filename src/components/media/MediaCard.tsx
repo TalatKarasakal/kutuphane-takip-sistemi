@@ -34,6 +34,7 @@ export function MediaCard({ item, onClick }: { item: Media; onClick: () => void 
           >
             <TypeIcon size={10} /> {typeLabel}
           </span>
+          {item.genre && <span className="chip text-[11px]">{item.genre}</span>}
           {item.releaseYear && <span className="chip text-[11px]">{item.releaseYear}</span>}
           {item.watchYear && <span className="chip text-[11px]">İzlendi: {item.watchYear}</span>}
         </div>

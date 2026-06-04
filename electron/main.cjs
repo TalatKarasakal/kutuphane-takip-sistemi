@@ -1,7 +1,97 @@
-const { app, BrowserWindow, Menu, shell } = require('electron');
+const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
+const { registerAiIpc } = require('./ai.cjs');
 
 let mainWindow = null;
+
+const MAX_BACKUPS = 20;
+
+function backupDir() {
+  return path.join(app.getPath('userData'), 'backups');
+}
+
+function ensureBackupDir() {
+  const dir = backupDir();
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+function stamp(d = new Date()) {
+  const p = (n) => String(n).padStart(2, '0');
+  return (
+    `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}` +
+    `-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`
+  );
+}
+
+function listBackups() {
+  const dir = backupDir();
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir)
+    .filter((n) => n.startsWith('kutuphanem-') && n.endsWith('.json'))
+    .map((name) => {
+      const full = path.join(dir, name);
+      const st = fs.statSync(full);
+      return { name, path: full, size: st.size, mtime: st.mtimeMs };
+    })
+    .sort((a, b) => b.mtime - a.mtime);
+}
+
+function rotateBackups() {
+  const files = listBackups();
+  files.slice(MAX_BACKUPS).forEach((f) => {
+    try {
+      fs.unlinkSync(f.path);
+    } catch {
+      /* yoksay */
+    }
+  });
+}
+
+function registerBackupIpc() {
+  ipcMain.handle('backup:write', async (_e, json) => {
+    try {
+      const dir = ensureBackupDir();
+      const filePath = path.join(dir, `kutuphanem-${stamp()}.json`);
+      await fs.promises.writeFile(filePath, json, 'utf8');
+      rotateBackups();
+      return { ok: true, path: filePath };
+    } catch (err) {
+      return { ok: false, error: String((err && err.message) || err) };
+    }
+  });
+
+  ipcMain.handle('backup:list', async () => listBackups());
+
+  ipcMain.handle('backup:read', async (_e, filePath) => {
+    try {
+      // Yalnızca yedek klasörü içindeki dosyalar okunabilir.
+      const dir = backupDir();
+      const resolved = path.resolve(filePath);
+      if (!resolved.startsWith(path.resolve(dir))) return null;
+      return await fs.promises.readFile(resolved, 'utf8');
+    } catch {
+      return null;
+    }
+  });
+
+  ipcMain.handle('backup:reveal', async () => {
+    try {
+      const dir = ensureBackupDir();
+      await shell.openPath(dir);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
+  ipcMain.handle('backup:lastInfo', async () => {
+    const files = listBackups();
+    return files.length ? { name: files[0].name, mtime: files[0].mtime } : null;
+  });
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -15,11 +105,21 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      preload: path.join(__dirname, 'preload.cjs'),
     },
   });
 
   mainWindow.removeMenu();
-  mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
+
+  // Geliştirme: VITE_DEV_SERVER_URL ayarlıysa canlı dev sunucusunu yükle
+  // (gerçek Electron + IPC ile test için). Aksi halde paketlenmiş dosyayı aç.
+  const devUrl = process.env.VITE_DEV_SERVER_URL;
+  if (devUrl) {
+    mainWindow.loadURL(devUrl);
+    mainWindow.webContents.openDevTools({ mode: 'detach' });
+  } else {
+    mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
+  }
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -28,6 +128,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  registerBackupIpc();
+  registerAiIpc();
+
   if (process.platform === 'darwin') {
     Menu.setApplicationMenu(Menu.buildFromTemplate([
       { role: 'appMenu' },

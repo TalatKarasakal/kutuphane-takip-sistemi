@@ -5,6 +5,7 @@ const norm = (s: string) => s.trim().toLocaleLowerCase('tr').replace(/[._\-]+/g,
 export type MediaMappableField =
   | 'title'
   | 'director'
+  | 'genre'
   | 'releaseYear'
   | 'watchYear'
   | 'duration'
@@ -17,6 +18,7 @@ export type MediaMappableField =
 export const MEDIA_FIELD_LABELS: Record<MediaMappableField, string> = {
   title: 'Başlık',
   director: 'Yönetmen',
+  genre: 'Tür',
   releaseYear: 'Çıkış Yılı',
   watchYear: 'İzlenme Yılı',
   duration: 'Süre (dk)',
@@ -30,6 +32,7 @@ export const MEDIA_FIELD_LABELS: Record<MediaMappableField, string> = {
 const MEDIA_CANDIDATES: Record<Exclude<MediaMappableField, '__ignore__'>, string[]> = {
   title: ['title', 'başlık', 'baslik', 'film', 'dizi', 'ad', 'name', 'film adı', 'dizi adı'],
   director: ['director', 'yönetmen', 'yonetmen', 'yöneten', 'yoneten'],
+  genre: ['genre', 'category', 'tür', 'tur', 'kategori', 'janr', 'tarz'],
   releaseYear: ['year', 'yıl', 'yil', 'çıkış yılı', 'cikis yili', 'release year', 'yapım yılı', 'yapim yili'],
   watchYear: ['watch year', 'izlenme yılı', 'izlenme yili', 'watched year', 'izledim yılı'],
   duration: ['duration', 'süre', 'sure', 'dakika', 'minutes', 'runtime', 'length', 'süre (dk)'],

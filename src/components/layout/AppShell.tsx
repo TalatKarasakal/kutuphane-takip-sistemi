@@ -4,6 +4,7 @@ import { Topbar } from './Topbar';
 import { BookList } from '../books/BookList';
 import { BookFormDialog } from '../books/BookFormDialog';
 import { BookDetailDrawer } from '../books/BookDetailDrawer';
+import { PhotoImportDialog } from '../books/PhotoImportDialog';
 import { MediaList } from '../media/MediaList';
 import { MediaFormDialog } from '../media/MediaFormDialog';
 import { MediaDetailDrawer } from '../media/MediaDetailDrawer';
@@ -16,6 +17,7 @@ import { useBooks } from '../../store/booksStore';
 import { useMedia } from '../../store/mediaStore';
 import { useSettings } from '../../store/settingsStore';
 import { applyTheme } from '../../lib/theme';
+import { maybeAutoBackup } from '../../lib/backup';
 import type { Book } from '../../types/book';
 import type { Media } from '../../types/media';
 
@@ -24,6 +26,8 @@ export type Section = 'books' | 'movies' | 'tv';
 export function AppShell() {
   const { load: loadBooks, add: addBook, update: updateBook, remove: removeBook } = useBooks();
   const { load: loadMedia, add: addMedia, update: updateMedia, remove: removeMedia } = useMedia();
+  const booksLoaded = useBooks((s) => s.loaded);
+  const mediaLoaded = useMedia((s) => s.loaded);
   const settings = useSettings();
 
   const [section, setSection] = useState<Section>('books');
@@ -39,6 +43,7 @@ export function AppShell() {
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [photoImportOpen, setPhotoImportOpen] = useState(false);
 
   const searchRef = useRef<HTMLInputElement>(null) as React.RefObject<HTMLInputElement>;
   const sectionRef = useRef(section);
@@ -46,6 +51,7 @@ export function AppShell() {
 
   useEffect(() => { loadBooks(); }, [loadBooks]);
   useEffect(() => { loadMedia(); }, [loadMedia]);
+  useEffect(() => { if (booksLoaded && mediaLoaded) maybeAutoBackup(); }, [booksLoaded, mediaLoaded]);
   useEffect(() => { applyTheme(settings); }, [settings.theme, settings.accent, settings.fontFamily, settings.fontSize, settings.density, settings]);
 
   useEffect(() => {
@@ -96,6 +102,7 @@ export function AppShell() {
         onImport={() => setImportOpen(true)}
         onExport={() => setExportOpen(true)}
         onSettings={() => setSettingsOpen(true)}
+        onPhotoImport={() => setPhotoImportOpen(true)}
       />
 
       <div className="flex-1 flex min-h-0">
@@ -138,6 +145,12 @@ export function AppShell() {
         onClose={() => setMediaDetail(null)}
         onEdit={(m) => { setEditingMedia(m); setMediaFormOpen(true); setMediaDetail(null); }}
         onDelete={(id) => removeMedia([id])}
+      />
+
+      <PhotoImportDialog
+        open={photoImportOpen}
+        onClose={() => setPhotoImportOpen(false)}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
 
       <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} section={section} />

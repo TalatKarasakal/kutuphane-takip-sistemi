@@ -63,8 +63,9 @@ export function exportJson(books: Book[], fields: (keyof Book)[], filename: stri
 
 const MEDIA_ALL_FIELDS: { key: keyof Media; label: string }[] = [
   { key: 'title', label: 'Başlık' },
-  { key: 'type', label: 'Tür' },
+  { key: 'type', label: 'Tip' },
   { key: 'director', label: 'Yönetmen' },
+  { key: 'genre', label: 'Tür' },
   { key: 'releaseYear', label: 'Çıkış Yılı' },
   { key: 'watchYear', label: 'İzlenme Yılı' },
   { key: 'duration', label: 'Süre (dk)' },

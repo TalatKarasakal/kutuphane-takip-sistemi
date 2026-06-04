@@ -27,15 +27,15 @@ const NEXT_LABEL: Partial<Record<MediaStatus, string>> = {
 };
 
 export function MediaList({ type, onOpen }: Props) {
-  const { media, search, statusFilter, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useMedia();
+  const { media, search, statusFilter, genreFilter, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useMedia();
   const { view, density, filmColumns, tvColumns } = useSettings();
 
   const columns = type === 'film' ? filmColumns : tvColumns;
   const visibleCols = useMemo(() => columns.filter((c) => c.visible), [columns]);
 
   const filtered = useMemo(
-    () => applyMediaFilters(media, type, { search, statusFilter, sortKey, sortDir }),
-    [media, type, search, statusFilter, sortKey, sortDir],
+    () => applyMediaFilters(media, type, { search, statusFilter, genreFilter, sortKey, sortDir }),
+    [media, type, search, statusFilter, genreFilter, sortKey, sortDir],
   );
 
   const allSelected = filtered.length > 0 && filtered.every((m) => selectedIds.has(m.id));
@@ -140,6 +140,7 @@ export function MediaList({ type, onOpen }: Props) {
 const MEDIA_COL_LABEL: Record<string, string> = {
   title: 'Başlık',
   director: 'Yönetmen',
+  genre: 'Tür',
   releaseYear: 'Çıkış Yılı',
   duration: 'Süre (dk)',
   seasons: 'Sezon',
@@ -162,6 +163,7 @@ function renderCell(m: Media, key: string, density: string) {
       </td>
     );
     case 'director': return <td key={key} className={cn('px-4', py, 'text-muted')}>{m.director ?? EMPTY}</td>;
+    case 'genre': return <td key={key} className={cn('px-4', py, 'text-muted')}>{m.genre ?? EMPTY}</td>;
     case 'releaseYear': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.releaseYear ?? EMPTY}</td>;
     case 'duration': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.duration ? `${m.duration} dk` : EMPTY}</td>;
     case 'seasons': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.seasons ?? EMPTY}</td>;

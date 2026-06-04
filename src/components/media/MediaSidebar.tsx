@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function MediaSidebar({ type }: Props) {
-  const { media, statusFilter, toggleStatusFilter, clearFilters } = useMedia();
+  const { media, statusFilter, genreFilter, toggleStatusFilter, toggleGenreFilter, clearFilters } = useMedia();
 
   const items = useMemo(() => media.filter((m) => m.type === type), [media, type]);
 
@@ -20,7 +20,13 @@ export function MediaSidebar({ type }: Props) {
     return c;
   }, [items]);
 
-  const hasActive = statusFilter.length > 0;
+  const activeGenres = useMemo(() => {
+    const c: Record<string, number> = {};
+    items.forEach((m) => { if (m.genre) c[m.genre] = (c[m.genre] ?? 0) + 1; });
+    return Object.entries(c).sort((a, b) => a[0].localeCompare(b[0], 'tr'));
+  }, [items]);
+
+  const hasActive = statusFilter.length > 0 || genreFilter.length > 0;
   const typeLabel = type === 'film' ? 'film' : 'dizi';
   const TypeIcon = type === 'film' ? Film : Tv2;
 
@@ -59,6 +65,23 @@ export function MediaSidebar({ type }: Props) {
               />
             );
           })}
+        </FilterCard>
+
+        <FilterCard title="Tür">
+          {activeGenres.length === 0 ? (
+            <div className="px-3 py-2 text-xs text-muted italic">Henüz tür eklenmemiş</div>
+          ) : (
+            activeGenres.map(([g, count], i) => (
+              <FilterRow
+                key={g}
+                first={i === 0}
+                active={genreFilter.includes(g)}
+                onClick={() => toggleGenreFilter(g)}
+                label={g}
+                count={count}
+              />
+            ))
+          )}
         </FilterCard>
       </div>
     </aside>

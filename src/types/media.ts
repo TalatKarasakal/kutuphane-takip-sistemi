@@ -6,6 +6,7 @@ export interface Media {
   title: string;
   type: MediaType;
   director?: string;
+  genre?: string;
   releaseYear?: number;
   watchYear?: number;
   duration?: number;

@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { MEDIA_STATUSES } from '../../constants/mediaStatuses';
+import { MEDIA_GENRES } from '../../constants/genres';
+import { useMedia } from '../../store/mediaStore';
 import { smartTitleCase } from '../../lib/utils';
 import type { Media, MediaStatus, MediaType } from '../../types/media';
 
@@ -19,6 +21,7 @@ function empty(type: MediaType): FormState {
     title: '',
     type,
     director: '',
+    genre: '',
     releaseYear: undefined,
     watchYear: undefined,
     duration: undefined,
@@ -30,8 +33,14 @@ function empty(type: MediaType): FormState {
 }
 
 export function MediaFormDialog({ open, onClose, onSave, initial, type }: Props) {
+  const { media } = useMedia();
   const [form, setForm] = useState<FormState>(empty(type));
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
+
+  const genres = useMemo(() => {
+    const fromData = media.map((m) => m.genre).filter(Boolean) as string[];
+    return [...new Set([...MEDIA_GENRES, ...fromData])].sort((a, b) => a.localeCompare(b, 'tr'));
+  }, [media]);
 
   useEffect(() => {
     if (open) {
@@ -88,6 +97,16 @@ export function MediaFormDialog({ open, onClose, onSave, initial, type }: Props)
             value={form.director ?? ''}
             onChange={(e) => setForm((f) => ({ ...f, director: smartTitleCase(f.director ?? '', e.target.value) }))}
           />
+        </Field>
+
+        <Field label="Tür">
+          <input
+            list="media-genre-list"
+            className="input"
+            value={form.genre ?? ''}
+            onChange={(e) => update('genre', e.target.value)}
+          />
+          <datalist id="media-genre-list">{genres.map((g) => <option key={g} value={g} />)}</datalist>
         </Field>
 
         <Field label="Durum">
