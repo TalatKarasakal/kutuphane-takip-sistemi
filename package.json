@@ -10,6 +10,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
+    "lint": "eslint .",
     "pack:mac": "npm run build && node scripts/build-mac.mjs",
     "pack:win": "npm run build && electron-builder --win --publish never",
     "pack:all": "npm run pack:mac && electron-builder --win --publish never"
@@ -45,6 +46,12 @@
       "signAndEditExecutable": false,
       "target": [
         {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
           "target": "portable",
           "arch": [
             "x64"
@@ -72,6 +79,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/papaparse": "^5.3.14",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -79,9 +87,14 @@
     "autoprefixer": "^10.4.20",
     "electron": "^41.2.1",
     "electron-builder": "^25.1.8",
+    "eslint": "^10.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.6.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
     "typescript": "^5.5.3",
+    "typescript-eslint": "^8.61.1",
     "vite": "^5.4.8"
   }
 }
