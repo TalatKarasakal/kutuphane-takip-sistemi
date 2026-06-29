@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { parseXlsx } from '../../lib/importers/xlsx';
 import { parseCsv } from '../../lib/importers/csv';
@@ -100,6 +100,30 @@ export function ImportDialog({ open, onClose, section }: Props) {
     ? [...new Set(dataRows.map((r) => String((r as unknown[])[Number(statusColIdx)] ?? '').trim()).filter(Boolean))]
     : [];
 
+  const mappableFields = isMedia ? MAPPABLE_MEDIA_FIELDS : MAPPABLE_FIELDS;
+  const fieldLabels = isMedia ? MEDIA_FIELD_LABELS : FIELD_LABELS;
+  const statusOptions = isMedia ? MEDIA_STATUSES : STATUSES;
+
+  useEffect(() => {
+    const missingValues = statusRawValues.filter((value) => statusMap[value] == null);
+    if (missingValues.length === 0) return;
+    const fallbackStatus = statusOptions[0]?.value;
+    if (!fallbackStatus) return;
+
+    setStatusMap((prev) => {
+      let changed = false;
+      const next = { ...prev };
+
+      missingValues.forEach((value) => {
+        if (next[value] != null) return;
+        next[value] = (isMedia ? normalizeMediaStatus(value) : normalizeStatus(value)) ?? fallbackStatus;
+        changed = true;
+      });
+
+      return changed ? next : prev;
+    });
+  }, [isMedia, statusMap, statusOptions, statusRawValues]);
+
   const buildBooks = (): { rows: Omit<Book, 'id' | 'addedAt' | 'updatedAt'>[]; errors: { row: number; reason: string }[] } => {
     const result: Omit<Book, 'id' | 'addedAt' | 'updatedAt'>[] = [];
     const errors: { row: number; reason: string }[] = [];
@@ -185,10 +209,6 @@ export function ImportDialog({ open, onClose, section }: Props) {
   };
 
   const currentResult = isMedia ? buildMedia() : buildBooks();
-
-  const mappableFields = isMedia ? MAPPABLE_MEDIA_FIELDS : MAPPABLE_FIELDS;
-  const fieldLabels = isMedia ? MEDIA_FIELD_LABELS : FIELD_LABELS;
-  const statusOptions = isMedia ? MEDIA_STATUSES : STATUSES;
 
   return (
     <Modal

@@ -69,8 +69,10 @@ function registerBackupIpc() {
     try {
       // Yalnızca yedek klasörü içindeki dosyalar okunabilir.
       const dir = backupDir();
+      const resolvedDir = path.resolve(dir);
       const resolved = path.resolve(filePath);
-      if (!resolved.startsWith(path.resolve(dir))) return null;
+      const base = resolvedDir + path.sep;
+      if (resolved !== resolvedDir && !resolved.startsWith(base)) return null;
       return await fs.promises.readFile(resolved, 'utf8');
     } catch {
       return null;

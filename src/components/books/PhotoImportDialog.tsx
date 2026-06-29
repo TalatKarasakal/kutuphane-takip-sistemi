@@ -7,6 +7,7 @@ import { Modal } from '../ui/Modal';
 import { useBooks } from '../../store/booksStore';
 import { useSettings } from '../../store/settingsStore';
 import { detectBooksFromImage, type DetectedBook } from '../../lib/ai/detectBooks';
+import { duplicateKey } from '../../lib/filters';
 import { STATUSES } from '../../constants/statuses';
 import type { Book, BookStatus } from '../../types/book';
 
@@ -25,7 +26,16 @@ interface ReviewRow extends DetectedBook {
   duplicate: boolean;
 }
 
-const norm = (s: string) => s.trim().toLocaleLowerCase('tr');
+const detectedDuplicateKey = (b: Pick<Book, 'title' | 'author' | 'isbn'>) =>
+  duplicateKey({
+    id: '',
+    title: b.title,
+    author: b.author,
+    isbn: b.isbn,
+    status: 'okunacak',
+    addedAt: '',
+    updatedAt: '',
+  });
 
 export function PhotoImportDialog({ open, onClose, onOpenSettings }: Props) {
   const { addMany, books } = useBooks();
@@ -44,7 +54,10 @@ export function PhotoImportDialog({ open, onClose, onOpenSettings }: Props) {
 
   const existing = () => {
     const set = new Set<string>();
-    books.forEach((b) => set.add(norm(b.title)));
+    books.forEach((b) => {
+      const key = duplicateKey(b);
+      if (key) set.add(key);
+    });
     return set;
   };
 
@@ -63,7 +76,8 @@ export function PhotoImportDialog({ open, onClose, onOpenSettings }: Props) {
     }
     const seen = existing();
     setRows(res.books.map((b, i) => {
-      const duplicate = seen.has(norm(b.title));
+      const key = detectedDuplicateKey(b);
+      const duplicate = key != null && seen.has(key);
       return {
         ...b,
         rid: `${i}-${b.title}`,

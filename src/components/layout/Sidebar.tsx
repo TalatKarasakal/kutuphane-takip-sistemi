@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { BookMarked, Filter, X, Copy } from 'lucide-react';
 import { useBooks } from '../../store/booksStore';
 import { STATUSES } from '../../constants/statuses';
@@ -21,6 +21,12 @@ export function Sidebar() {
   }, [books]);
 
   const duplicateCount = useMemo(() => findDuplicateIds(books).size, [books]);
+
+  // Yinelenen kalmayınca filtre kartı (ve kapatma düğmesi) DOM'dan kalkar; bu durumda
+  // duplicatesOnly açık kalırsa liste boş görünüp kullanıcıyı çıkmaza sokar. Otomatik kapat.
+  useEffect(() => {
+    if (duplicatesOnly && duplicateCount === 0) toggleDuplicatesOnly();
+  }, [duplicatesOnly, duplicateCount, toggleDuplicatesOnly]);
 
   const hasActive = statusFilter.length > 0 || genreFilter.length > 0 || duplicatesOnly;
 
