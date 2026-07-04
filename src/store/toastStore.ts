@@ -20,9 +20,10 @@ export const useToast = create<ToastState>((set) => ({
   show: (message, type = 'success', undo) => {
     const id = crypto.randomUUID();
     set((s) => ({ toasts: [...s.toasts, { id, message, type, undo }] }));
+    // "Geri Al" içeren bildirimlere tepki verecek zaman tanı.
     setTimeout(() => {
       set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) }));
-    }, 3500);
+    }, undo ? 7000 : 3500);
   },
   dismiss: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
 }));

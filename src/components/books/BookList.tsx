@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, ChevronDown, Trash2, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, ChevronDown, SearchX, Trash2, X } from 'lucide-react';
 import { useBooks, type SortKey } from '../../store/booksStore';
 import { useSettings } from '../../store/settingsStore';
 import { applyFilters } from '../../lib/filters';
 import { STATUSES } from '../../constants/statuses';
+import { BOOK_COLUMN_LABELS } from '../../constants/columns';
 import { StatusBadge, GenreChip } from '../ui/Badge';
 import { BookCard } from './BookCard';
 import type { Book, BookStatus } from '../../types/book';
@@ -33,7 +34,7 @@ const NEXT_LABEL: Partial<Record<BookStatus, string>> = {
 };
 
 export function BookList({ onOpen }: Props) {
-  const { books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus, setGenre, setPublisher } = useBooks();
+  const { books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, clearFilters, remove, setStatus, setGenre, setPublisher } = useBooks();
   const { view, density, bookColumns } = useSettings();
 
   const filtered = useMemo(
@@ -49,14 +50,24 @@ export function BookList({ onOpen }: Props) {
   const allPublishers = useMemo(() => [...new Set(books.map((b) => b.publisher).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, 'tr')), [books]);
 
   if (filtered.length === 0) {
+    const isFiltered = books.length > 0;
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center p-10">
           <div className="w-14 h-14 mx-auto rounded-full bg-primary/15 text-primary flex items-center justify-center mb-4">
-            <BookOpen size={24} />
+            {isFiltered ? <SearchX size={24} /> : <BookOpen size={24} />}
           </div>
-          <h3 className="font-semibold mb-1">Henüz kitap yok</h3>
-          <p className="text-sm text-muted max-w-xs">Sağ üstten kitap ekleyebilir, Excel/CSV/JSON dosyasından içe aktarabilirsin.</p>
+          <h3 className="font-semibold mb-1">{isFiltered ? 'Sonuç bulunamadı' : 'Henüz kitap yok'}</h3>
+          <p className="text-sm text-muted max-w-xs">
+            {isFiltered
+              ? 'Arama veya filtrelerle eşleşen kitap yok.'
+              : 'Sağ üstten kitap ekleyebilir, Excel/CSV/JSON dosyasından içe aktarabilirsin.'}
+          </p>
+          {isFiltered && (
+            <button className="btn btn-outline mt-4" onClick={clearFilters}>
+              <X size={14} /> Filtreleri Temizle
+            </button>
+          )}
         </div>
       </div>
     );
@@ -99,7 +110,7 @@ export function BookList({ onOpen }: Props) {
                   {visibleCols.map((col) => (
                     <ThSort
                       key={col.key}
-                      label={BOOK_COL_LABEL[col.key] ?? col.key}
+                      label={BOOK_COLUMN_LABELS[col.key] ?? col.key}
                       k={col.key as SortKey}
                       sortKey={sortKey}
                       sortDir={sortDir}
@@ -146,16 +157,6 @@ export function BookList({ onOpen }: Props) {
   );
 }
 
-const BOOK_COL_LABEL: Record<string, string> = {
-  title: 'Başlık',
-  author: 'Yazar',
-  publisher: 'Yayınevi',
-  genre: 'Tür',
-  pageCount: 'Sayfa',
-  publicationYear: 'Yayın Yılı',
-  status: 'Durum',
-};
-
 const EMPTY = <span className="text-muted/30 select-none">—</span>;
 
 function renderCell(b: Book, key: string, density: string) {
@@ -170,7 +171,7 @@ function renderCell(b: Book, key: string, density: string) {
       </td>
     );
     case 'author': return <td key={key} className={cn('px-4', py)}>{b.author || EMPTY}</td>;
-    case 'publisher': return <td key={key} className={cn('px-4', py, 'text-muted')}>{b.publisher ?? EMPTY}</td>;
+    case 'publisher': return <td key={key} className={cn('px-4', py, 'text-muted')}>{b.publisher || EMPTY}</td>;
     case 'genre': return (
       <td key={key} className={cn('px-4', py)}>
         {b.genre ? <GenreChip genre={b.genre} /> : EMPTY}

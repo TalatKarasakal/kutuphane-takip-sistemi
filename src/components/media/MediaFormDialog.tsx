@@ -58,7 +58,15 @@ export function MediaFormDialog({ open, onClose, onSave, initial, type }: Props)
     if (!form.title.trim()) e.title = 'Başlık zorunlu';
     setErrors(e);
     if (Object.keys(e).length) return;
-    onSave({ ...form, title: form.title.trim() });
+    // Boş stringler undefined'a çevrilir; aksi halde listede "—" yerine boşluk görünür.
+    const clean = (s?: string) => (s?.trim() ? s.trim() : undefined);
+    onSave({
+      ...form,
+      title: form.title.trim(),
+      director: clean(form.director),
+      genre: clean(form.genre),
+      notes: clean(form.notes),
+    });
     onClose();
   };
 
@@ -68,7 +76,7 @@ export function MediaFormDialog({ open, onClose, onSave, initial, type }: Props)
     <Modal
       open={open}
       onClose={onClose}
-      title={initial ? `${typeLabel}i Düzenle` : `Yeni ${typeLabel}`}
+      title={initial ? (type === 'film' ? 'Filmi Düzenle' : 'Diziyi Düzenle') : `Yeni ${typeLabel}`}
       size="md"
       footer={
         <>

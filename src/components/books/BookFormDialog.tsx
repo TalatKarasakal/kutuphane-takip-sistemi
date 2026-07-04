@@ -65,10 +65,20 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
     if (!form.author.trim()) e.author = 'Yazar zorunlu';
     setErrors(e);
     if (Object.keys(e).length) return;
+    // Boş stringler undefined'a çevrilir; aksi halde listede "—" yerine boşluk görünür.
+    const clean = (s?: string) => (s?.trim() ? s.trim() : undefined);
     onSave({
       ...form,
       title: form.title.trim(),
       author: form.author.trim(),
+      publisher: clean(form.publisher),
+      genre: clean(form.genre),
+      isbn: clean(form.isbn),
+      language: clean(form.language),
+      translator: clean(form.translator),
+      notes: clean(form.notes),
+      readStartDate: clean(form.readStartDate),
+      readEndDate: clean(form.readEndDate),
     });
     onClose();
   };

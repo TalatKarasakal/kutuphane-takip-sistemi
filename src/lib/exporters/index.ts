@@ -103,7 +103,7 @@ export function exportMediaXlsx(media: Media[], fields: (keyof Media)[], filenam
 export function exportMediaCsv(media: Media[], fields: (keyof Media)[], filename: string) {
   const rows = media.map((m) => toMediaRow(m, fields));
   const csv = Papa.unparse(rows);
-  downloadBlob(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }), filename);
+  downloadBlob(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }), filename);
 }
 
 export function exportMediaJson(media: Media[], fields: (keyof Media)[], filename: string) {

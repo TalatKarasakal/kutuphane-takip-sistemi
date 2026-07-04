@@ -24,8 +24,8 @@ import type { Media } from '../../types/media';
 export type Section = 'books' | 'movies' | 'tv';
 
 export function AppShell() {
-  const { load: loadBooks, add: addBook, update: updateBook, remove: removeBook } = useBooks();
-  const { load: loadMedia, add: addMedia, update: updateMedia, remove: removeMedia } = useMedia();
+  const { load: loadBooks, add: addBook, update: updateBook, remove: removeBook, clearSelection: clearBookSelection } = useBooks();
+  const { load: loadMedia, add: addMedia, update: updateMedia, remove: removeMedia, clearSelection: clearMediaSelection } = useMedia();
   const booksLoaded = useBooks((s) => s.loaded);
   const mediaLoaded = useMedia((s) => s.loaded);
   const settings = useSettings();
@@ -51,6 +51,16 @@ export function AppShell() {
 
   useEffect(() => { loadBooks(); }, [loadBooks]);
   useEffect(() => { loadMedia(); }, [loadMedia]);
+
+  // Bölüm değişince seçimleri ve açık detay panellerini bırak: film seçiliyken
+  // Diziler'e geçildiğinde toplu işlem çubuğu yanlış kayıtlara işlem yapmasın.
+  useEffect(() => {
+    clearBookSelection();
+    clearMediaSelection();
+    setDetail(null);
+    setMediaDetail(null);
+  }, [section, clearBookSelection, clearMediaSelection]);
+
   useEffect(() => { if (booksLoaded && mediaLoaded) maybeAutoBackup(); }, [booksLoaded, mediaLoaded]);
   useEffect(() => { applyTheme(settings); }, [settings.theme, settings.accent, settings.fontFamily, settings.fontSize, settings.density]);
 
@@ -64,14 +74,15 @@ export function AppShell() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement).tagName;
-      const isEditable = ['INPUT', 'TEXTAREA', 'SELECT'].includes(tag);
+      const el = e.target as HTMLElement;
+      const isEditable = ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable;
+      const hasModifier = e.metaKey || e.ctrlKey || e.altKey;
 
-      if (e.key === '1' && !isEditable) { setSection('books'); return; }
-      if (e.key === '2' && !isEditable) { setSection('movies'); return; }
-      if (e.key === '3' && !isEditable) { setSection('tv'); return; }
+      if (e.key === '1' && !isEditable && !hasModifier) { setSection('books'); return; }
+      if (e.key === '2' && !isEditable && !hasModifier) { setSection('movies'); return; }
+      if (e.key === '3' && !isEditable && !hasModifier) { setSection('tv'); return; }
 
-      if (e.key === 'n' && !isEditable && !e.metaKey && !e.ctrlKey) {
+      if (e.key === 'n' && !isEditable && !hasModifier) {
         e.preventDefault();
         if (sectionRef.current === 'books') { setEditing(undefined); setFormOpen(true); }
         else { setEditingMedia(undefined); setMediaFormOpen(true); }

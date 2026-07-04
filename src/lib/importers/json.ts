@@ -7,7 +7,13 @@ export interface ParsedJson {
 export async function parseJson(file: File): Promise<ParsedJson> {
   const text = await file.text();
   const data = JSON.parse(text);
-  const arr: Record<string, unknown>[] = Array.isArray(data) ? data : Array.isArray(data?.books) ? data.books : [data];
+  const arr: Record<string, unknown>[] = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.books)
+      ? data.books
+      : Array.isArray(data?.media)
+        ? data.media
+        : [data];
   const headerSet = new Set<string>();
   arr.forEach((r) => Object.keys(r ?? {}).forEach((k) => headerSet.add(k)));
   const headers = [...headerSet];

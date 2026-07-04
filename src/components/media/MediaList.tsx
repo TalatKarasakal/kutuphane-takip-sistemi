@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { ArrowDown, ArrowUp, ArrowUpDown, Film, Tv2, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Film, Tv2, SearchX, Trash2, X } from 'lucide-react';
 import { useMedia, applyMediaFilters, type MediaSortKey } from '../../store/mediaStore';
 import { useSettings } from '../../store/settingsStore';
 import { MEDIA_STATUSES } from '../../constants/mediaStatuses';
-import { MediaStatusBadge } from '../ui/Badge';
+import { FILM_COLUMN_LABELS, TV_COLUMN_LABELS } from '../../constants/columns';
+import { MediaStatusBadge, GenreChip } from '../ui/Badge';
 import { MediaCard } from './MediaCard';
 import type { Media, MediaStatus, MediaType } from '../../types/media';
 import { cn } from '../../lib/utils';
@@ -27,7 +28,7 @@ const NEXT_LABEL: Partial<Record<MediaStatus, string>> = {
 };
 
 export function MediaList({ type, onOpen }: Props) {
-  const { media, search, statusFilter, genreFilter, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, remove, setStatus } = useMedia();
+  const { media, search, statusFilter, genreFilter, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, clearFilters, remove, setStatus } = useMedia();
   const { view, density, filmColumns, tvColumns } = useSettings();
 
   const columns = type === 'film' ? filmColumns : tvColumns;
@@ -44,14 +45,24 @@ export function MediaList({ type, onOpen }: Props) {
   const TypeIcon = type === 'film' ? Film : Tv2;
 
   if (filtered.length === 0) {
+    const isFiltered = media.some((m) => m.type === type);
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center p-10">
           <div className="w-14 h-14 mx-auto rounded-full bg-primary/15 text-primary flex items-center justify-center mb-4">
-            <TypeIcon size={24} />
+            {isFiltered ? <SearchX size={24} /> : <TypeIcon size={24} />}
           </div>
-          <h3 className="font-semibold mb-1">Henüz {typeLabel} yok</h3>
-          <p className="text-sm text-muted max-w-xs">Sağ üstten {typeLabel} ekleyebilirsin.</p>
+          <h3 className="font-semibold mb-1">{isFiltered ? 'Sonuç bulunamadı' : `Henüz ${typeLabel} yok`}</h3>
+          <p className="text-sm text-muted max-w-xs">
+            {isFiltered
+              ? `Arama veya filtrelerle eşleşen ${typeLabel} yok.`
+              : `Sağ üstten ${typeLabel} ekleyebilir, Excel/CSV/JSON dosyasından içe aktarabilirsin.`}
+          </p>
+          {isFiltered && (
+            <button className="btn btn-outline mt-4" onClick={clearFilters}>
+              <X size={14} /> Filtreleri Temizle
+            </button>
+          )}
         </div>
       </div>
     );
@@ -90,7 +101,7 @@ export function MediaList({ type, onOpen }: Props) {
                   {visibleCols.map((col) => (
                     <ThSort
                       key={col.key}
-                      label={MEDIA_COL_LABEL[col.key] ?? col.key}
+                      label={COL_LABELS[col.key] ?? col.key}
                       k={col.key as MediaSortKey}
                       sortKey={sortKey}
                       sortDir={sortDir}
@@ -137,17 +148,7 @@ export function MediaList({ type, onOpen }: Props) {
   );
 }
 
-const MEDIA_COL_LABEL: Record<string, string> = {
-  title: 'Başlık',
-  director: 'Yönetmen',
-  genre: 'Tür',
-  releaseYear: 'Çıkış Yılı',
-  duration: 'Süre (dk)',
-  seasons: 'Sezon',
-  episodeDuration: 'Bölüm Süresi (dk)',
-  watchYear: 'İzlenme Yılı',
-  status: 'Durum',
-};
+const COL_LABELS: Record<string, string> = { ...FILM_COLUMN_LABELS, ...TV_COLUMN_LABELS };
 
 const EMPTY = <span className="text-muted/30 select-none">—</span>;
 
@@ -162,8 +163,12 @@ function renderCell(m: Media, key: string, density: string) {
         </div>
       </td>
     );
-    case 'director': return <td key={key} className={cn('px-4', py, 'text-muted')}>{m.director ?? EMPTY}</td>;
-    case 'genre': return <td key={key} className={cn('px-4', py, 'text-muted')}>{m.genre ?? EMPTY}</td>;
+    case 'director': return <td key={key} className={cn('px-4', py, 'text-muted')}>{m.director || EMPTY}</td>;
+    case 'genre': return (
+      <td key={key} className={cn('px-4', py)}>
+        {m.genre ? <GenreChip genre={m.genre} /> : EMPTY}
+      </td>
+    );
     case 'releaseYear': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.releaseYear ?? EMPTY}</td>;
     case 'duration': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.duration ? `${m.duration} dk` : EMPTY}</td>;
     case 'seasons': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{m.seasons ?? EMPTY}</td>;
@@ -190,17 +195,21 @@ function ThSort({
 
 function BulkBar({ count, onClear, onDelete, onStatus }: { count: number; onClear: () => void; onDelete: () => void; onStatus: (s: MediaStatus) => void }) {
   return (
-    <div className="sticky top-0 z-10 bg-primary/10 border-b border-primary/20 px-5 py-2 flex items-center gap-2 text-sm">
-      <span className="font-medium text-primary">{count} seçili</span>
-      <div className="ml-4 flex items-center gap-1">
-        <span className="text-muted mr-1">Durum değiştir:</span>
+    <div className="sticky top-0 z-10 bg-primary/10 border-b border-primary/20 px-5 py-2 flex items-center gap-3 text-sm flex-wrap">
+      <span className="font-medium text-primary shrink-0">{count} seçili</span>
+
+      <div className="w-px h-4 bg-primary/20 shrink-0" />
+
+      <div className="flex items-center gap-1 flex-wrap">
+        <span className="text-muted text-xs shrink-0">Durum:</span>
         {MEDIA_STATUSES.map((s) => (
-          <button key={s.value} className="chip hover:bg-primary/20" onClick={() => onStatus(s.value)}>{s.label}</button>
+          <button key={s.value} className="chip hover:bg-primary/20 text-xs" onClick={() => onStatus(s.value)}>{s.label}</button>
         ))}
       </div>
+
       <div className="ml-auto flex items-center gap-2">
         <button className="btn btn-ghost text-secondary" onClick={onDelete}><Trash2 size={14} /> Sil</button>
-        <button className="btn btn-ghost" onClick={onClear}>Temizle</button>
+        <button className="btn btn-ghost" onClick={onClear}>Seçimi Kaldır</button>
       </div>
     </div>
   );

@@ -158,12 +158,14 @@ export function applyMediaFilters(
   result.sort((a, b) => {
     const dir = opts.sortDir === 'asc' ? 1 : -1;
     const k = opts.sortKey;
-    const av = a[k] ?? '';
-    const bv = b[k] ?? '';
-    if (typeof av === 'string' && typeof bv === 'string') return av.localeCompare(bv, 'tr') * dir;
-    if (av < bv) return -1 * dir;
-    if (av > bv) return 1 * dir;
-    return 0;
+    const av = a[k];
+    const bv = b[k];
+    // Boş değerler yönden bağımsız olarak her zaman sona gider (kitap listesiyle aynı davranış).
+    if ((av == null || av === '') && (bv == null || bv === '')) return 0;
+    if (av == null || av === '') return 1;
+    if (bv == null || bv === '') return -1;
+    if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
+    return String(av).localeCompare(String(bv), 'tr') * dir;
   });
 
   return result;

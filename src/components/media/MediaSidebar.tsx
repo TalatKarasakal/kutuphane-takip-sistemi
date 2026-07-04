@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Film, Tv2, X } from 'lucide-react';
+import { Film, Filter, Tv2, X } from 'lucide-react';
 import { useMedia } from '../../store/mediaStore';
 import { MEDIA_STATUSES } from '../../constants/mediaStatuses';
 import type { MediaType } from '../../types/media';
@@ -59,6 +59,7 @@ export function MediaSidebar({ type }: Props) {
                 key={s.value}
                 first={i === 0}
                 active={active}
+                accent="primary"
                 onClick={() => toggleStatusFilter(s.value)}
                 label={s.label}
                 count={counts[s.value] ?? 0}
@@ -67,7 +68,7 @@ export function MediaSidebar({ type }: Props) {
           })}
         </FilterCard>
 
-        <FilterCard title="Tür">
+        <FilterCard title="Tür" icon={<Filter size={12} />}>
           {activeGenres.length === 0 ? (
             <div className="px-3 py-2 text-xs text-muted italic">Henüz tür eklenmemiş</div>
           ) : (
@@ -76,6 +77,7 @@ export function MediaSidebar({ type }: Props) {
                 key={g}
                 first={i === 0}
                 active={genreFilter.includes(g)}
+                accent="secondary"
                 onClick={() => toggleGenreFilter(g)}
                 label={g}
                 count={count}
@@ -88,11 +90,12 @@ export function MediaSidebar({ type }: Props) {
   );
 }
 
-function FilterCard({ title, children }: { title: string; children: React.ReactNode }) {
+function FilterCard({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section className="rounded-xl border border-border bg-surface2/40 overflow-hidden">
-      <div className="px-3 pt-2.5 pb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-        {title}
+      <div className="px-3 pt-2.5 pb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted">
+        {icon}
+        <span>{title}</span>
       </div>
       <div className="border-t border-border/70" />
       <div className="p-1">{children}</div>
@@ -100,9 +103,10 @@ function FilterCard({ title, children }: { title: string; children: React.ReactN
   );
 }
 
-function FilterRow({ first, active, onClick, label, count }: {
+function FilterRow({ first, active, accent, onClick, label, count }: {
   first?: boolean;
   active: boolean;
+  accent: 'primary' | 'secondary';
   onClick: () => void;
   label: string;
   count: number;
@@ -113,7 +117,11 @@ function FilterRow({ first, active, onClick, label, count }: {
       className={cn(
         'w-full flex items-center justify-between px-3 py-2 text-sm transition-colors',
         !first && 'border-t border-border/60',
-        active ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-surface2 text-text',
+        active
+          ? accent === 'primary'
+            ? 'bg-primary/10 text-primary font-medium'
+            : 'bg-secondary/10 text-secondary font-medium'
+          : 'hover:bg-surface2 text-text',
       )}
     >
       <span>{label}</span>
