@@ -3,6 +3,11 @@ const path = require('path');
 const fs = require('fs');
 const { registerAiIpc } = require('./ai.cjs');
 
+// Dock/menü çubuğunda "Electron" yerine uygulama adı görünsün.
+app.setName('Kütüphanem');
+
+const ICON_PATH = path.join(__dirname, '..', 'build', 'icon.png');
+
 let mainWindow = null;
 
 const MAX_BACKUPS = 20;
@@ -103,6 +108,7 @@ function createWindow() {
     minHeight: 640,
     backgroundColor: '#0b1220',
     title: 'Kütüphanem',
+    icon: ICON_PATH,
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -130,6 +136,11 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // macOS: Dock simgesini çalışma anında ayarla (dev modda da doğru simge).
+  if (process.platform === 'darwin' && app.dock) {
+    try { app.dock.setIcon(ICON_PATH); } catch { /* yoksay */ }
+  }
+
   registerBackupIpc();
   registerAiIpc();
 

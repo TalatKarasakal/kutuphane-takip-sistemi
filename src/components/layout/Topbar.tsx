@@ -51,8 +51,8 @@ export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExpor
   return (
     <header className="h-14 border-b border-border bg-surface/80 backdrop-blur px-5 flex items-center shrink-0">
       {/* Sol — arama */}
-      <div className="flex-1 flex items-center">
-        <div className="relative w-96">
+      <div className="flex-1 flex items-center min-w-0">
+        <div className="relative w-full max-w-96 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={15} />
           <input
             ref={searchRef}
@@ -95,17 +95,20 @@ export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExpor
         )}
       </div>
 
-      {/* Sağ — import/export/ayarlar/ekle */}
-      <div className="flex-1 flex items-center justify-end gap-2">
+      {/* Sağ — import/export/ayarlar/ekle. Dar (pencere) ekranlarda yazılar
+          gizlenip yalnızca ikon kalır (tooltip'ler korunur); geniş (tam ekran)
+          ekranda tam yazı görünür. Böylece butonlar pencerede orantısız
+          büyümez. */}
+      <div className="flex items-center justify-end gap-2 shrink-0 ml-2">
         {section === 'books' && (
-          <button className="btn btn-outline" onClick={onPhotoImport} title="Fotoğraftan kitap ekle">
-            <Camera size={15} /> Fotoğraftan Ekle
+          <button className="btn btn-outline whitespace-nowrap shrink-0" onClick={onPhotoImport} title="Fotoğraftan kitap ekle">
+            <Camera size={15} /> <span className="hidden xl:inline">Fotoğraftan Ekle</span>
           </button>
         )}
-        <button className="btn btn-outline" onClick={onImport}><ArrowDownToLine size={15} /> İçe Aktar</button>
-        <button className="btn btn-outline" onClick={onExport}><ArrowUpFromLine size={15} /> Dışa Aktar</button>
-        <button className="btn btn-ghost" onClick={onSettings} title="Ayarlar"><Settings size={15} /></button>
-        <button className="btn btn-primary" onClick={onAdd}><Plus size={15} /> {ADD_LABEL[section]}</button>
+        <button className="btn btn-outline whitespace-nowrap shrink-0" onClick={onImport} title="İçe Aktar"><ArrowDownToLine size={15} /> <span className="hidden xl:inline">İçe Aktar</span></button>
+        <button className="btn btn-outline whitespace-nowrap shrink-0" onClick={onExport} title="Dışa Aktar"><ArrowUpFromLine size={15} /> <span className="hidden xl:inline">Dışa Aktar</span></button>
+        <button className="btn btn-ghost shrink-0" onClick={onSettings} title="Ayarlar"><Settings size={15} /></button>
+        <button className="btn btn-primary whitespace-nowrap shrink-0" onClick={onAdd} title={ADD_LABEL[section]}><Plus size={15} /> <span className="hidden lg:inline">{ADD_LABEL[section]}</span></button>
       </div>
     </header>
   );
