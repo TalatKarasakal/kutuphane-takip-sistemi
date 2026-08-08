@@ -12,7 +12,7 @@
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
 | Kontrol bekleyen çözüm | 0 |
-| Geliştirme fikri | 12 |
+| Geliştirme fikri | 17 |
 | Reddedilen öneri | 0 |
 
 ### Ayrıntı Belgeleri

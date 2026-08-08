@@ -99,3 +99,44 @@
 - **Sorumlu:** Atanmadı
 - **Son Güncelleme:** 2026-08-08
 - **Öneri:** `[Model: GPT-5 Codex]` kullanılmayan `date-fns` ve `dexie-react-hooks` bağımlılıklarını kaldır. Uygulanmayacaksa ölü rating/tags alanlarını ve backup IPC metotlarını çıkar. Gereksiz entitlement'ları sil; dış Google Fonts bağımlılığını kaldır veya yerel fontlarla değiştir.
+
+### IMP-013 — Atomik veri işlemleri ve görsel önbellekleme mimarisi
+
+- **Öncelik:** P2
+- **Durum:** Fikir
+- **Sorumlu:** Atanmadı
+- **Son Güncelleme:** 2026-08-08
+- **Öneri:** `[Model: Gemini 3.6 Flash]` IndexedDB (Dexie) katmanında toplu ekleme/güncelleme/silme işlemlerini atomik transaction kapsamına alarak veri bütünlüğünü garanti altına al. Kitap kapak görselleri ve fotoğrafları için yerel IndexedDB Blob önbelleği oluştur.
+
+### IMP-014 — Hızlı erişim komut paleti (Command Palette — Cmd/Ctrl + K)
+
+- **Öncelik:** P2
+- **Durum:** Fikir
+- **Sorumlu:** Atanmadı
+- **Son Güncelleme:** 2026-08-08
+- **Öneri:** `[Model: Gemini 3.6 Flash]` Masaüstü deneyimini ve verimliliği artırmak için `Cmd+K` / `Ctrl+K` ile açılan gelişmiş komut paleti bileşeni ekle. Klavyeden hızlı arama, sayfa geçişleri, yeni kitap/medya ekleme ve filtre sıfırlama eylemleri sağla.
+
+### IMP-015 — Çoklu dil ve yerelleştirme (i18n) desteği
+
+- **Öncelik:** P3
+- **Durum:** Fikir
+- **Sorumlu:** Atanmadı
+- **Son Güncelleme:** 2026-08-08
+- **Öneri:** `[Model: Gemini 3.6 Flash]` Uygulama arayüz metinlerini bileşenlerden ayırarak `locales/tr.json` ve `locales/en.json` yapılandırmasına taşı; hafif bir i18n dil yönetim katmanı ekle.
+
+### IMP-016 — Dinamik tema mimarisi ve OS teması entegrasyonu
+
+- **Öncelik:** P3
+- **Durum:** Fikir
+- **Sorumlu:** Atanmadı
+- **Son Güncelleme:** 2026-08-08
+- **Öneri:** `[Model: Gemini 3.6 Flash]` Koyu tema yanında açık tema ve işletim sistemi tema tercihine (Electron `nativeTheme` IPC) otomatik uyum sağlayan esnek CSS Variable / Tailwind dark mode entegrasyonu sağla.
+
+### IMP-017 — Etiket (Tag) ve dinamik renkli kategori yönetim merkezi
+
+- **Öncelik:** P2
+- **Durum:** Fikir
+- **Sorumlu:** Atanmadı
+- **Son Güncelleme:** 2026-08-08
+- **Öneri:** `[Model: Gemini 3.6 Flash]` Kitap ve medya kayıtlarına uygulanabilir özel renkli etiket yönetimi (Tag Manager) ekle. Çoklu etiket filtreleme (AND/OR mantığı) ve etiket bazlı hızlı gruplama desteği oluştur.
+
