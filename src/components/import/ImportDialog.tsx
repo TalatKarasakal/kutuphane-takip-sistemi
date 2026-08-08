@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { parseXlsx } from '../../lib/importers/xlsx';
 import { parseCsv } from '../../lib/importers/csv';
@@ -93,12 +93,17 @@ export function ImportDialog({ open, onClose, section }: Props) {
   };
 
   const headers = (sheets[sheetIdx]?.rows[headerRowIdx] ?? []) as string[];
-  const dataRows = (sheets[sheetIdx]?.rows.slice(headerRowIdx + 1) ?? []);
+  const dataRows = useMemo(
+    () => sheets[sheetIdx]?.rows.slice(headerRowIdx + 1) ?? [],
+    [headerRowIdx, sheetIdx, sheets],
+  );
 
   const statusColIdx = Object.entries(mapping).find(([, v]) => v === 'status')?.[0];
-  const statusRawValues = statusColIdx != null
-    ? [...new Set(dataRows.map((r) => String((r as unknown[])[Number(statusColIdx)] ?? '').trim()).filter(Boolean))]
-    : [];
+  const statusRawValues = useMemo(() => (
+    statusColIdx != null
+      ? [...new Set(dataRows.map((r) => String((r as unknown[])[Number(statusColIdx)] ?? '').trim()).filter(Boolean))]
+      : []
+  ), [dataRows, statusColIdx]);
 
   const mappableFields = isMedia ? MAPPABLE_MEDIA_FIELDS : MAPPABLE_FIELDS;
   const fieldLabels = isMedia ? MEDIA_FIELD_LABELS : FIELD_LABELS;

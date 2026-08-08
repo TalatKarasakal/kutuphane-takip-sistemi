@@ -1,6 +1,6 @@
 import type { BookField } from '../../types/book';
 
-const norm = (s: string) => s.trim().toLocaleLowerCase('tr').replace(/[._\-]+/g, ' ').replace(/\s+/g, ' ');
+const norm = (s: string) => s.trim().toLocaleLowerCase('tr').replace(/[._-]+/g, ' ').replace(/\s+/g, ' ');
 
 export type MediaMappableField =
   | 'title'

@@ -62,7 +62,7 @@ export function AppShell() {
   }, [section, clearBookSelection, clearMediaSelection]);
 
   useEffect(() => { if (booksLoaded && mediaLoaded) maybeAutoBackup(); }, [booksLoaded, mediaLoaded]);
-  useEffect(() => { applyTheme(settings); }, [settings.theme, settings.accent, settings.fontFamily, settings.fontSize, settings.density]);
+  useEffect(() => { applyTheme(settings); }, [settings]);
 
   useEffect(() => {
     if (settings.theme !== 'system') return;
