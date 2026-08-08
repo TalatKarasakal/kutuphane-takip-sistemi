@@ -17,6 +17,11 @@ export async function parseJson(file: File): Promise<ParsedJson> {
   const headerSet = new Set<string>();
   arr.forEach((r) => Object.keys(r ?? {}).forEach((k) => headerSet.add(k)));
   const headers = [...headerSet];
-  const rows: unknown[][] = [headers, ...arr.map((r) => headers.map((h) => (r as Record<string, unknown>)?.[h] ?? ''))];
+  const rows: unknown[][] = [
+    headers,
+    ...arr.map((r) =>
+      headers.map((h) => (r as Record<string, unknown>)?.[h] ?? ""),
+    ),
+  ];
   return { rows, headers, records: arr };
 }

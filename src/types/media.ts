@@ -1,5 +1,5 @@
-export type MediaStatus = 'izlendi' | 'izlenecek';
-export type MediaType = 'film' | 'dizi';
+export type MediaStatus = "izlendi" | "izlenecek";
+export type MediaType = "film" | "dizi";
 
 export interface Media {
   id: string;
@@ -14,6 +14,8 @@ export interface Media {
   episodeDuration?: number;
   status: MediaStatus;
   notes?: string;
+  tagIds?: string[];
+  posterUrl?: string;
   addedAt: string;
   updatedAt: string;
 }

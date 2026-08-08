@@ -1,5 +1,5 @@
-import Papa from 'papaparse';
-import { isRtf, rtfToPlainText } from './rtf';
+import Papa from "papaparse";
+import { isRtf, rtfToPlainText } from "./rtf";
 
 export interface ParsedCsv {
   rows: unknown[][];
@@ -14,13 +14,20 @@ export async function parseCsv(file: File): Promise<ParsedCsv> {
     text = rtfToPlainText(text);
   }
   const delim = detectDelimiter(text);
-  const res = Papa.parse<unknown[]>(text, { header: false, skipEmptyLines: true, delimiter: delim });
-  return { rows: (res.data as unknown[][]).filter((r) => Array.isArray(r)), wasRtf };
+  const res = Papa.parse<unknown[]>(text, {
+    header: false,
+    skipEmptyLines: true,
+    delimiter: delim,
+  });
+  return {
+    rows: (res.data as unknown[][]).filter((r) => Array.isArray(r)),
+    wasRtf,
+  };
 }
 
 function detectDelimiter(text: string): string | undefined {
-  const sample = text.split('\n').slice(0, 5).join('\n');
-  const counts = { ',': 0, ';': 0, '\t': 0, '|': 0 } as Record<string, number>;
+  const sample = text.split("\n").slice(0, 5).join("\n");
+  const counts = { ",": 0, ";": 0, "\t": 0, "|": 0 } as Record<string, number>;
   for (const ch of sample) if (ch in counts) counts[ch]++;
   const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
   return best[1] > 0 ? best[0] : undefined;
