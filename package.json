@@ -10,6 +10,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
+    "tracker:check": "node scripts/validate-project-tracker.mjs",
     "pack:mac": "npm run build && node scripts/build-mac.mjs",
     "pack:win": "npm run build && electron-builder --win --publish never",
     "pack:all": "npm run pack:mac && electron-builder --win --publish never"
