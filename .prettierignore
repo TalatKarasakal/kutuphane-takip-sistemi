@@ -3,3 +3,10 @@ release
 coverage
 node_modules
 package-lock.json
+playwright-report
+test-results
+.agents
+PROJECT_HISTORY.md
+PROJECT_TRACKER.md
+docs/project-tracker
+scripts/validate-project-tracker.mjs
