@@ -7,136 +7,135 @@
 ### IMP-001 — Kitap durum modelini iki eksene ayır
 
 - **Öncelik:** P1
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Reddedildi
+- **Sorumlu:** Kullanıcı kararı
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` mevcut sahiplik ve okuma durumlarını `ownershipStatus` ve `readingStatus` olarak ayır; “okuyor” durumunu ve okuma ilerlemesini ekle.
 
 ### IMP-002 — Puan ve etiket alanlarını tamamla
 
 - **Öncelik:** P2
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` `Book.rating` ve `Book.tags` alanlarını form, liste, detay, filtre, import ve export akışlarına ekle. Yakın vadede kullanılmayacaksa ölü alan olarak kalmaması için modelden çıkar.
 
 ### IMP-003 — Uygulama içi yedek geçmişi
 
 - **Öncelik:** P1
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` mevcut backup list/read/lastInfo yetenekleriyle tarih, boyut ve kayıt sayısı gösteren yedek geçmişi ekranı oluştur; seçilen yedeği önizleyerek geri yüklet. Özellik yapılmayacaksa kullanılmayan IPC yüzeyini kaldır.
 
 ### IMP-004 — ISBN/barkod ve çevrimiçi künye araması
 
 - **Öncelik:** P2
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` barkod veya elle ISBN girildiğinde kontrollü künye araması sun. Dış servise gönderilen veriyi açıkla ve sonuç eklenmeden önce önizleme göster.
 
 ### IMP-005 — Duplicate birleştirme merkezi
 
 - **Öncelik:** P1
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` tekrar kayıtları alan bazında karşılaştıran “birleştir” akışı ekle. Dosya ve fotoğraf importunda “atla / yeni ekle / mevcutla birleştir” seçenekleri sun.
 
 ### IMP-006 — Okuma takibi ve istatistikler
 
 - **Öncelik:** P2
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Reddedildi
+- **Sorumlu:** Kullanıcı kararı
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` okuma yüzdesi/sayfası, başlangıç-bitiş geçmişi, yıllık hedef, aylık okunan sayfa/kitap ve tür dağılımı ekle. Film/dizi için izleme geçmişi ve yıllık özet düşünülebilir.
 
 ### IMP-007 — Ödünç verme takibi
 
 - **Öncelik:** P3
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` kitap için ödünç verilen kişi, tarih, planlanan iade ve iade edildi durumu ekle.
 
 ### IMP-008 — Büyük koleksiyon performansı
 
 - **Öncelik:** P2
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` binlerce kayıt için sanal listeleme veya sayfalama, IndexedDB indeksli sorgular ve parçalı import kullan. Önce gerçekçi 1.000/10.000 kayıt performans testi oluştur.
 
 ### IMP-009 — Görsel ve bilgi zenginleştirme
 
 - **Öncelik:** P3
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` kitap detayında kapağı göster; kartlarda portre oranını koru. Film/dizi için isteğe bağlı poster alanı ekle; harici servis varsa kullanıcı anahtarı ve gizlilik tercihi sun.
 
 ### IMP-010 — Dağıtım ve ürün bilgileri
 
 - **Öncelik:** P2
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` Intel/Universal macOS, Windows imzalı kurulum ve Linux paket scripti ekle. Hakkında/sürüm ekranı, changelog ve isteğe bağlı güvenli güncelleme kontrolü oluştur.
 
 ### IMP-011 — Form deneyimi ve geri bildirim
 
 - **Öncelik:** P2
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` form kirliyken kaydedilmemiş değişiklik uyarısı göster. Toplu durum güncellemelerinde başarı toast'ı; toplu silmede geri alma yanında isteğe bağlı doğrulama kullan. Kart görünümüne seçim affordance'ı ekle.
 
 ### IMP-012 — Çıkarılabilecek ve sadeleştirilebilecek parçalar
 
 - **Öncelik:** P1
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: GPT-5 Codex]` kullanılmayan `date-fns` ve `dexie-react-hooks` bağımlılıklarını kaldır. Uygulanmayacaksa ölü rating/tags alanlarını ve backup IPC metotlarını çıkar. Gereksiz entitlement'ları sil; dış Google Fonts bağımlılığını kaldır veya yerel fontlarla değiştir.
 
 ### IMP-013 — Atomik veri işlemleri ve görsel önbellekleme mimarisi
 
 - **Öncelik:** P2
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: Gemini 3.6 Flash]` IndexedDB (Dexie) katmanında toplu ekleme/güncelleme/silme işlemlerini atomik transaction kapsamına alarak veri bütünlüğünü garanti altına al. Kitap kapak görselleri ve fotoğrafları için yerel IndexedDB Blob önbelleği oluştur.
 
 ### IMP-014 — Hızlı erişim komut paleti (Command Palette — Cmd/Ctrl + K)
 
 - **Öncelik:** P2
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: Gemini 3.6 Flash]` Masaüstü deneyimini ve verimliliği artırmak için `Cmd+K` / `Ctrl+K` ile açılan gelişmiş komut paleti bileşeni ekle. Klavyeden hızlı arama, sayfa geçişleri, yeni kitap/medya ekleme ve filtre sıfırlama eylemleri sağla.
 
 ### IMP-015 — Çoklu dil ve yerelleştirme (i18n) desteği
 
 - **Öncelik:** P3
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Reddedildi
+- **Sorumlu:** Kullanıcı kararı
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: Gemini 3.6 Flash]` Uygulama arayüz metinlerini bileşenlerden ayırarak `locales/tr.json` ve `locales/en.json` yapılandırmasına taşı; hafif bir i18n dil yönetim katmanı ekle.
 
 ### IMP-016 — Dinamik tema mimarisi ve OS teması entegrasyonu
 
 - **Öncelik:** P3
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: Gemini 3.6 Flash]` Koyu tema yanında açık tema ve işletim sistemi tema tercihine (Electron `nativeTheme` IPC) otomatik uyum sağlayan esnek CSS Variable / Tailwind dark mode entegrasyonu sağla.
 
 ### IMP-017 — Etiket (Tag) ve dinamik renkli kategori yönetim merkezi
 
 - **Öncelik:** P2
-- **Durum:** Fikir
-- **Sorumlu:** Atanmadı
-- **Son Güncelleme:** 2026-08-08
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Codex
+- **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: Gemini 3.6 Flash]` Kitap ve medya kayıtlarına uygulanabilir özel renkli etiket yönetimi (Tag Manager) ekle. Çoklu etiket filtreleme (AND/OR mantığı) ve etiket bazlı hızlı gruplama desteği oluştur.
-

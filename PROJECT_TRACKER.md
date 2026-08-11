@@ -6,14 +6,14 @@
 
 | Alan | Durum |
 |---|---|
-| Son güncelleme | 2026-08-08 |
-| Sıradaki iş | [ISS-001](docs/project-tracker/ISSUES.md#iss-001--macos-paketi-doğrulanamıyor-ve-uygulama-ikonu-pakete-girmiyor) |
+| Son güncelleme | 2026-08-11 |
+| Sıradaki iş | ISS-001 için Developer ID/notarization ve Windows imza anahtarlarıyla dış doğrulama |
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
-| Kontrol bekleyen çözüm | 0 |
+| Kontrol bekleyen çözüm | 26 |
 | Geliştirme fikri | 17 |
-| Reddedilen öneri | 0 |
+| Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
 
@@ -24,11 +24,12 @@
 
 ### Son İnceleme Özeti
 
-- `npm run typecheck` ve `npm run build` başarılı.
-- Üretim JavaScript çıktısı **880,58 KB**; Vite kod bölme uyarısı veriyor.
-- Arayüz 1360×860 ve Electron minimumu 1024×640 boyutlarında taşma olmadan açıldı; tarayıcı konsolunda hata görülmedi.
-- Mevcut macOS `.app` çıktısı 348 MB, DMG 134 MB; kopyalanan `node_modules` yaklaşık 84 MB.
-- İnceleme sorunları henüz uygulanmadı; tamamlanan kayıt yok.
+- `tracker:check`, Prettier, typecheck, ESLint, 18 unit/component testi, 2 Electron E2E senaryosu, build ve npm audit başarılı.
+- Ana JavaScript chunk'ı **387,56 KB**; barkod (**477,93 KB**) ve xlsx (**493,28 KB**) başlangıçtan ayrıldı.
+- 10.000 kayıt fixture'ında filtre/sıralama 300 ms hedefinin altında; sanallaştırılmış listeler DOM'u 200 öğenin altında tutuyor.
+- macOS Universal `.app` 490 MB, DMG 208 MB; `codesign --verify --deep --strict`, Universal mimari, ikon/Plist ve pakette yinelenen `node_modules` bulunmaması doğrulandı.
+- Tarayıcı ve Electron kontrollerinde kitap/medya CRUD, boş yazarın `Bilinmiyor` olması, mükerrer birleştirme, ödünç/iade, komut paleti ve yedek geri yükleme doğrulandı.
+- Gerçek Developer ID/notarization ve Windows imzası, imza anahtarları bekleyen tek dış doğrulama olarak açık.
 
 ---
 
@@ -77,19 +78,19 @@
 
 | Kimlik | Öncelik | Önem | Durum | Sorumlu | Başlık | Çözüm |
 |---|---|---|---|---|---|---|
-| ISS-001 | P0 | Kritik | Açık | Atanmadı | macOS paket/imza/ikon hatası | SOL-001 |
-| ISS-002 | P0 | Kritik | Açık | Atanmadı | Yedek şeması doğrulanmıyor | SOL-002, SOL-010 |
-| ISS-003 | P1 | Yüksek | Açık | Atanmadı | Async kayıt hatalarında form kapanıyor | SOL-003, SOL-012 |
-| ISS-004 | P1 | Yüksek | Açık | Atanmadı | İçe aktarma yanlış varsayımlar yapıyor | SOL-004, SOL-010 |
-| ISS-005 | P1 | Yüksek | Açık | Atanmadı | Modal açıkken kısayollar arka planı değiştiriyor | SOL-005 |
-| ISS-006 | P1 | Orta/Yüksek | Açık | Atanmadı | Erişilebilirlik eksikleri | SOL-005 |
-| ISS-007 | P1 | Orta | Açık | Atanmadı | Ortak medya filtresi ve Türkçe arama hatası | SOL-006 |
-| ISS-008 | P0 | Kritik/Yüksek | Açık | Atanmadı | Bağımlılık güvenlik uyarıları | SOL-001, SOL-007 |
-| ISS-009 | P1 | Yüksek | Açık | Atanmadı | Electron ve gizli anahtar güvenliği | SOL-008, SOL-012 |
-| ISS-010 | P2 | Orta | Açık | Atanmadı | Büyük bundle ve masaüstü paketi | SOL-001, SOL-009 |
-| ISS-011 | P1 | Orta | Açık | Atanmadı | Girdi ve dosya sınırları eksik | SOL-004, SOL-010 |
-| ISS-012 | P2 | Orta | Açık | Atanmadı | Test, lint ve CI yok | SOL-007, SOL-012 |
-| ISS-013 | P1 | Orta | Açık | Atanmadı | Gizlilik metni ağ trafiğini açıklamıyor | SOL-011 |
+| ISS-001 | P0 | Kritik | Dış doğrulama bekliyor | Codex | macOS paket/imza/ikon hatası | SOL-001 |
+| ISS-002 | P0 | Kritik | Kontrol bekliyor | Codex | Yedek şeması doğrulanmıyor | SOL-002, SOL-010 |
+| ISS-003 | P1 | Yüksek | Kontrol bekliyor | Codex | Async kayıt hatalarında form kapanıyor | SOL-003, SOL-012 |
+| ISS-004 | P1 | Yüksek | Kontrol bekliyor | Codex | İçe aktarma yanlış varsayımlar yapıyor | SOL-004, SOL-010 |
+| ISS-005 | P1 | Yüksek | Kontrol bekliyor | Codex | Modal açıkken kısayollar arka planı değiştiriyor | SOL-005 |
+| ISS-006 | P1 | Orta/Yüksek | Kontrol bekliyor | Codex | Erişilebilirlik eksikleri | SOL-005 |
+| ISS-007 | P1 | Orta | Kontrol bekliyor | Codex | Ortak medya filtresi ve Türkçe arama hatası | SOL-006 |
+| ISS-008 | P0 | Kritik/Yüksek | Kontrol bekliyor | Codex | Bağımlılık güvenlik uyarıları | SOL-001, SOL-007 |
+| ISS-009 | P1 | Yüksek | Kontrol bekliyor | Codex | Electron ve gizli anahtar güvenliği | SOL-008, SOL-012 |
+| ISS-010 | P2 | Orta | Kontrol bekliyor | Codex | Büyük bundle ve masaüstü paketi | SOL-001, SOL-009 |
+| ISS-011 | P1 | Orta | Kontrol bekliyor | Codex | Girdi ve dosya sınırları eksik | SOL-004, SOL-010 |
+| ISS-012 | P2 | Orta | Kontrol bekliyor | Codex | Test, lint ve CI yok | SOL-007, SOL-012 |
+| ISS-013 | P1 | Orta | Kontrol bekliyor | Codex | Gizlilik metni ağ trafiğini açıklamıyor | SOL-011 |
 
 Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
 
@@ -103,7 +104,17 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
 
 ## 4. 🧪 Kontrol Edilecek Çözümler
 
-- *(Henüz onay bekleyen çözüm bulunmuyor.)*
+- **SOL-001–SOL-012 — Kapsamlı sorun çözüm paketi**
+  - **Uygulayan:** Codex `[Model: GPT-5 Codex]`
+  - **Commitler:** `5fab877`, `0a104b1`, `79e3f39`, `409c917`, `f26f768`, `616181e`, `8822f79`, `5be79cc`, `db1e8ce`, `f0c0d9a`, `b1aa2f1`, `fcbf62c`.
+  - **Doğrulama:** format, typecheck, lint, 18 unit/component testi, 2 Electron E2E, build, audit ve macOS Universal paket smoke kontrolleri başarılı.
+  - **Kullanıcı kontrolü:** Ayarlar/yedek, import/mükerrer, form hata/dirty, klavye-overlay, Türkçe filtre, güvenli anahtar ve çevrimdışı mod akışlarını kontrol edin.
+- **IMP-002/003/004/005/007/008/009/010/011/012/013/014/016/017 — Seçilen geliştirmeler**
+  - **Uygulayan:** Codex `[Model: GPT-5 Codex]`
+  - **Commitler:** `79e3f39`, `f26f768`, `616181e`, `8822f79`, `5be79cc`, `db1e8ce`, `f0c0d9a`, `b1aa2f1`, `fcbf62c`.
+  - **Doğrulama:** puan/etiket, aktif ödünç, ISBN/barkod, klasik-zengin görünüm, sanallaştırma, komut paleti, tema ve dağıtım senaryoları otomatik veya manuel olarak doğrulandı.
+  - **Kullanıcı kontrolü:** Klasik görünümün varsayılan kalmasını, Zengin görünüm geçişini ve ödünç bölümünün yalnız aktif kayıt varken görünmesini kontrol edin.
+- **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:
 
@@ -117,12 +128,14 @@ Bir kayıt buraya taşınırken şu bilgiler zorunludur:
 
 ## 5. 🚀 Geliştirme Önerileri
 
-12 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bu bölüm yalnızca kullanıcı açıkça geliştirme tavsiyesi istediğinde güncellenir.
+17 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 14'ü uygulanmış ve kontrol bekliyor, 3'ü kullanıcı kararıyla reddedilmiştir.
 
 ---
 
 ## 6. 🚫 Reddedilen Öneriler
 
-- *(Henüz reddedilen öneri bulunmuyor.)*
+- **IMP-001 — Kitap durum modelini iki eksene ayır:** Kullanıcı mevcut durum modelini korumayı seçti. Karar: 2026-08-08.
+- **IMP-006 — Okuma takibi ve istatistikler:** Kullanıcı bu kapsamın eklenmemesini istedi. Karar: 2026-08-08.
+- **IMP-015 — Çoklu dil ve yerelleştirme:** Kullanıcı i18n katmanına gerek olmadığını belirtti. Karar: 2026-08-08.
 
 Reddedilen kayıtlar gerekçesi ve karar tarihiyle [PROJECT_HISTORY.md](PROJECT_HISTORY.md) içine arşivlenir.

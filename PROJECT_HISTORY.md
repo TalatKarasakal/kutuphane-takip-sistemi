@@ -20,7 +20,33 @@
 
 ### Reddedilen Öneriler
 
-- *(Henüz reddedilmiş öneri bulunmuyor.)*
+- **Kimlik ve başlık:** IMP-001 — Kitap durum modelini iki eksene ayır
+  - **Tür:** Reddedilen öneri
+  - **Karar tarihi:** 2026-08-08
+  - **Uygulayan:** Kullanıcı kararı
+  - **Doğrulayan:** Kullanıcı
+  - **Commit:** `2e712f9` (öneri kaydı; ret kararı bu tracker uzlaştırmasında işlendi)
+  - **Sonuç:** Mevcut tek durum modeli korunuyor.
+  - **Doğrulama:** Uygulanmadığı veri modeli ve arayüz üzerinden kontrol edildi.
+  - **Karar gerekçesi:** Kullanıcı `IMP-001` için gereksinim olmadığını belirtti.
+- **Kimlik ve başlık:** IMP-006 — Okuma takibi ve istatistikler
+  - **Tür:** Reddedilen öneri
+  - **Karar tarihi:** 2026-08-08
+  - **Uygulayan:** Kullanıcı kararı
+  - **Doğrulayan:** Kullanıcı
+  - **Commit:** `2e712f9` (öneri kaydı; ret kararı bu tracker uzlaştırmasında işlendi)
+  - **Sonuç:** İlerleme, hedef ve istatistik ekranları eklenmedi.
+  - **Doğrulama:** İlgili model ve ekranların eklenmediği kontrol edildi.
+  - **Karar gerekçesi:** Kullanıcı `IMP-006` için gereksinim olmadığını belirtti.
+- **Kimlik ve başlık:** IMP-015 — Çoklu dil ve yerelleştirme desteği
+  - **Tür:** Reddedilen öneri
+  - **Karar tarihi:** 2026-08-08
+  - **Uygulayan:** Kullanıcı kararı
+  - **Doğrulayan:** Kullanıcı
+  - **Commit:** `6566d9e` (öneri kaydı; ret kararı bu tracker uzlaştırmasında işlendi)
+  - **Sonuç:** Türkçe tek dil yapısı ve mevcut metin yerleşimi korundu.
+  - **Doğrulama:** i18n bağımlılığı ve locale kaynakları eklenmediği kontrol edildi.
+  - **Karar gerekçesi:** Kullanıcı `IMP-015` için gereksinim olmadığını belirtti.
 
 ---
 

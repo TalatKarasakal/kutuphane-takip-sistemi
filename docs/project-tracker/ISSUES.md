@@ -12,10 +12,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P0
 - **Önem:** Kritik
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kısmi · Dış Doğrulama Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** ISS-008 tamamlandıktan sonra son paket doğrulaması tekrarlanmalı.
 
 #### Bulgular
@@ -28,11 +28,11 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] macOS paketi tek, belgelenmiş ve tekrarlanabilir bir komutla üretiliyor.
-- [ ] Finder, Dock ve pencere uygulamanın kendi ikonunu gösteriyor.
-- [ ] `codesign --verify --deep --strict` hatasız tamamlanıyor.
+- [x] macOS paketi tek, belgelenmiş ve tekrarlanabilir bir komutla üretiliyor.
+- [x] Finder, Dock ve pencere uygulamanın kendi ikonunu gösteriyor.
+- [x] `codesign --verify --deep --strict` hatasız tamamlanıyor.
 - [ ] Genel dağıtım hedefleniyorsa Gatekeeper/notarization doğrulaması başarılı.
-- [ ] Windows imzalama kararı ve yayın prosedürü belgelenmiş.
+- [x] Windows imzalama kararı ve yayın prosedürü belgelenmiş.
 
 #### Doğrulama
 
@@ -47,10 +47,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P0
 - **Önem:** Kritik
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** ISS-011 ile ortak doğrulama katmanı tercih edilmeli.
 
 #### Bulgular
@@ -63,11 +63,12 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Geçersiz alan tipi, status/type değeri, duplicate ID ve desteklenmeyen sürüm işlem başlamadan reddediliyor.
-- [ ] Doğrulama hatası kullanıcıya kayıt/satır bağlamıyla gösteriliyor.
-- [ ] Güvenlik yedeği başarısızsa mevcut veri kullanıcı onayı olmadan değiştirilmiyor.
-- [ ] Başarısız geri yüklemede mevcut veritabanı olduğu gibi kalıyor.
-- [ ] Dosya boyutu ve kayıt sayısı sınırları tanımlı ve testli.
+- [x] Geçersiz alan tipi, status/type değeri, duplicate ID ve desteklenmeyen sürüm işlem başlamadan reddediliyor.
+- [x] Doğrulama hatası kullanıcıya kayıt/satır bağlamıyla gösteriliyor.
+- [x] Güvenlik yedeği başarısızsa mevcut veri kullanıcı onayı olmadan değiştirilmiyor.
+- [x] Başarısız geri yüklemede mevcut veritabanı olduğu gibi kalıyor.
+- [x] Dosya boyutu ve kayıt sayısı sınırları tanımlı ve testli.
+- [ ] Kullanıcı, Ayarlar'daki yedek önizleme ve geri yükleme senaryosunu doğruladı.
 
 #### Doğrulama
 
@@ -81,10 +82,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P1
 - **Önem:** Yüksek
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** Yok.
 
 #### Bulgular
@@ -96,11 +97,12 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Formlar kaydetme Promise'i başarıyla tamamlanmadan kapanmıyor.
-- [ ] İşlem sürerken çift gönderim engelleniyor ve görünür yükleniyor durumu gösteriliyor.
-- [ ] Veritabanı hatasında form değerleri korunuyor ve kullanıcıya anlaşılır hata gösteriliyor.
-- [ ] İlk yükleme için loading/error durumu, beklenmeyen render hataları için error boundary var.
-- [ ] Toplu işlemler ve import/backup akışları aynı hata sözleşmesini kullanıyor.
+- [x] Formlar kaydetme Promise'i başarıyla tamamlanmadan kapanmıyor.
+- [x] İşlem sürerken çift gönderim engelleniyor ve görünür yükleniyor durumu gösteriliyor.
+- [x] Veritabanı hatasında form değerleri korunuyor ve kullanıcıya anlaşılır hata gösteriliyor.
+- [x] İlk yükleme için loading/error durumu, beklenmeyen render hataları için error boundary var.
+- [x] Toplu işlemler ve import/backup akışları aynı hata sözleşmesini kullanıyor.
+- [ ] Kullanıcı, başarısız kayıt ve kirli form senaryolarını doğruladı.
 
 #### Doğrulama
 
@@ -114,10 +116,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P1
 - **Önem:** Yüksek
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** ISS-011 ile ortak normalizasyon kuralları kullanılmalı.
 
 #### Bulgular
@@ -131,12 +133,13 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Bilinmeyen durum güvenli varsayıma düşüyor veya kullanıcı eşlemesi zorunlu oluyor.
-- [ ] Zorunlu metinler trim ediliyor; boş kayıt içe alınmıyor.
-- [ ] Bir hedef alan yalnızca bir kaynak sütuna eşlenebiliyor.
-- [ ] Sıfır geçerli satırda import başlatılamıyor.
-- [ ] Hata satırları dosyadaki gerçek satır numarasını gösteriyor.
-- [ ] Parse hataları modal içinde açıklanıyor; uygulama hata diyaloğuna düşmüyor.
+- [x] Bilinmeyen durum güvenli varsayıma düşüyor veya kullanıcı eşlemesi zorunlu oluyor.
+- [x] Zorunlu metinler trim ediliyor; boş kayıt içe alınmıyor.
+- [x] Bir hedef alan yalnızca bir kaynak sütuna eşlenebiliyor.
+- [x] Sıfır geçerli satırda import başlatılamıyor.
+- [x] Hata satırları dosyadaki gerçek satır numarasını gösteriyor.
+- [x] Parse hataları modal içinde açıklanıyor; uygulama hata diyaloğuna düşmüyor.
+- [ ] Kullanıcı, mükerrer içeren CSV importu ve uyarı akışını doğruladı.
 
 #### Doğrulama
 
@@ -149,10 +152,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P1
 - **Önem:** Yüksek
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** ISS-006 ile aynı overlay altyapısında çözülmeli.
 
 #### Bulgular
@@ -163,10 +166,11 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Modal/drawer açıkken `1`, `2`, `3`, `n` ve `/` arka planı etkilemiyor.
-- [ ] Escape yalnızca en üst overlay'i kapatıyor.
-- [ ] Overlay kapandıktan sonra global kısayollar yeniden çalışıyor.
-- [ ] Form verisi kısayol nedeniyle sıfırlanmıyor.
+- [x] Modal/drawer açıkken `1`, `2`, `3`, `n` ve `/` arka planı etkilemiyor.
+- [x] Escape yalnızca en üst overlay'i kapatıyor.
+- [x] Overlay kapandıktan sonra global kısayollar yeniden çalışıyor.
+- [x] Form verisi kısayol nedeniyle sıfırlanmıyor.
+- [ ] Kullanıcı, iç içe overlay ve global kısayol senaryosunu doğruladı.
 
 #### Doğrulama
 
@@ -179,10 +183,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P1
 - **Önem:** Orta/Yüksek
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** ISS-005 ile ortak overlay altyapısı.
 
 #### Bulgular
@@ -196,11 +200,12 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Modal/drawer ekran okuyucuda doğru ad ve rolle duyuruluyor; arka plan inert.
-- [ ] Tab odağı overlay dışına kaçmıyor ve kapanınca açan elemana dönüyor.
-- [ ] Kapalı drawer erişilebilirlik ağacında bulunmuyor.
-- [ ] Hatalı input'lar programatik olarak hata metnine bağlı ve ilk hataya odaklanıyor.
-- [ ] Tablo satırları, seçimler, toast'lar ve sütun yönetimi klavyeyle kullanılabiliyor.
+- [x] Modal/drawer ekran okuyucuda doğru ad ve rolle duyuruluyor; arka plan inert.
+- [x] Tab odağı overlay dışına kaçmıyor ve kapanınca açan elemana dönüyor.
+- [x] Kapalı drawer erişilebilirlik ağacında bulunmuyor.
+- [x] Hatalı input'lar programatik olarak hata metnine bağlı ve ilk hataya odaklanıyor.
+- [x] Tablo satırları, seçimler, toast'lar ve sütun yönetimi klavyeyle kullanılabiliyor.
+- [ ] Kullanıcı, yalnız klavyeyle kitap/medya ekleme ve detay açmayı doğruladı.
 
 #### Doğrulama
 
@@ -214,10 +219,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P1
 - **Önem:** Orta
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** Yok.
 
 #### Bulgular
@@ -228,10 +233,11 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Film ve dizi filtre/arama durumu birbirini beklenmedik biçimde etkilemiyor.
-- [ ] Bölüm değişiminde görünmeyen aktif filtre oluşmuyor.
-- [ ] `İ`, `I`, `i`, `ı` örnekleri Türkçe locale beklentisine göre aranabiliyor.
-- [ ] Arama davranışı kitap ve medya bölümlerinde tutarlı.
+- [x] Film ve dizi filtre/arama durumu birbirini beklenmedik biçimde etkilemiyor.
+- [x] Bölüm değişiminde görünmeyen aktif filtre oluşmuyor.
+- [x] `İ`, `I`, `i`, `ı` örnekleri Türkçe locale beklentisine göre aranabiliyor.
+- [x] Arama davranışı kitap ve medya bölümlerinde tutarlı.
+- [ ] Kullanıcı, film ve dizi bölümlerinde bağımsız filtreleri doğruladı.
 
 #### Doğrulama
 
@@ -244,10 +250,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P0
 - **Önem:** Kritik/Yüksek
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** Yok; ISS-001 ve ISS-009 son doğrulaması bundan sonra yapılmalı.
 
 #### Bulgular
@@ -258,10 +264,11 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Doğrudan production bağımlılıklarında kabul edilmemiş yüksek/kritik açık yok.
-- [ ] Paketlenen Electron sürümü bilinen ilgili advisory aralıklarının dışında.
-- [ ] Build-only açıklar risk ve düzeltme planıyla belgelenmiş veya giderilmiş.
-- [ ] Lockfile güncel, typecheck/build ve paket smoke testi başarılı.
+- [x] Doğrudan production bağımlılıklarında kabul edilmemiş yüksek/kritik açık yok.
+- [x] Paketlenen Electron sürümü bilinen ilgili advisory aralıklarının dışında.
+- [x] Build-only açıklar risk ve düzeltme planıyla belgelenmiş veya giderilmiş.
+- [x] Lockfile güncel, typecheck/build ve paket smoke testi başarılı.
+- [ ] Kullanıcı, bağımlılık sürümleri ve audit sonucunu doğruladı.
 
 #### Doğrulama
 
@@ -276,10 +283,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P1
 - **Önem:** Yüksek
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** ISS-008 sonrasında güncel Electron üzerinde doğrulanmalı.
 
 #### Bulgular
@@ -292,11 +299,12 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Üretim CSP yalnızca gereken kaynakları/protokolleri açıyor.
-- [ ] Harici açma ve navigasyon yalnızca onaylı HTTPS hedeflerinde çalışıyor.
-- [ ] Gemini anahtarı localStorage'da düz metin olarak bulunmuyor.
-- [ ] IPC çağrıları sender, argüman şeması, mime ve boyut bakımından doğrulanıyor.
-- [ ] Kullanılmayan preload/IPC yüzeyleri kaldırılmış.
+- [x] Üretim CSP yalnızca gereken kaynakları/protokolleri açıyor.
+- [x] Harici açma ve navigasyon yalnızca onaylı HTTPS hedeflerinde çalışıyor.
+- [x] Gemini anahtarı localStorage'da düz metin olarak bulunmuyor.
+- [x] IPC çağrıları sender, argüman şeması, mime ve boyut bakımından doğrulanıyor.
+- [x] Kullanılmayan preload/IPC yüzeyleri kaldırılmış.
+- [ ] Kullanıcı, güvenli anahtar kaydetme/silme ve çevrimdışı modu doğruladı.
 
 #### Doğrulama
 
@@ -310,10 +318,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P2
 - **Önem:** Orta
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** ISS-001 paketleme yaklaşımıyla birlikte ele alınmalı.
 
 #### Bulgular
@@ -325,11 +333,12 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] xlsx ve ağır dialog kodu ilk açılış bundle'ından ayrılmış.
-- [ ] Kullanılmayan doğrudan bağımlılıklar kaldırılmış.
-- [ ] Masaüstü paketi yalnızca runtime için gereken dosyaları içeriyor.
-- [ ] Önce/sonra JS, `.app` ve DMG boyutları kaydedilmiş; anlamlı küçülme doğrulanmış.
-- [ ] Entitlement listesi yalnızca gerçek gereksinimlerle sınırlı.
+- [x] xlsx ve ağır dialog kodu ilk açılış bundle'ından ayrılmış.
+- [x] Kullanılmayan doğrudan bağımlılıklar kaldırılmış.
+- [x] Masaüstü paketi yalnızca runtime için gereken dosyaları içeriyor.
+- [x] Önce/sonra JS, `.app` ve DMG boyutları kaydedilmiş; anlamlı küçülme doğrulanmış.
+- [x] Entitlement listesi yalnızca gerçek gereksinimlerle sınırlı.
+- [ ] Kullanıcı, başlangıç ve ağır modül chunk boyutlarını doğruladı.
 
 #### Doğrulama
 
@@ -344,10 +353,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P1
 - **Önem:** Orta
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** ISS-002 ve ISS-004 ile ortak normalizasyon katmanı önerilir.
 
 #### Bulgular
@@ -360,11 +369,12 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Tüm giriş kanalları aynı merkezi alan kurallarını kullanıyor.
-- [ ] Sayısal/tarih/ISBN sınırları hem UI hem runtime katmanında uygulanıyor.
-- [ ] Dosya ve IPC boyut/kayıt sınırları kullanıcıya açık hata gösteriyor.
-- [ ] CSV formül başlangıç karakterleri güvenli şekilde kaçırılıyor.
-- [ ] Yazar zorunluluğu ürün kararıyla tutarlı hâle getirilmiş.
+- [x] Tüm giriş kanalları aynı merkezi alan kurallarını kullanıyor.
+- [x] Sayısal/tarih/ISBN sınırları hem UI hem runtime katmanında uygulanıyor.
+- [x] Dosya ve IPC boyut/kayıt sınırları kullanıcıya açık hata gösteriyor.
+- [x] CSV formül başlangıç karakterleri güvenli şekilde kaçırılıyor.
+- [x] Yazar zorunluluğu ürün kararıyla tutarlı hâle getirilmiş.
+- [ ] Kullanıcı, sınır değerleri ve boş yazarın `Bilinmiyor` dönüşümünü doğruladı.
 
 #### Doğrulama
 
@@ -377,10 +387,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P2
 - **Önem:** Orta
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** Yok; diğer sorunların kalıcı doğrulamasını kolaylaştırır.
 
 #### Bulgular
@@ -391,11 +401,12 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] Unit/component/E2E test katmanlarının kapsamı ve komutları tanımlı.
-- [ ] Filtre, import ve yedek gibi saf mantıklar için başlangıç regresyon testleri var.
-- [ ] Modal/form ve en az bir Electron smoke akışı otomatik test ediliyor.
-- [ ] Lint ve format kontrolü mevcut.
-- [ ] CI typecheck, tracker check, lint, test ve build başarısızlığında commit/PR'ı kırıyor.
+- [x] Unit/component/E2E test katmanlarının kapsamı ve komutları tanımlı.
+- [x] Filtre, import ve yedek gibi saf mantıklar için başlangıç regresyon testleri var.
+- [x] Modal/form ve en az bir Electron smoke akışı otomatik test ediliyor.
+- [x] Lint ve format kontrolü mevcut.
+- [x] CI typecheck, tracker check, lint, test ve build başarısızlığında commit/PR'ı kırıyor.
+- [ ] Kullanıcı, CI kalite kapılarını doğruladı.
 
 #### Doğrulama
 
@@ -410,10 +421,10 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 - **Öncelik:** P1
 - **Önem:** Orta
-- **Durum:** Açık
-- **Sorumlu:** Atanmadı
+- **Durum:** Kontrol Bekliyor
+- **Sorumlu:** Codex
 - **Oluşturma:** 2026-08-08
-- **Son Güncelleme:** 2026-08-08
+- **Son Güncelleme:** 2026-08-11
 - **Bağımlılıklar:** ISS-009 kapsamında hangi üçüncü taraf isteklerinin korunacağı netleşmeli.
 
 #### Bulgular
@@ -424,10 +435,11 @@ Her sorun; öncelik, önem, durum, sorumlu, tarihler, bağımlılıklar, bulgula
 
 #### Kabul Kriterleri
 
-- [ ] README ve uygulama içi açıklama her üçüncü tarafı, gönderilen veriyi ve amacı listeliyor.
-- [ ] API anahtarının saklanma yöntemi ve yedeklere dâhil edilmediği doğru anlatılıyor.
-- [ ] Çevrimdışı kullanımda hangi özelliklerin çalışmadığı açık.
-- [ ] Harici kapak/font istekleri ürün tercihine göre kaldırılmış veya kullanıcıya kontrol verilmiş.
+- [x] README ve uygulama içi açıklama her üçüncü tarafı, gönderilen veriyi ve amacı listeliyor.
+- [x] API anahtarının saklanma yöntemi ve yedeklere dâhil edilmediği doğru anlatılıyor.
+- [x] Çevrimdışı kullanımda hangi özelliklerin çalışmadığı açık.
+- [x] Harici kapak/font istekleri ürün tercihine göre kaldırılmış veya kullanıcıya kontrol verilmiş.
+- [ ] Kullanıcı, gizlilik ve çevrimdışı çalışma açıklamasını doğruladı.
 
 #### Doğrulama
 
