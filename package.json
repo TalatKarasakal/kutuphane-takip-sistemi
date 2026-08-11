@@ -64,6 +64,7 @@
       "writeUpdateInfo": false
     },
     "win": {
+      "icon": "build/icon.ico",
       "signAndEditExecutable": true,
       "target": [
         {
@@ -80,6 +81,7 @@
       "allowToChangeInstallationDirectory": true
     },
     "linux": {
+      "icon": "build/icon.png",
       "target": [
         {
           "target": "AppImage",
