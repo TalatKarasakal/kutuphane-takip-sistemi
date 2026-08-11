@@ -23,7 +23,7 @@
     "test:e2e": "npm run build && playwright test",
     "ci:check": "npm run tracker:check && npm run format:check && npm run typecheck && npm run lint && npm test && npm run build",
     "tracker:check": "node scripts/validate-project-tracker.mjs",
-    "pack:mac": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg --universal --publish never",
+    "pack:mac": "npm run build && CSC_IDENTITY_AUTO_DISCOVERY=${CSC_IDENTITY_AUTO_DISCOVERY:-false} electron-builder --mac dmg --universal --publish never",
     "pack:win": "npm run build && electron-builder --win nsis --x64 --publish never",
     "pack:linux": "npm run build && electron-builder --linux AppImage deb --x64 --publish never",
     "pack:all": "npm run pack:mac && npm run pack:win && npm run pack:linux"
