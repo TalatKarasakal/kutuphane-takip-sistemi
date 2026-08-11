@@ -61,7 +61,6 @@
       "entitlementsInherit": "electron/entitlements.plist"
     },
     "dmg": {
-      "backgroundColor": "#111827",
       "writeUpdateInfo": false
     },
     "win": {
