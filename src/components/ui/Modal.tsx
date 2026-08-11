@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
-import { X } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { useId, useRef } from "react";
+import { X } from "lucide-react";
+import { cn } from "../../lib/utils";
+import { useOverlay } from "../../lib/overlay";
+import { createPortal } from "react-dom";
 
 interface Props {
   open: boolean;
@@ -8,38 +10,70 @@ interface Props {
   title: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
-const SIZE: Record<NonNullable<Props['size']>, string> = {
-  sm: 'max-w-md',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
-  xl: 'max-w-5xl',
+const SIZE: Record<NonNullable<Props["size"]>, string> = {
+  sm: "max-w-md",
+  md: "max-w-lg",
+  lg: "max-w-2xl",
+  xl: "max-w-5xl",
 };
 
-export function Modal({ open, onClose, title, children, footer, size = 'md' }: Props) {
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', h);
-    return () => window.removeEventListener('keydown', h);
-  }, [open, onClose]);
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  footer,
+  size = "md",
+}: Props) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  useOverlay(open, onClose, dialogRef);
 
   if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className={cn('relative w-full card flex flex-col max-h-[92vh]', SIZE[size])}>
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      data-overlay-open
+    >
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className={cn(
+          "relative w-full card flex flex-col max-h-[92vh]",
+          SIZE[size],
+        )}
+      >
         <div className="flex items-center justify-between px-5 py-3 border-b border-border">
-          <h3 className="text-base font-semibold">{title}</h3>
-          <button className="btn btn-ghost p-1.5" onClick={onClose} aria-label="Kapat">
+          <h3 id={titleId} className="text-base font-semibold">
+            {title}
+          </h3>
+          <button
+            className="btn btn-ghost p-1.5"
+            onClick={onClose}
+            aria-label="Kapat"
+          >
             <X size={18} />
           </button>
         </div>
         <div className="flex-1 overflow-auto px-5 py-4">{children}</div>
-        {footer && <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">{footer}</div>}
+        {footer && (
+          <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
+            {footer}
+          </div>
+        )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

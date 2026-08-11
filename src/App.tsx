@@ -1,5 +1,10 @@
-import { AppShell } from './components/layout/AppShell';
+import { AppShell } from "./components/layout/AppShell";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 
 export default function App() {
-  return <AppShell />;
+  return (
+    <ErrorBoundary>
+      <AppShell />
+    </ErrorBoundary>
+  );
 }

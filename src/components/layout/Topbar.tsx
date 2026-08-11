@@ -1,11 +1,28 @@
-import { BookMarked, Film, Tv2, ArrowDownToLine, ArrowUpFromLine, Camera, LayoutGrid, Plus, Search, Settings, Table, type LucideProps } from 'lucide-react';
-import { useBooks } from '../../store/booksStore';
-import { useMedia } from '../../store/mediaStore';
-import { useSettings } from '../../store/settingsStore';
-import { ColumnManager } from '../ui/ColumnManager';
-import { BOOK_COLUMN_LABELS, FILM_COLUMN_LABELS, TV_COLUMN_LABELS } from '../../constants/columns';
-import { cn } from '../../lib/utils';
-import type { Section } from './AppShell';
+import {
+  BookMarked,
+  Film,
+  Tv2,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Camera,
+  LayoutGrid,
+  Plus,
+  Search,
+  Settings,
+  Table,
+  type LucideProps,
+} from "lucide-react";
+import { useBooks } from "../../store/booksStore";
+import { useMedia } from "../../store/mediaStore";
+import { useSettings } from "../../store/settingsStore";
+import { ColumnManager } from "../ui/ColumnManager";
+import {
+  BOOK_COLUMN_LABELS,
+  FILM_COLUMN_LABELS,
+  TV_COLUMN_LABELS,
+} from "../../constants/columns";
+import { cn } from "../../lib/utils";
+import type { Section } from "./AppShell";
 
 interface Props {
   section: Section;
@@ -18,42 +35,75 @@ interface Props {
   onPhotoImport: () => void;
 }
 
-const SECTIONS: { value: Section; icon: React.ComponentType<LucideProps>; title: string }[] = [
-  { value: 'books', icon: BookMarked, title: 'Kitaplar' },
-  { value: 'movies', icon: Film, title: 'Filmler' },
-  { value: 'tv', icon: Tv2, title: 'Diziler' },
+const SECTIONS: {
+  value: Section;
+  icon: React.ComponentType<LucideProps>;
+  title: string;
+}[] = [
+  { value: "books", icon: BookMarked, title: "Kitaplar" },
+  { value: "movies", icon: Film, title: "Filmler" },
+  { value: "tv", icon: Tv2, title: "Diziler" },
 ];
 
 const ADD_LABEL: Record<Section, string> = {
-  books: 'Kitap Ekle',
-  movies: 'Film Ekle',
-  tv: 'Dizi Ekle',
+  books: "Kitap Ekle",
+  movies: "Film Ekle",
+  tv: "Dizi Ekle",
 };
 
 const SEARCH_PLACEHOLDER: Record<Section, string> = {
-  books: 'Başlık, yazar, ISBN, not içinde ara…',
-  movies: 'Başlık, yönetmen, not içinde ara…',
-  tv: 'Başlık, yönetmen, not içinde ara…',
+  books: "Başlık, yazar, ISBN, not içinde ara…",
+  movies: "Başlık, yönetmen, not içinde ara…",
+  tv: "Başlık, yönetmen, not içinde ara…",
 };
 
-export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExport, onSettings, onPhotoImport }: Props) {
+export function Topbar({
+  section,
+  onSection,
+  searchRef,
+  onAdd,
+  onImport,
+  onExport,
+  onSettings,
+  onPhotoImport,
+}: Props) {
   const books = useBooks();
   const media = useMedia();
-  const { view, set, setColumns, bookColumns, filmColumns, tvColumns } = useSettings();
+  const { view, set, setColumns, bookColumns, filmColumns, tvColumns } =
+    useSettings();
 
-  const search = section === 'books' ? books.search : media.search;
-  const setSearch = section === 'books' ? books.setSearch : media.setSearch;
+  const mediaType = section === "movies" ? "film" : "dizi";
+  const search =
+    section === "books" ? books.search : media.filters[mediaType].search;
+  const setSearch = (value: string) =>
+    section === "books"
+      ? books.setSearch(value)
+      : media.setSearch(mediaType, value);
 
-  const colConfig = section === 'books' ? bookColumns : section === 'movies' ? filmColumns : tvColumns;
-  const colLabels = section === 'books' ? BOOK_COLUMN_LABELS : section === 'movies' ? FILM_COLUMN_LABELS : TV_COLUMN_LABELS;
-  const colSection = section === 'books' ? 'book' : section === 'movies' ? 'film' : 'tv';
+  const colConfig =
+    section === "books"
+      ? bookColumns
+      : section === "movies"
+        ? filmColumns
+        : tvColumns;
+  const colLabels =
+    section === "books"
+      ? BOOK_COLUMN_LABELS
+      : section === "movies"
+        ? FILM_COLUMN_LABELS
+        : TV_COLUMN_LABELS;
+  const colSection =
+    section === "books" ? "book" : section === "movies" ? "film" : "tv";
 
   return (
     <header className="h-14 border-b border-border bg-surface/80 backdrop-blur px-5 flex items-center shrink-0">
       {/* Sol — arama */}
       <div className="flex-1 flex items-center min-w-0">
         <div className="relative w-full max-w-96 min-w-0">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={15} />
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+            size={15}
+          />
           <input
             ref={searchRef}
             value={search}
@@ -72,7 +122,12 @@ export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExpor
               key={value}
               onClick={() => onSection(value)}
               title={title}
-              className={cn('px-3 py-2', section === value ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-surface2')}
+              className={cn(
+                "px-3 py-2",
+                section === value
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted hover:bg-surface2",
+              )}
             >
               <Icon size={15} />
             </button>
@@ -82,16 +137,38 @@ export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExpor
         <div className="w-px h-5 bg-border" />
 
         <div className="flex items-center border border-border rounded-lg bg-surface overflow-hidden">
-          <button onClick={() => set('view', 'table')} className={cn('px-3 py-2', view === 'table' ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-surface2')} title="Tablo">
+          <button
+            onClick={() => set("view", "table")}
+            className={cn(
+              "px-3 py-2",
+              view === "table"
+                ? "bg-primary/15 text-primary"
+                : "text-muted hover:bg-surface2",
+            )}
+            title="Tablo"
+          >
             <Table size={15} />
           </button>
-          <button onClick={() => set('view', 'card')} className={cn('px-3 py-2', view === 'card' ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-surface2')} title="Kart">
+          <button
+            onClick={() => set("view", "card")}
+            className={cn(
+              "px-3 py-2",
+              view === "card"
+                ? "bg-primary/15 text-primary"
+                : "text-muted hover:bg-surface2",
+            )}
+            title="Kart"
+          >
             <LayoutGrid size={15} />
           </button>
         </div>
 
-        {view === 'table' && (
-          <ColumnManager columns={colConfig} labels={colLabels} onChange={(cols) => setColumns(colSection, cols)} />
+        {view === "table" && (
+          <ColumnManager
+            columns={colConfig}
+            labels={colLabels}
+            onChange={(cols) => setColumns(colSection, cols)}
+          />
         )}
       </div>
 
@@ -100,15 +177,47 @@ export function Topbar({ section, onSection, searchRef, onAdd, onImport, onExpor
           ekranda tam yazı görünür. Böylece butonlar pencerede orantısız
           büyümez. */}
       <div className="flex items-center justify-end gap-2 shrink-0 ml-2">
-        {section === 'books' && (
-          <button className="btn btn-outline whitespace-nowrap shrink-0" onClick={onPhotoImport} title="Fotoğraftan kitap ekle">
-            <Camera size={15} /> <span className="hidden xl:inline">Fotoğraftan Ekle</span>
+        {section === "books" && (
+          <button
+            className="btn btn-outline whitespace-nowrap shrink-0"
+            onClick={onPhotoImport}
+            title="Fotoğraftan kitap ekle"
+          >
+            <Camera size={15} />{" "}
+            <span className="hidden xl:inline">Fotoğraftan Ekle</span>
           </button>
         )}
-        <button className="btn btn-outline whitespace-nowrap shrink-0" onClick={onImport} title="İçe Aktar"><ArrowDownToLine size={15} /> <span className="hidden xl:inline">İçe Aktar</span></button>
-        <button className="btn btn-outline whitespace-nowrap shrink-0" onClick={onExport} title="Dışa Aktar"><ArrowUpFromLine size={15} /> <span className="hidden xl:inline">Dışa Aktar</span></button>
-        <button className="btn btn-ghost shrink-0" onClick={onSettings} title="Ayarlar"><Settings size={15} /></button>
-        <button className="btn btn-primary whitespace-nowrap shrink-0" onClick={onAdd} title={ADD_LABEL[section]}><Plus size={15} /> <span className="hidden lg:inline">{ADD_LABEL[section]}</span></button>
+        <button
+          className="btn btn-outline whitespace-nowrap shrink-0"
+          onClick={onImport}
+          title="İçe Aktar"
+        >
+          <ArrowDownToLine size={15} />{" "}
+          <span className="hidden xl:inline">İçe Aktar</span>
+        </button>
+        <button
+          className="btn btn-outline whitespace-nowrap shrink-0"
+          onClick={onExport}
+          title="Dışa Aktar"
+        >
+          <ArrowUpFromLine size={15} />{" "}
+          <span className="hidden xl:inline">Dışa Aktar</span>
+        </button>
+        <button
+          className="btn btn-ghost shrink-0"
+          onClick={onSettings}
+          title="Ayarlar"
+        >
+          <Settings size={15} />
+        </button>
+        <button
+          className="btn btn-primary whitespace-nowrap shrink-0"
+          onClick={onAdd}
+          title={ADD_LABEL[section]}
+        >
+          <Plus size={15} />{" "}
+          <span className="hidden lg:inline">{ADD_LABEL[section]}</span>
+        </button>
       </div>
     </header>
   );

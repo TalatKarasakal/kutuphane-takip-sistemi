@@ -1,36 +1,75 @@
-import { useEffect, useRef, useState } from 'react';
-import { Sidebar } from './Sidebar';
-import { Topbar } from './Topbar';
-import { BookList } from '../books/BookList';
-import { BookFormDialog } from '../books/BookFormDialog';
-import { BookDetailDrawer } from '../books/BookDetailDrawer';
-import { PhotoImportDialog } from '../books/PhotoImportDialog';
-import { MediaList } from '../media/MediaList';
-import { MediaFormDialog } from '../media/MediaFormDialog';
-import { MediaDetailDrawer } from '../media/MediaDetailDrawer';
-import { MediaSidebar } from '../media/MediaSidebar';
-import { ImportDialog } from '../import/ImportDialog';
-import { ExportDialog } from '../export/ExportDialog';
-import { SettingsDialog } from '../settings/SettingsDialog';
-import { ToastContainer } from '../ui/Toast';
-import { useBooks } from '../../store/booksStore';
-import { useMedia } from '../../store/mediaStore';
-import { useSettings } from '../../store/settingsStore';
-import { applyTheme } from '../../lib/theme';
-import { maybeAutoBackup } from '../../lib/backup';
-import type { Book } from '../../types/book';
-import type { Media } from '../../types/media';
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { Sidebar } from "./Sidebar";
+import { Topbar } from "./Topbar";
+import { BookList } from "../books/BookList";
+import { BookFormDialog } from "../books/BookFormDialog";
+import { BookDetailDrawer } from "../books/BookDetailDrawer";
+import { MediaList } from "../media/MediaList";
+import { MediaFormDialog } from "../media/MediaFormDialog";
+import { MediaDetailDrawer } from "../media/MediaDetailDrawer";
+import { MediaSidebar } from "../media/MediaSidebar";
+import { CommandPalette } from "../commands/CommandPalette";
+import { ToastContainer } from "../ui/Toast";
+import { useBooks } from "../../store/booksStore";
+import { useMedia } from "../../store/mediaStore";
+import { useSettings } from "../../store/settingsStore";
+import { useTags } from "../../store/tagsStore";
+import { useLoans } from "../../store/loansStore";
+import { useToast } from "../../store/toastStore";
+import { applyTheme, subscribeNativeTheme } from "../../lib/theme";
+import { maybeAutoBackup } from "../../lib/backup";
+import type { Book } from "../../types/book";
+import type { Media } from "../../types/media";
 
-export type Section = 'books' | 'movies' | 'tv';
+const PhotoImportDialog = lazy(() =>
+  import("../books/PhotoImportDialog").then((module) => ({
+    default: module.PhotoImportDialog,
+  })),
+);
+const ImportDialog = lazy(() =>
+  import("../import/ImportDialog").then((module) => ({
+    default: module.ImportDialog,
+  })),
+);
+const ExportDialog = lazy(() =>
+  import("../export/ExportDialog").then((module) => ({
+    default: module.ExportDialog,
+  })),
+);
+const SettingsDialog = lazy(() =>
+  import("../settings/SettingsDialog").then((module) => ({
+    default: module.SettingsDialog,
+  })),
+);
+
+export type Section = "books" | "movies" | "tv";
 
 export function AppShell() {
-  const { load: loadBooks, add: addBook, update: updateBook, remove: removeBook, clearSelection: clearBookSelection } = useBooks();
-  const { load: loadMedia, add: addMedia, update: updateMedia, remove: removeMedia, clearSelection: clearMediaSelection } = useMedia();
+  const {
+    load: loadBooks,
+    add: addBook,
+    update: updateBook,
+    remove: removeBook,
+    clearSelection: clearBookSelection,
+  } = useBooks();
+  const {
+    load: loadMedia,
+    add: addMedia,
+    update: updateMedia,
+    remove: removeMedia,
+    clearSelection: clearMediaSelection,
+  } = useMedia();
   const booksLoaded = useBooks((s) => s.loaded);
   const mediaLoaded = useMedia((s) => s.loaded);
+  const booksError = useBooks((s) => s.error);
+  const mediaError = useMedia((s) => s.error);
+  const loadTags = useTags((s) => s.load);
+  const tagsLoaded = useTags((s) => s.loaded);
+  const loadLoans = useLoans((s) => s.load);
+  const loansLoaded = useLoans((s) => s.loaded);
   const settings = useSettings();
 
-  const [section, setSection] = useState<Section>('books');
+  const [section, setSection] = useState<Section>("books");
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Book | undefined>();
@@ -44,13 +83,26 @@ export function AppShell() {
   const [exportOpen, setExportOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
+  const [commandOpen, setCommandOpen] = useState(false);
 
-  const searchRef = useRef<HTMLInputElement>(null) as React.RefObject<HTMLInputElement>;
+  const searchRef = useRef<HTMLInputElement>(
+    null,
+  ) as React.RefObject<HTMLInputElement>;
   const sectionRef = useRef(section);
   sectionRef.current = section;
 
-  useEffect(() => { loadBooks(); }, [loadBooks]);
-  useEffect(() => { loadMedia(); }, [loadMedia]);
+  useEffect(() => {
+    void loadBooks().catch(() => undefined);
+  }, [loadBooks]);
+  useEffect(() => {
+    void loadMedia().catch(() => undefined);
+  }, [loadMedia]);
+  useEffect(() => {
+    void loadTags().catch(() => undefined);
+  }, [loadTags]);
+  useEffect(() => {
+    void loadLoans().catch(() => undefined);
+  }, [loadLoans]);
 
   // Bölüm değişince seçimleri ve açık detay panellerini bırak: film seçiliyken
   // Diziler'e geçildiğinde toplu işlem çubuğu yanlış kayıtlara işlem yapmasın.
@@ -61,67 +113,146 @@ export function AppShell() {
     setMediaDetail(null);
   }, [section, clearBookSelection, clearMediaSelection]);
 
-  useEffect(() => { if (booksLoaded && mediaLoaded) maybeAutoBackup(); }, [booksLoaded, mediaLoaded]);
-  useEffect(() => { applyTheme(settings); }, [settings]);
+  useEffect(() => {
+    if (booksLoaded && mediaLoaded)
+      void maybeAutoBackup().catch((error) => {
+        useToast
+          .getState()
+          .show(
+            error instanceof Error
+              ? error.message
+              : "Otomatik yedek alınamadı.",
+            "error",
+          );
+      });
+  }, [booksLoaded, mediaLoaded]);
+  useEffect(() => {
+    applyTheme(settings);
+  }, [settings]);
+  useEffect(() => subscribeNativeTheme(settings), [settings]);
 
   useEffect(() => {
-    if (settings.theme !== 'system') return;
-    const mq = matchMedia('(prefers-color-scheme: dark)');
+    if (settings.theme !== "system") return;
+    const mq = matchMedia("(prefers-color-scheme: dark)");
     const h = () => applyTheme(settings);
-    mq.addEventListener('change', h);
-    return () => mq.removeEventListener('change', h);
+    mq.addEventListener("change", h);
+    return () => mq.removeEventListener("change", h);
   }, [settings]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
-      const isEditable = ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable;
+      const isEditable =
+        ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) ||
+        el.isContentEditable;
       const hasModifier = e.metaKey || e.ctrlKey || e.altKey;
 
-      if (e.key === '1' && !isEditable && !hasModifier) { setSection('books'); return; }
-      if (e.key === '2' && !isEditable && !hasModifier) { setSection('movies'); return; }
-      if (e.key === '3' && !isEditable && !hasModifier) { setSection('tv'); return; }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLocaleLowerCase("tr") === "k") {
+        if (Number(document.body.dataset.overlayCount ?? "0") === 0) {
+          e.preventDefault();
+          setCommandOpen(true);
+        }
+        return;
+      }
+      if (Number(document.body.dataset.overlayCount ?? "0") > 0) return;
 
-      if (e.key === 'n' && !isEditable && !hasModifier) {
-        e.preventDefault();
-        if (sectionRef.current === 'books') { setEditing(undefined); setFormOpen(true); }
-        else { setEditingMedia(undefined); setMediaFormOpen(true); }
+      if (e.key === "1" && !isEditable && !hasModifier) {
+        setSection("books");
+        return;
+      }
+      if (e.key === "2" && !isEditable && !hasModifier) {
+        setSection("movies");
+        return;
+      }
+      if (e.key === "3" && !isEditable && !hasModifier) {
+        setSection("tv");
         return;
       }
 
-      if (e.key === '/' && !isEditable) {
+      if (e.key === "n" && !isEditable && !hasModifier) {
+        e.preventDefault();
+        if (sectionRef.current === "books") {
+          setEditing(undefined);
+          setFormOpen(true);
+        } else {
+          setEditingMedia(undefined);
+          setMediaFormOpen(true);
+        }
+        return;
+      }
+
+      if (e.key === "/" && !isEditable) {
         e.preventDefault();
         searchRef.current?.focus();
       }
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const mediaType = section === 'movies' ? 'film' as const : 'dizi' as const;
+  const mediaType =
+    section === "movies" ? ("film" as const) : ("dizi" as const);
+
+  if (booksError || mediaError) {
+    return (
+      <div className="h-screen grid place-items-center bg-bg text-text p-8">
+        <div className="card max-w-md p-6 text-center">
+          <h1 className="font-semibold">Yerel veriler yüklenemedi</h1>
+          <p className="mt-2 text-sm text-muted">{booksError ?? mediaError}</p>
+          <button
+            className="btn btn-primary mt-4"
+            onClick={() => window.location.reload()}
+          >
+            Tekrar Dene
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!booksLoaded || !mediaLoaded || !tagsLoaded || !loansLoaded) {
+    return (
+      <div className="h-screen grid place-items-center bg-bg text-text">
+        <div className="text-sm text-muted">Kütüphaneniz yükleniyor…</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-screen flex flex-col bg-bg text-text">
-      <Topbar
-        section={section}
-        onSection={setSection}
-        searchRef={searchRef}
-        onAdd={() => {
-          if (section === 'books') { setEditing(undefined); setFormOpen(true); }
-          else { setEditingMedia(undefined); setMediaFormOpen(true); }
-        }}
-        onImport={() => setImportOpen(true)}
-        onExport={() => setExportOpen(true)}
-        onSettings={() => setSettingsOpen(true)}
-        onPhotoImport={() => setPhotoImportOpen(true)}
-      />
+    <div className="bg-bg text-text">
+      <div className="h-screen flex flex-col" data-app-content>
+        <Topbar
+          section={section}
+          onSection={setSection}
+          searchRef={searchRef}
+          onAdd={() => {
+            if (section === "books") {
+              setEditing(undefined);
+              setFormOpen(true);
+            } else {
+              setEditingMedia(undefined);
+              setMediaFormOpen(true);
+            }
+          }}
+          onImport={() => setImportOpen(true)}
+          onExport={() => setExportOpen(true)}
+          onSettings={() => setSettingsOpen(true)}
+          onPhotoImport={() => setPhotoImportOpen(true)}
+        />
 
-      <div className="flex-1 flex min-h-0">
-        {section === 'books' ? <Sidebar /> : <MediaSidebar type={mediaType} />}
-        <div className="flex-1 flex flex-col min-w-0">
-          {section === 'books'
-            ? <BookList onOpen={setDetail} />
-            : <MediaList type={mediaType} onOpen={setMediaDetail} />}
+        <div className="flex-1 flex min-h-0">
+          {section === "books" ? (
+            <Sidebar />
+          ) : (
+            <MediaSidebar type={mediaType} />
+          )}
+          <div className="flex-1 flex flex-col min-w-0">
+            {section === "books" ? (
+              <BookList onOpen={setDetail} />
+            ) : (
+              <MediaList type={mediaType} onOpen={setMediaDetail} />
+            )}
+          </div>
         </div>
       </div>
 
@@ -137,7 +268,11 @@ export function AppShell() {
       <BookDetailDrawer
         book={detail}
         onClose={() => setDetail(null)}
-        onEdit={(b) => { setEditing(b); setFormOpen(true); setDetail(null); }}
+        onEdit={(b) => {
+          setEditing(b);
+          setFormOpen(true);
+          setDetail(null);
+        }}
         onDelete={(id) => removeBook([id])}
       />
 
@@ -154,19 +289,66 @@ export function AppShell() {
       <MediaDetailDrawer
         item={mediaDetail}
         onClose={() => setMediaDetail(null)}
-        onEdit={(m) => { setEditingMedia(m); setMediaFormOpen(true); setMediaDetail(null); }}
+        onEdit={(m) => {
+          setEditingMedia(m);
+          setMediaFormOpen(true);
+          setMediaDetail(null);
+        }}
         onDelete={(id) => removeMedia([id])}
       />
 
-      <PhotoImportDialog
-        open={photoImportOpen}
-        onClose={() => setPhotoImportOpen(false)}
-        onOpenSettings={() => setSettingsOpen(true)}
-      />
+      <Suspense fallback={null}>
+        {photoImportOpen && (
+          <PhotoImportDialog
+            open
+            onClose={() => setPhotoImportOpen(false)}
+            onOpenSettings={() => setSettingsOpen(true)}
+          />
+        )}
+        {importOpen && (
+          <ImportDialog
+            open
+            onClose={() => setImportOpen(false)}
+            section={section}
+          />
+        )}
+        {exportOpen && (
+          <ExportDialog
+            open
+            onClose={() => setExportOpen(false)}
+            section={section}
+          />
+        )}
+        {settingsOpen && (
+          <SettingsDialog open onClose={() => setSettingsOpen(false)} />
+        )}
+      </Suspense>
 
-      <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} section={section} />
-      <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} section={section} />
-      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <CommandPalette
+        open={commandOpen}
+        onClose={() => setCommandOpen(false)}
+        section={section}
+        onSection={setSection}
+        onAdd={() => {
+          if (section === "books") {
+            setEditing(undefined);
+            setFormOpen(true);
+          } else {
+            setEditingMedia(undefined);
+            setMediaFormOpen(true);
+          }
+        }}
+        onImport={() => setImportOpen(true)}
+        onSettings={() => setSettingsOpen(true)}
+        onOpenBook={(book) => {
+          setSection("books");
+          requestAnimationFrame(() => setDetail(book));
+        }}
+        onOpenMedia={(item) => {
+          setSection(item.type === "film" ? "movies" : "tv");
+          requestAnimationFrame(() => setMediaDetail(item));
+        }}
+      />
 
       <ToastContainer />
     </div>

@@ -1,4 +1,67 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap');
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("@fontsource/inter/files/inter-latin-ext-400-normal.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url("@fontsource/inter/files/inter-latin-ext-500-normal.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("@fontsource/inter/files/inter-latin-ext-600-normal.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url("@fontsource/inter/files/inter-latin-ext-700-normal.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "Merriweather";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("@fontsource/merriweather/files/merriweather-latin-ext-400-normal.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "Merriweather";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url("@fontsource/merriweather/files/merriweather-latin-ext-700-normal.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("@fontsource/jetbrains-mono/files/jetbrains-mono-latin-ext-400-normal.woff2")
+    format("woff2");
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("@fontsource/jetbrains-mono/files/jetbrains-mono-latin-ext-600-normal.woff2")
+    format("woff2");
+}
 
 @tailwind base;
 @tailwind components;
@@ -24,11 +87,11 @@
   --text: 15 23 42;
   --muted: 100 116 139;
 
-  --font-app: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-app: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-size-app: 15px;
 }
 
-html[data-theme='dark'] {
+html[data-theme="dark"] {
   --bg: 9 14 26;
   --surface: 17 24 39;
   --surface-2: 30 41 59;
@@ -37,7 +100,7 @@ html[data-theme='dark'] {
   --muted: 148 163 184;
 }
 
-html[data-accent='kirmizi'] {
+html[data-accent="kirmizi"] {
   --primary: var(--accent-kirmizi);
   --primary-soft: var(--accent-kirmizi-soft);
   --secondary: var(--accent-turkuaz);
@@ -55,19 +118,37 @@ body {
   min-height: 100vh;
 }
 
-*::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: rgb(var(--border)); border-radius: 8px; }
-*::-webkit-scrollbar-thumb:hover { background: rgb(var(--muted)); }
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--border));
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--muted));
+}
 
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-transparent disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  .btn-primary { @apply bg-primary text-primary-foreground hover:brightness-110; }
-  .btn-secondary { @apply bg-secondary text-secondary-foreground hover:brightness-110; }
-  .btn-ghost { @apply bg-transparent hover:bg-surface2 text-text; }
-  .btn-outline { @apply border-border bg-surface hover:bg-surface2 text-text; }
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:brightness-110;
+  }
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:brightness-110;
+  }
+  .btn-ghost {
+    @apply bg-transparent hover:bg-surface2 text-text;
+  }
+  .btn-outline {
+    @apply border-border bg-surface hover:bg-surface2 text-text;
+  }
   .input {
     @apply w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60;
   }
