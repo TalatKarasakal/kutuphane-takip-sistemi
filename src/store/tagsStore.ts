@@ -12,6 +12,7 @@ interface TagsState {
   tags: Tag[];
   load: () => Promise<void>;
   add: (name: string, color?: string) => Promise<Tag>;
+  addMany: (names: string[]) => Promise<Tag[]>;
   update: (
     id: string,
     patch: Pick<Partial<Tag>, "name" | "color">,
@@ -57,6 +58,47 @@ export const useTags = create<TagsState>((set, get) => ({
       useToast
         .getState()
         .show(`Etiket eklenemedi: ${validationMessage(error)}`, "error");
+      throw error;
+    }
+  },
+  addMany: async (names) => {
+    const uniqueNames = [
+      ...new Map(
+        names
+          .map((name) => name.trim())
+          .filter(Boolean)
+          .map((name) => [name.toLocaleLowerCase("tr"), name]),
+      ).entries(),
+    ];
+    const known = new Map(
+      get().tags.map((tag) => [tag.name.toLocaleLowerCase("tr"), tag]),
+    );
+    const now = new Date().toISOString();
+    const created = uniqueNames
+      .filter(([key]) => !known.has(key))
+      .map(([key, name], index) => {
+        const tag = normalizeTag({
+          id: nanoid(),
+          name,
+          color: TAG_COLORS[(get().tags.length + index) % TAG_COLORS.length],
+          createdAt: now,
+          updatedAt: now,
+        });
+        known.set(key, tag);
+        return tag;
+      });
+    try {
+      await db.transaction("rw", db.tags, async () => {
+        for (let offset = 0; offset < created.length; offset += 500) {
+          await db.tags.bulkAdd(created.slice(offset, offset + 500));
+        }
+      });
+      if (created.length) set({ tags: sortTags([...get().tags, ...created]) });
+      return uniqueNames.map(([key]) => known.get(key)!);
+    } catch (error) {
+      useToast
+        .getState()
+        .show(`Etiketler eklenemedi: ${validationMessage(error)}`, "error");
       throw error;
     }
   },

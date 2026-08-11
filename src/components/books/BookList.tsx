@@ -1,53 +1,153 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, ChevronDown, SearchX, Trash2, X } from 'lucide-react';
-import { useBooks, type SortKey } from '../../store/booksStore';
-import { useSettings } from '../../store/settingsStore';
-import { applyFilters } from '../../lib/filters';
-import { STATUSES } from '../../constants/statuses';
-import { BOOK_COLUMN_LABELS } from '../../constants/columns';
-import { StatusBadge, GenreChip } from '../ui/Badge';
-import { BookCard } from './BookCard';
-import type { Book, BookStatus } from '../../types/book';
-import { cn } from '../../lib/utils';
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  BookOpen,
+  ChevronDown,
+  SearchX,
+  Star,
+  Trash2,
+  UserRound,
+  X,
+} from "lucide-react";
+import { useBooks, type SortKey } from "../../store/booksStore";
+import { useLoans } from "../../store/loansStore";
+import { useSettings } from "../../store/settingsStore";
+import { applyFilters } from "../../lib/filters";
+import { STATUSES } from "../../constants/statuses";
+import { BOOK_COLUMN_LABELS } from "../../constants/columns";
+import { StatusBadge, GenreChip } from "../ui/Badge";
+import { BookCard } from "./BookCard";
+import { LoanDialog } from "./LoanDialog";
+import type { Book, BookStatus } from "../../types/book";
+import { cn } from "../../lib/utils";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useResponsiveColumns } from "../../lib/virtual";
+import { useIndexedBookIds } from "../../lib/indexedQueries";
 
 interface Props {
   onOpen: (b: Book) => void;
 }
 
 const STATUS_DOT: Record<BookStatus, string> = {
-  okundu: 'bg-emerald-500',
-  okunacak: 'bg-sky-500',
-  mevcut: 'bg-amber-500',
-  'satin-alinacak': 'bg-rose-500',
+  okundu: "bg-emerald-500",
+  okunacak: "bg-sky-500",
+  mevcut: "bg-amber-500",
+  "satin-alinacak": "bg-rose-500",
 };
 
 const NEXT_STATUS: Partial<Record<BookStatus, BookStatus>> = {
-  'satin-alinacak': 'mevcut',
-  mevcut: 'okunacak',
-  okunacak: 'okundu',
+  "satin-alinacak": "mevcut",
+  mevcut: "okunacak",
+  okunacak: "okundu",
 };
 
 const NEXT_LABEL: Partial<Record<BookStatus, string>> = {
-  'satin-alinacak': '→ Mevcut',
-  mevcut: '→ Okunacak',
-  okunacak: '→ Okundu ✓',
+  "satin-alinacak": "→ Mevcut",
+  mevcut: "→ Okunacak",
+  okunacak: "→ Okundu ✓",
 };
 
 export function BookList({ onOpen }: Props) {
-  const { books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir, setSort, selectedIds, toggleSelect, selectAll, clearSelection, clearFilters, remove, setStatus, setGenre, setPublisher } = useBooks();
+  const {
+    books,
+    search,
+    statusFilter,
+    genreFilter,
+    tagFilter,
+    tagFilterMode,
+    duplicatesOnly,
+    loansOnly,
+    sortKey,
+    sortDir,
+    setSort,
+    selectedIds,
+    toggleSelect,
+    selectAll,
+    clearSelection,
+    clearFilters,
+    remove,
+    setStatus,
+    setGenre,
+    setPublisher,
+  } = useBooks();
+  const loans = useLoans((state) => state.loans);
   const { view, density, bookColumns } = useSettings();
+  const [loanBook, setLoanBook] = useState<Book | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const cardColumns = useResponsiveColumns();
+  const loanIds = useMemo(
+    () => new Set(loans.map((loan) => loan.bookId)),
+    [loans],
+  );
+  const indexedIds = useIndexedBookIds(books, statusFilter, genreFilter);
 
   const filtered = useMemo(
-    () => applyFilters(books, { search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir }),
-    [books, search, statusFilter, genreFilter, duplicatesOnly, sortKey, sortDir],
+    () =>
+      applyFilters(
+        indexedIds ? books.filter((book) => indexedIds.has(book.id)) : books,
+        {
+          search,
+          statusFilter,
+          genreFilter,
+          tagFilter,
+          tagFilterMode,
+          duplicatesOnly,
+          loansOnly,
+          loanIds,
+          sortKey,
+          sortDir,
+        },
+      ),
+    [
+      books,
+      indexedIds,
+      search,
+      statusFilter,
+      genreFilter,
+      tagFilter,
+      tagFilterMode,
+      duplicatesOnly,
+      loansOnly,
+      loanIds,
+      sortKey,
+      sortDir,
+    ],
   );
 
-  const allSelected = filtered.length > 0 && filtered.every((b) => selectedIds.has(b.id));
+  const allSelected =
+    filtered.length > 0 && filtered.every((b) => selectedIds.has(b.id));
   const hasSel = selectedIds.size > 0;
-  const visibleCols = useMemo(() => bookColumns.filter((c) => c.visible), [bookColumns]);
+  const visibleCols = useMemo(
+    () => bookColumns.filter((c) => c.visible),
+    [bookColumns],
+  );
+  const virtualizer = useVirtualizer({
+    count:
+      view === "card"
+        ? Math.ceil(filtered.length / cardColumns)
+        : filtered.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () =>
+      view === "card" ? 320 : density === "compact" ? 38 : 48,
+    overscan: 8,
+  });
 
-  const allGenres = useMemo(() => [...new Set(books.map((b) => b.genre).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, 'tr')), [books]);
-  const allPublishers = useMemo(() => [...new Set(books.map((b) => b.publisher).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, 'tr')), [books]);
+  const allGenres = useMemo(
+    () =>
+      [...new Set(books.map((b) => b.genre).filter(Boolean) as string[])].sort(
+        (a, b) => a.localeCompare(b, "tr"),
+      ),
+    [books],
+  );
+  const allPublishers = useMemo(
+    () =>
+      [
+        ...new Set(books.map((b) => b.publisher).filter(Boolean) as string[]),
+      ].sort((a, b) => a.localeCompare(b, "tr")),
+    [books],
+  );
 
   if (filtered.length === 0) {
     const isFiltered = books.length > 0;
@@ -57,11 +157,13 @@ export function BookList({ onOpen }: Props) {
           <div className="w-14 h-14 mx-auto rounded-full bg-primary/15 text-primary flex items-center justify-center mb-4">
             {isFiltered ? <SearchX size={24} /> : <BookOpen size={24} />}
           </div>
-          <h3 className="font-semibold mb-1">{isFiltered ? 'Sonuç bulunamadı' : 'Henüz kitap yok'}</h3>
+          <h3 className="font-semibold mb-1">
+            {isFiltered ? "Sonuç bulunamadı" : "Henüz kitap yok"}
+          </h3>
           <p className="text-sm text-muted max-w-xs">
             {isFiltered
-              ? 'Arama veya filtrelerle eşleşen kitap yok.'
-              : 'Sağ üstten kitap ekleyebilir, Excel/CSV/JSON dosyasından içe aktarabilirsin.'}
+              ? "Arama veya filtrelerle eşleşen kitap yok."
+              : "Sağ üstten kitap ekleyebilir, Excel/CSV/JSON dosyasından içe aktarabilirsin."}
           </p>
           {isFiltered && (
             <button className="btn btn-outline mt-4" onClick={clearFilters}>
@@ -74,7 +176,7 @@ export function BookList({ onOpen }: Props) {
   }
 
   return (
-    <div className="flex-1 overflow-auto">
+    <div ref={scrollRef} className="flex-1 overflow-auto">
       {hasSel && (
         <BulkBar
           count={selectedIds.size}
@@ -83,16 +185,50 @@ export function BookList({ onOpen }: Props) {
           onStatus={(s) => setStatus([...selectedIds], s)}
           onGenre={(g) => setGenre([...selectedIds], g)}
           onPublisher={(p) => setPublisher([...selectedIds], p)}
+          onLoan={
+            selectedIds.size === 1
+              ? () =>
+                  setLoanBook(
+                    books.find((book) => selectedIds.has(book.id)) ?? null,
+                  )
+              : undefined
+          }
           genres={allGenres}
           publishers={allPublishers}
         />
       )}
 
-      {view === 'card' ? (
-        <div className="p-5 grid gap-3 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
-          {filtered.map((b) => (
-            <BookCard key={b.id} book={b} onClick={() => onOpen(b)} />
-          ))}
+      {view === "card" ? (
+        <div className="p-5">
+          <div
+            className="relative"
+            style={{ height: virtualizer.getTotalSize() }}
+          >
+            {virtualizer.getVirtualItems().map((row) => (
+              <div
+                key={row.key}
+                ref={virtualizer.measureElement}
+                data-index={row.index}
+                className="absolute left-0 top-0 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 pb-3"
+                style={{ transform: `translateY(${row.start}px)` }}
+              >
+                {filtered
+                  .slice(
+                    row.index * cardColumns,
+                    row.index * cardColumns + cardColumns,
+                  )
+                  .map((book) => (
+                    <BookCard
+                      key={book.id}
+                      book={book}
+                      onClick={() => onOpen(book)}
+                      selected={selectedIds.has(book.id)}
+                      onToggleSelect={() => toggleSelect(book.id)}
+                    />
+                  ))}
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="p-5">
@@ -103,8 +239,13 @@ export function BookList({ onOpen }: Props) {
                   <th className="w-10 px-3 py-3.5 text-left">
                     <input
                       type="checkbox"
+                      aria-label="Gösterilen kitapların tümünü seç"
                       checked={allSelected}
-                      onChange={() => (allSelected ? clearSelection() : selectAll(filtered.map((b) => b.id)))}
+                      onChange={() =>
+                        allSelected
+                          ? clearSelection()
+                          : selectAll(filtered.map((b) => b.id))
+                      }
                     />
                   </th>
                   {visibleCols.map((col) => (
@@ -115,44 +256,101 @@ export function BookList({ onOpen }: Props) {
                       sortKey={sortKey}
                       sortDir={sortDir}
                       onClick={setSort}
-                      align={['pageCount', 'publicationYear'].includes(col.key) ? 'right' : undefined}
+                      align={
+                        ["pageCount", "publicationYear"].includes(col.key)
+                          ? "right"
+                          : undefined
+                      }
                     />
                   ))}
                   <th className="w-0" />
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((b) => (
-                  <tr
-                    key={b.id}
-                    className={cn(
-                      'group border-t border-border/50 hover:bg-primary/5 cursor-pointer transition-colors',
-                      density === 'compact' ? 'text-[13px]' : '',
-                    )}
-                    onClick={() => onOpen(b)}
-                  >
-                    <td className="px-3 py-2.5" onClick={(e) => e.stopPropagation()}>
-                      <input type="checkbox" checked={selectedIds.has(b.id)} onChange={() => toggleSelect(b.id)} />
-                    </td>
-                    {visibleCols.map((col) => renderCell(b, col.key, density))}
-                    <td className="pr-3" onClick={(e) => e.stopPropagation()}>
-                      {NEXT_STATUS[b.status] && (
-                        <button
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-md bg-surface2 hover:bg-primary/15 hover:text-primary whitespace-nowrap"
-                          onClick={() => setStatus([b.id], NEXT_STATUS[b.status]!)}
-                        >
-                          {NEXT_LABEL[b.status]}
-                        </button>
-                      )}
-                    </td>
+                {virtualizer.getVirtualItems()[0]?.start > 0 && (
+                  <tr aria-hidden="true">
+                    <td
+                      colSpan={visibleCols.length + 2}
+                      style={{ height: virtualizer.getVirtualItems()[0].start }}
+                    />
                   </tr>
-                ))}
+                )}
+                {virtualizer.getVirtualItems().map((virtualRow) => {
+                  const b = filtered[virtualRow.index];
+                  return (
+                    <tr
+                      key={b.id}
+                      ref={virtualizer.measureElement}
+                      data-index={virtualRow.index}
+                      tabIndex={0}
+                      className={cn(
+                        "group border-t border-border/50 hover:bg-primary/5 cursor-pointer transition-colors",
+                        density === "compact" ? "text-[13px]" : "",
+                      )}
+                      onClick={() => onOpen(b)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          onOpen(b);
+                        }
+                      }}
+                    >
+                      <td
+                        className="px-3 py-2.5"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          aria-label={`${b.title} seç`}
+                          checked={selectedIds.has(b.id)}
+                          onChange={() => toggleSelect(b.id)}
+                        />
+                      </td>
+                      {visibleCols.map((col) =>
+                        renderCell(b, col.key, density),
+                      )}
+                      <td className="pr-3" onClick={(e) => e.stopPropagation()}>
+                        {NEXT_STATUS[b.status] && (
+                          <button
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-md bg-surface2 hover:bg-primary/15 hover:text-primary whitespace-nowrap"
+                            onClick={() =>
+                              setStatus([b.id], NEXT_STATUS[b.status]!)
+                            }
+                          >
+                            {NEXT_LABEL[b.status]}
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {virtualizer.getVirtualItems().at(-1) && (
+                  <tr aria-hidden="true">
+                    <td
+                      colSpan={visibleCols.length + 2}
+                      style={{
+                        height: Math.max(
+                          0,
+                          virtualizer.getTotalSize() -
+                            virtualizer.getVirtualItems().at(-1)!.end,
+                        ),
+                      }}
+                    />
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
-          <div className="mt-2 text-xs text-muted">{filtered.length} kitap gösteriliyor</div>
+          <div className="mt-2 text-xs text-muted">
+            {filtered.length} kitap gösteriliyor
+          </div>
         </div>
       )}
+      <LoanDialog
+        book={loanBook}
+        open={Boolean(loanBook)}
+        onClose={() => setLoanBook(null)}
+      />
     </div>
   );
 }
@@ -160,46 +358,128 @@ export function BookList({ onOpen }: Props) {
 const EMPTY = <span className="text-muted/30 select-none">—</span>;
 
 function renderCell(b: Book, key: string, density: string) {
-  const py = density === 'compact' ? 'py-2' : 'py-3.5';
+  const py = density === "compact" ? "py-2" : "py-3.5";
   switch (key) {
-    case 'title': return (
-      <td key={key} className={cn('px-4', py, 'font-medium')}>
-        <div className="flex items-center gap-2.5">
-          <div className={cn('w-[3px] h-4 rounded-full shrink-0', STATUS_DOT[b.status])} />
-          {b.title}
-        </div>
-      </td>
-    );
-    case 'author': return <td key={key} className={cn('px-4', py)}>{b.author || EMPTY}</td>;
-    case 'publisher': return <td key={key} className={cn('px-4', py, 'text-muted')}>{b.publisher || EMPTY}</td>;
-    case 'genre': return (
-      <td key={key} className={cn('px-4', py)}>
-        {b.genre ? <GenreChip genre={b.genre} /> : EMPTY}
-      </td>
-    );
-    case 'pageCount': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{b.pageCount ?? EMPTY}</td>;
-    case 'publicationYear': return <td key={key} className={cn('px-4', py, 'text-right tabular-nums')}>{b.publicationYear ?? EMPTY}</td>;
-    case 'status': return <td key={key} className={cn('px-4', py)}><StatusBadge status={b.status} /></td>;
-    default: return null;
+    case "title":
+      return (
+        <td key={key} className={cn("px-4", py, "font-medium")}>
+          <div className="flex items-center gap-2.5">
+            <div
+              className={cn(
+                "w-[3px] h-4 rounded-full shrink-0",
+                STATUS_DOT[b.status],
+              )}
+            />
+            {b.title}
+          </div>
+        </td>
+      );
+    case "author":
+      return (
+        <td key={key} className={cn("px-4", py)}>
+          {b.author || EMPTY}
+        </td>
+      );
+    case "publisher":
+      return (
+        <td key={key} className={cn("px-4", py, "text-muted")}>
+          {b.publisher || EMPTY}
+        </td>
+      );
+    case "genre":
+      return (
+        <td key={key} className={cn("px-4", py)}>
+          {b.genre ? <GenreChip genre={b.genre} /> : EMPTY}
+        </td>
+      );
+    case "pageCount":
+      return (
+        <td key={key} className={cn("px-4", py, "text-right tabular-nums")}>
+          {b.pageCount ?? EMPTY}
+        </td>
+      );
+    case "publicationYear":
+      return (
+        <td key={key} className={cn("px-4", py, "text-right tabular-nums")}>
+          {b.publicationYear ?? EMPTY}
+        </td>
+      );
+    case "rating":
+      return (
+        <td key={key} className={cn("px-4", py)}>
+          {b.rating ? (
+            <span className="inline-flex items-center gap-1">
+              <Star size={12} className="fill-amber-400 text-amber-400" />
+              {b.rating}
+            </span>
+          ) : (
+            EMPTY
+          )}
+        </td>
+      );
+    case "status":
+      return (
+        <td key={key} className={cn("px-4", py)}>
+          <StatusBadge status={b.status} />
+        </td>
+      );
+    default:
+      return null;
   }
 }
 
 function ThSort({
-  label, k, sortKey, sortDir, onClick, align,
-}: { label: string; k: SortKey; sortKey: SortKey; sortDir: 'asc' | 'desc'; onClick: (k: SortKey) => void; align?: 'right' }) {
+  label,
+  k,
+  sortKey,
+  sortDir,
+  onClick,
+  align,
+}: {
+  label: string;
+  k: SortKey;
+  sortKey: SortKey;
+  sortDir: "asc" | "desc";
+  onClick: (k: SortKey) => void;
+  align?: "right";
+}) {
   const active = sortKey === k;
   return (
-    <th className={cn('px-4 py-3.5 font-semibold', align === 'right' ? 'text-right' : 'text-left')}>
-      <button onClick={() => onClick(k)} className="inline-flex items-center gap-1 hover:text-text">
+    <th
+      className={cn(
+        "px-4 py-3.5 font-semibold",
+        align === "right" ? "text-right" : "text-left",
+      )}
+    >
+      <button
+        onClick={() => onClick(k)}
+        className="inline-flex items-center gap-1 hover:text-text"
+      >
         {label}
-        {active ? (sortDir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />) : <ArrowUpDown size={12} className="opacity-40" />}
+        {active ? (
+          sortDir === "asc" ? (
+            <ArrowUp size={12} />
+          ) : (
+            <ArrowDown size={12} />
+          )
+        ) : (
+          <ArrowUpDown size={12} className="opacity-40" />
+        )}
       </button>
     </th>
   );
 }
 
 function BulkBar({
-  count, onClear, onDelete, onStatus, onGenre, onPublisher, genres, publishers,
+  count,
+  onClear,
+  onDelete,
+  onStatus,
+  onGenre,
+  onPublisher,
+  onLoan,
+  genres,
+  publishers,
 }: {
   count: number;
   onClear: () => void;
@@ -207,6 +487,7 @@ function BulkBar({
   onStatus: (s: BookStatus) => void;
   onGenre: (g: string | undefined) => void;
   onPublisher: (p: string | undefined) => void;
+  onLoan?: () => void;
   genres: string[];
   publishers: string[];
 }) {
@@ -219,7 +500,13 @@ function BulkBar({
       <div className="flex items-center gap-1 flex-wrap">
         <span className="text-muted text-xs shrink-0">Durum:</span>
         {STATUSES.map((s) => (
-          <button key={s.value} className="chip hover:bg-primary/20 text-xs" onClick={() => onStatus(s.value)}>{s.label}</button>
+          <button
+            key={s.value}
+            className="chip hover:bg-primary/20 text-xs"
+            onClick={() => onStatus(s.value)}
+          >
+            {s.label}
+          </button>
         ))}
       </div>
 
@@ -229,28 +516,50 @@ function BulkBar({
       <BulkPicker label="Yayınevi" options={publishers} onPick={onPublisher} />
 
       <div className="ml-auto flex items-center gap-2">
-        <button className="btn btn-ghost text-secondary" onClick={onDelete}><Trash2 size={14} /> Sil</button>
-        <button className="btn btn-ghost" onClick={onClear}>Seçimi Kaldır</button>
+        {onLoan && (
+          <button className="btn btn-outline" onClick={onLoan}>
+            <UserRound size={14} /> Ödünç Ver
+          </button>
+        )}
+        <button className="btn btn-ghost text-secondary" onClick={onDelete}>
+          <Trash2 size={14} /> Sil
+        </button>
+        <button className="btn btn-ghost" onClick={onClear}>
+          Seçimi Kaldır
+        </button>
       </div>
     </div>
   );
 }
 
-function BulkPicker({ label, options, onPick }: { label: string; options: string[]; onPick: (v: string | undefined) => void }) {
+function BulkPicker({
+  label,
+  options,
+  onPick,
+}: {
+  label: string;
+  options: string[];
+  onPick: (v: string | undefined) => void;
+}) {
   const [open, setOpen] = useState(false);
-  const [custom, setCustom] = useState('');
+  const [custom, setCustom] = useState("");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
-  const pick = (v: string | undefined) => { onPick(v); setOpen(false); setCustom(''); };
+  const pick = (v: string | undefined) => {
+    onPick(v);
+    setOpen(false);
+    setCustom("");
+  };
 
   return (
     <div ref={ref} className="relative">
@@ -270,10 +579,15 @@ function BulkPicker({ label, options, onPick }: { label: string; options: string
                 placeholder={`Yeni ${label.toLowerCase()}…`}
                 value={custom}
                 onChange={(e) => setCustom(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && custom.trim()) pick(custom.trim()); }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && custom.trim()) pick(custom.trim());
+                }}
               />
               {custom.trim() && (
-                <button className="btn btn-primary text-xs py-1 px-2 shrink-0" onClick={() => pick(custom.trim())}>
+                <button
+                  className="btn btn-primary text-xs py-1 px-2 shrink-0"
+                  onClick={() => pick(custom.trim())}
+                >
                   Uygula
                 </button>
               )}
