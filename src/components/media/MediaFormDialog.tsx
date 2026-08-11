@@ -211,6 +211,7 @@ export function MediaFormDialog({
                 }))
               }
               autoFocus
+              data-initial-focus
             />
           </Field>
         </div>

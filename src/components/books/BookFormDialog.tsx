@@ -226,6 +226,7 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
             value={form.title}
             onChange={(event) => updateTitle("title", event.target.value)}
             autoFocus
+            data-initial-focus
           />
         </Field>
         <Field label="Yazar" error={errors.author} errorId="book-author-error">

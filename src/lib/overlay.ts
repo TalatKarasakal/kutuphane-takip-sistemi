@@ -41,9 +41,12 @@ export function useOverlay(
     syncBackground();
 
     const frame = requestAnimationFrame(() => {
+      const initial = container.current?.querySelector<HTMLElement>(
+        "[data-initial-focus]",
+      );
       const focusable =
         container.current?.querySelectorAll<HTMLElement>(FOCUSABLE);
-      (focusable?.[0] ?? container.current)?.focus();
+      (initial ?? focusable?.[0] ?? container.current)?.focus();
     });
 
     const onKeyDown = (event: KeyboardEvent) => {

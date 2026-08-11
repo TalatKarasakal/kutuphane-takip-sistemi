@@ -84,6 +84,7 @@ describe("forms and overlays", () => {
     const { container, rerender } = render(
       <Modal open onClose={() => undefined} title="Test">
         <button>İşlem</button>
+        <input data-initial-focus aria-label="İlk alan" />
       </Modal>,
     );
     expect(screen.getByRole("dialog", { name: "Test" })).toHaveAttribute(
@@ -91,9 +92,13 @@ describe("forms and overlays", () => {
       "true",
     );
     expect(await axe(container)).toHaveNoViolations();
+    await waitFor(() =>
+      expect(screen.getByLabelText("İlk alan")).toHaveFocus(),
+    );
     rerender(
       <Modal open={false} onClose={() => undefined} title="Test">
         <button>İşlem</button>
+        <input data-initial-focus aria-label="İlk alan" />
       </Modal>,
     );
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();

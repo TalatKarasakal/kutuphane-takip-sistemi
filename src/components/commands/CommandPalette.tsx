@@ -186,6 +186,7 @@ export function CommandPalette({
         />
         <input
           autoFocus
+          data-initial-focus
           className="input pl-9"
           placeholder="Kayıt veya komut ara…"
           value={query}
