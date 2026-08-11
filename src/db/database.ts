@@ -3,6 +3,7 @@ import type { Book } from "../types/book";
 import type { Media } from "../types/media";
 import type { ActiveLoan, ArtworkCache, Tag } from "../types/library";
 import { TAG_COLORS } from "../types/library";
+import { runInChunks } from "../lib/dbBatch";
 
 interface LegacyBook extends Book {
   tags?: string[];
@@ -75,7 +76,9 @@ export class LibraryDB extends Dexie {
             delete book.tags;
           });
         if (tags.size)
-          await tx.table<Tag, string>("tags").bulkPut([...tags.values()]);
+          await runInChunks([...tags.values()], (chunk) =>
+            tx.table<Tag, string>("tags").bulkPut(chunk),
+          );
       });
   }
 }

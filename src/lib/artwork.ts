@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { db } from "../db/database";
 import { useSettings } from "../store/settingsStore";
 import type { ArtworkOwnerType } from "../types/library";
+import { runInChunks } from "./dbBatch";
 
 const MAX_CACHE_BYTES = 250 * 1024 * 1024;
 
@@ -14,7 +15,10 @@ async function pruneArtworkCache(): Promise<void> {
     total -= item.size;
     remove.push(item.key);
   }
-  if (remove.length) await db.artworkCache.bulkDelete(remove);
+  if (remove.length)
+    await db.transaction("rw", db.artworkCache, () =>
+      runInChunks(remove, (chunk) => db.artworkCache.bulkDelete(chunk)),
+    );
 }
 
 export function useArtwork(

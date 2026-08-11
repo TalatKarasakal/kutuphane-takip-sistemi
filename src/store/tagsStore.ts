@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
 import { db } from "../db/database";
+import { runInChunks } from "../lib/dbBatch";
 import { normalizeTag, validationMessage } from "../lib/validation";
 import { TAG_COLORS, type Tag } from "../types/library";
 import { useToast } from "./toastStore";
@@ -89,9 +90,7 @@ export const useTags = create<TagsState>((set, get) => ({
       });
     try {
       await db.transaction("rw", db.tags, async () => {
-        for (let offset = 0; offset < created.length; offset += 500) {
-          await db.tags.bulkAdd(created.slice(offset, offset + 500));
-        }
+        await runInChunks(created, (chunk) => db.tags.bulkAdd(chunk));
       });
       if (created.length) set({ tags: sortTags([...get().tags, ...created]) });
       return uniqueNames.map(([key]) => known.get(key)!);
@@ -126,14 +125,24 @@ export const useTags = create<TagsState>((set, get) => ({
     try {
       await db.transaction("rw", db.tags, db.books, db.media, async () => {
         await db.tags.delete(id);
-        await db.books.toCollection().modify((book) => {
-          if (book.tagIds?.includes(id))
-            book.tagIds = book.tagIds.filter((tagId) => tagId !== id);
-        });
-        await db.media.toCollection().modify((item) => {
-          if (item.tagIds?.includes(id))
-            item.tagIds = item.tagIds.filter((tagId) => tagId !== id);
-        });
+        const books = await db.books.where("tagIds").equals(id).toArray();
+        const media = await db.media.where("tagIds").equals(id).toArray();
+        await runInChunks(
+          books.map((book) => ({
+            ...book,
+            tagIds: book.tagIds?.filter((tagId) => tagId !== id),
+            updatedAt: new Date().toISOString(),
+          })),
+          (chunk) => db.books.bulkPut(chunk),
+        );
+        await runInChunks(
+          media.map((item) => ({
+            ...item,
+            tagIds: item.tagIds?.filter((tagId) => tagId !== id),
+            updatedAt: new Date().toISOString(),
+          })),
+          (chunk) => db.media.bulkPut(chunk),
+        );
       });
       set({ tags: get().tags.filter((tag) => tag.id !== id) });
       await Promise.all([

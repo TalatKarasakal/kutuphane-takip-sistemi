@@ -6,6 +6,7 @@ import {
   validationMessage,
   type MediaDraft,
 } from "../lib/validation";
+import { runInChunks } from "../lib/dbBatch";
 import { useToast } from "./toastStore";
 import type { Media, MediaStatus, MediaType } from "../types/media";
 import type { TagFilterMode } from "../types/library";
@@ -29,6 +30,7 @@ export interface MediaFilters {
   genreFilter: string[];
   tagFilter: string[];
   tagFilterMode: TagFilterMode;
+  groupByTags: boolean;
   sortKey: MediaSortKey;
   sortDir: SortDir;
 }
@@ -54,6 +56,7 @@ interface MediaState {
   toggleGenreFilter: (type: MediaType, genre: string) => void;
   toggleTagFilter: (type: MediaType, tagId: string) => void;
   setTagFilterMode: (type: MediaType, mode: TagFilterMode) => void;
+  toggleGroupByTags: (type: MediaType) => void;
   clearFilters: (type?: MediaType) => void;
   setSort: (type: MediaType, key: MediaSortKey, direction?: SortDir) => void;
 
@@ -68,11 +71,10 @@ const emptyFilters = (): MediaFilters => ({
   genreFilter: [],
   tagFilter: [],
   tagFilterMode: "or",
+  groupByTags: false,
   sortKey: "addedAt",
   sortDir: "desc",
 });
-
-const BATCH_SIZE = 500;
 
 function draftFromMedia(item: Media): MediaDraft {
   const { id: _id, addedAt: _addedAt, updatedAt: _updatedAt, ...draft } = item;
@@ -132,9 +134,7 @@ export const useMedia = create<MediaState>((set, get) => ({
         updatedAt: now,
       }));
       await db.transaction("rw", db.media, async () => {
-        for (let index = 0; index < rows.length; index += BATCH_SIZE) {
-          await db.media.bulkAdd(rows.slice(index, index + BATCH_SIZE));
-        }
+        await runInChunks(rows, (chunk) => db.media.bulkAdd(chunk));
       });
       set({ media: [...get().media, ...rows] });
       useToast.getState().show(`${rows.length} öğe içe aktarıldı`);
@@ -180,9 +180,12 @@ export const useMedia = create<MediaState>((set, get) => ({
     ).flat();
     try {
       await db.transaction("rw", db.media, db.artworkCache, async () => {
-        await db.media.bulkDelete(ids);
+        await runInChunks(ids, (chunk) => db.media.bulkDelete(chunk));
         if (artwork.length)
-          await db.artworkCache.bulkDelete(artwork.map((item) => item.key));
+          await runInChunks(
+            artwork.map((item) => item.key),
+            (chunk) => db.artworkCache.bulkDelete(chunk),
+          );
       });
       set({
         media: get().media.filter((item) => !idSet.has(item.id)),
@@ -194,8 +197,12 @@ export const useMedia = create<MediaState>((set, get) => ({
         .getState()
         .show(`${ids.length} öğe silindi`, "success", async () => {
           await db.transaction("rw", db.media, db.artworkCache, async () => {
-            if (deleted.length) await db.media.bulkPut(deleted);
-            if (artwork.length) await db.artworkCache.bulkPut(artwork);
+            if (deleted.length)
+              await runInChunks(deleted, (chunk) => db.media.bulkPut(chunk));
+            if (artwork.length)
+              await runInChunks(artwork, (chunk) =>
+                db.artworkCache.bulkPut(chunk),
+              );
           });
           set({ media: [...get().media, ...deleted] });
         });
@@ -208,8 +215,10 @@ export const useMedia = create<MediaState>((set, get) => ({
     try {
       const now = new Date().toISOString();
       await db.transaction("rw", db.media, async () => {
-        await Promise.all(
-          ids.map((id) => db.media.update(id, { status, updatedAt: now })),
+        await runInChunks(ids, (chunk) =>
+          Promise.all(
+            chunk.map((id) => db.media.update(id, { status, updatedAt: now })),
+          ),
         );
       });
       const idSet = new Set(ids);
@@ -229,9 +238,11 @@ export const useMedia = create<MediaState>((set, get) => ({
       const now = new Date().toISOString();
       const unique = [...new Set(tagIds)];
       await db.transaction("rw", db.media, async () => {
-        await Promise.all(
-          ids.map((id) =>
-            db.media.update(id, { tagIds: unique, updatedAt: now }),
+        await runInChunks(ids, (chunk) =>
+          Promise.all(
+            chunk.map((id) =>
+              db.media.update(id, { tagIds: unique, updatedAt: now }),
+            ),
           ),
         );
       });
@@ -294,6 +305,16 @@ export const useMedia = create<MediaState>((set, get) => ({
       filters: {
         ...get().filters,
         [type]: { ...get().filters[type], tagFilterMode },
+      },
+    }),
+  toggleGroupByTags: (type) =>
+    set({
+      filters: {
+        ...get().filters,
+        [type]: {
+          ...get().filters[type],
+          groupByTags: !get().filters[type].groupByTags,
+        },
       },
     }),
   clearFilters: (type) =>

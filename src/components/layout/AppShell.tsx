@@ -82,6 +82,9 @@ export function AppShell() {
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTarget, setSettingsTarget] = useState<"general" | "about">(
+    "general",
+  );
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
 
@@ -236,7 +239,10 @@ export function AppShell() {
           }}
           onImport={() => setImportOpen(true)}
           onExport={() => setExportOpen(true)}
-          onSettings={() => setSettingsOpen(true)}
+          onSettings={() => {
+            setSettingsTarget("general");
+            setSettingsOpen(true);
+          }}
           onPhotoImport={() => setPhotoImportOpen(true)}
         />
 
@@ -302,7 +308,10 @@ export function AppShell() {
           <PhotoImportDialog
             open
             onClose={() => setPhotoImportOpen(false)}
-            onOpenSettings={() => setSettingsOpen(true)}
+            onOpenSettings={() => {
+              setSettingsTarget("general");
+              setSettingsOpen(true);
+            }}
           />
         )}
         {importOpen && (
@@ -320,7 +329,11 @@ export function AppShell() {
           />
         )}
         {settingsOpen && (
-          <SettingsDialog open onClose={() => setSettingsOpen(false)} />
+          <SettingsDialog
+            open
+            initialSection={settingsTarget}
+            onClose={() => setSettingsOpen(false)}
+          />
         )}
       </Suspense>
 
@@ -339,7 +352,14 @@ export function AppShell() {
           }
         }}
         onImport={() => setImportOpen(true)}
-        onSettings={() => setSettingsOpen(true)}
+        onSettings={() => {
+          setSettingsTarget("general");
+          setSettingsOpen(true);
+        }}
+        onAbout={() => {
+          setSettingsTarget("about");
+          setSettingsOpen(true);
+        }}
         onOpenBook={(book) => {
           setSection("books");
           requestAnimationFrame(() => setDetail(book));

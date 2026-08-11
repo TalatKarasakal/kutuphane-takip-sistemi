@@ -37,6 +37,7 @@ export function CommandPalette({
   onAdd,
   onImport,
   onSettings,
+  onAbout,
   onOpenBook,
   onOpenMedia,
 }: {
@@ -47,6 +48,7 @@ export function CommandPalette({
   onAdd: () => void;
   onImport: () => void;
   onSettings: () => void;
+  onAbout: () => void;
   onOpenBook: (book: Book) => void;
   onOpenMedia: (item: Media) => void;
 }) {
@@ -125,7 +127,7 @@ export function CommandPalette({
         id: "about",
         label: "Hakkında ve güncelleme bilgisi",
         icon: Info,
-        run: onSettings,
+        run: onAbout,
       },
     ];
     const records: Command[] = [
@@ -151,6 +153,7 @@ export function CommandPalette({
     clearMediaFilters,
     media,
     onAdd,
+    onAbout,
     onImport,
     onOpenBook,
     onOpenMedia,

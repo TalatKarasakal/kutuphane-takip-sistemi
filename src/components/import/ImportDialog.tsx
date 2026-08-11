@@ -19,6 +19,7 @@ import { parseNumber } from "../../lib/utils";
 import { useBooks } from "../../store/booksStore";
 import { useMedia } from "../../store/mediaStore";
 import { useTags } from "../../store/tagsStore";
+import { useToast } from "../../store/toastStore";
 import type { Book, BookStatus } from "../../types/book";
 import type { Media, MediaStatus, MediaType } from "../../types/media";
 import {
@@ -39,6 +40,13 @@ import {
   type BookDraft,
   type MediaDraft,
 } from "../../lib/validation";
+import {
+  persistBookImport,
+  persistMediaImport,
+  type TaggedBookDraft,
+  type TaggedMediaDraft,
+} from "../../lib/importPersistence";
+import { findDuplicateIds } from "../../lib/filters";
 
 type Step = "pick" | "sheet" | "map" | "preview";
 
@@ -54,9 +62,9 @@ interface Props {
 }
 
 export function ImportDialog({ open, onClose, section }: Props) {
-  const { addMany: addManyBooks } = useBooks();
-  const { addMany: addManyMedia } = useMedia();
-  const addManyTags = useTags((state) => state.addMany);
+  const loadBooks = useBooks((state) => state.load);
+  const loadMedia = useMedia((state) => state.load);
+  const loadTags = useTags((state) => state.load);
   const isMedia = section !== "books";
   const mediaType: MediaType = section === "movies" ? "film" : "dizi";
 
@@ -321,36 +329,20 @@ export function ImportDialog({ open, onClose, section }: Props) {
     setError("");
     try {
       const sourceRows = isMedia ? buildMedia().rows : buildBooks().rows;
-      const allTagNames = sourceRows.flatMap((row) => row.__tagNames ?? []);
-      const tags = await addManyTags(allTagNames);
-      const tagsByName = new Map(
-        tags.map((tag) => [tag.name.toLocaleLowerCase("tr"), tag.id]),
-      );
-      const resolveTags = (names: string[] | undefined) => [
-        ...new Set(
-          (names ?? [])
-            .map((name) => tagsByName.get(name.toLocaleLowerCase("tr")))
-            .filter((id): id is string => !!id),
-        ),
-      ];
       if (isMedia) {
-        const rows = sourceRows as Array<
-          MediaDraft & { __tagNames?: string[] }
-        >;
-        await addManyMedia(
-          rows.map(({ __tagNames, ...row }) => ({
-            ...row,
-            tagIds: resolveTags(__tagNames),
-          })),
-        );
+        const rows = await persistMediaImport(sourceRows as TaggedMediaDraft[]);
+        await Promise.all([loadMedia(), loadTags()]);
+        useToast.getState().show(`${rows.length} öğe içe aktarıldı`);
       } else {
-        const rows = sourceRows as Array<BookDraft & { __tagNames?: string[] }>;
-        await addManyBooks(
-          rows.map(({ __tagNames, ...row }) => ({
-            ...row,
-            tagIds: resolveTags(__tagNames),
-          })),
-        );
+        const rows = await persistBookImport(sourceRows as TaggedBookDraft[]);
+        await Promise.all([loadBooks(), loadTags()]);
+        const duplicateCount = findDuplicateIds(useBooks.getState().books).size;
+        useToast
+          .getState()
+          .show(
+            `${rows.length} kitap içe aktarıldı${duplicateCount ? ` · ${duplicateCount} mükerrer kayıt uyarısı` : ""}`,
+            duplicateCount ? "info" : "success",
+          );
       }
       close();
     } catch (caught) {

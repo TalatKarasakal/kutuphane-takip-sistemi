@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Film, Filter, Tags, Tv2, X } from "lucide-react";
+import { Film, Filter, Layers3, Tags, Tv2, X } from "lucide-react";
 import { useMedia } from "../../store/mediaStore";
 import { useTags } from "../../store/tagsStore";
 import { MEDIA_STATUSES } from "../../constants/mediaStatuses";
@@ -18,10 +18,12 @@ export function MediaSidebar({ type }: Props) {
     toggleGenreFilter,
     toggleTagFilter,
     setTagFilterMode,
+    toggleGroupByTags,
     clearFilters,
   } = useMedia();
   const tags = useTags((state) => state.tags);
-  const { statusFilter, genreFilter, tagFilter, tagFilterMode } = filters[type];
+  const { statusFilter, genreFilter, tagFilter, tagFilterMode, groupByTags } =
+    filters[type];
 
   const items = useMemo(
     () => media.filter((m) => m.type === type),
@@ -45,7 +47,10 @@ export function MediaSidebar({ type }: Props) {
   }, [items]);
 
   const hasActive =
-    statusFilter.length > 0 || genreFilter.length > 0 || tagFilter.length > 0;
+    statusFilter.length > 0 ||
+    genreFilter.length > 0 ||
+    tagFilter.length > 0 ||
+    groupByTags;
   const typeLabel = type === "film" ? "film" : "dizi";
   const TypeIcon = type === "film" ? Film : Tv2;
 
@@ -127,6 +132,18 @@ export function MediaSidebar({ type }: Props) {
                 color={tag.color}
               />
             ))}
+            <button
+              className={cn(
+                "mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border border-border px-2 py-1.5 text-xs",
+                groupByTags
+                  ? "bg-primary/10 text-primary"
+                  : "hover:bg-surface2",
+              )}
+              onClick={() => toggleGroupByTags(type)}
+              aria-pressed={groupByTags}
+            >
+              <Layers3 size={12} /> Etikete göre grupla
+            </button>
           </FilterCard>
         )}
 

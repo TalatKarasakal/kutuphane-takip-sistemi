@@ -91,9 +91,11 @@ function date(
 ): string | undefined {
   const text = cleanText(value, field, 10, issues);
   if (!text) return undefined;
+  const parsed = new Date(`${text}T00:00:00.000Z`);
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(text) ||
-    Number.isNaN(Date.parse(`${text}T00:00:00Z`))
+    Number.isNaN(parsed.getTime()) ||
+    parsed.toISOString().slice(0, 10) !== text
   ) {
     issues.push({ field, message: "Geçerli YYYY-AA-GG tarihi olmalı." });
     return undefined;

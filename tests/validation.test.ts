@@ -41,6 +41,17 @@ describe("central validation", () => {
     ).toThrow(ValidationError);
   });
 
+  it("rejects dates that do not exist on the calendar", () => {
+    expect(() =>
+      normalizeBookDraft({
+        title: "Kitap",
+        author: "Yazar",
+        status: "okundu",
+        readStartDate: "2026-02-31",
+      }),
+    ).toThrow(ValidationError);
+  });
+
   it("escapes spreadsheet formulas", () => {
     expect(sanitizeSpreadsheetValue("=2+2")).toBe("'=2+2");
     expect(sanitizeSpreadsheetValue("normal")).toBe("normal");

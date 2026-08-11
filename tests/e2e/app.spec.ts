@@ -39,6 +39,21 @@ async function addBook(title: string, author = "") {
 }
 
 test("book CRUD, active loan lifecycle and command palette", async () => {
+  test.setTimeout(60_000);
+  await page.getByRole("button", { name: "Kitap Ekle", exact: true }).click();
+  await page.getByLabel("Başlık *").fill("Korunan taslak");
+  await page.getByRole("button", { name: "Vazgeç" }).focus();
+  await page.keyboard.press("2");
+  await expect(page.getByRole("dialog", { name: "Yeni Kitap" })).toBeVisible();
+  await expect(page.getByLabel("Başlık *")).toHaveValue("Korunan taslak");
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Yeni Kitap" })).toHaveCount(0);
+  await page.keyboard.press("2");
+  await expect(page.getByTitle("Film Ekle")).toBeVisible();
+  await page.keyboard.press("1");
+  await expect(page.getByTitle("Kitap Ekle", { exact: true })).toBeVisible();
+
   await addBook("Uçtan Uca Kitap");
   await page.getByRole("row", { name: /Uçtan Uca Kitap/ }).click();
   await expect(
@@ -94,6 +109,19 @@ test("book CRUD, active loan lifecycle and command palette", async () => {
   await expect(page.getByRole("row", { name: /Uçtan Uca Kitap/ })).toHaveCount(
     0,
   );
+
+  await page.keyboard.press(
+    process.platform === "darwin" ? "Meta+K" : "Control+K",
+  );
+  await page
+    .getByPlaceholder("Kayıt veya komut ara…")
+    .fill("Hakkında ve güncelleme bilgisi");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog", { name: "Ayarlar" })).toBeVisible();
+  await expect(page.getByText("Hakkında", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Güncelleme denetle" }),
+  ).toBeFocused();
 });
 
 test("file import, duplicate merge and backup restore preview", async () => {
@@ -103,7 +131,7 @@ test("file import, duplicate merge and backup restore preview", async () => {
     name: "kitaplar.csv",
     mimeType: "text/csv",
     buffer: Buffer.from(
-      "Başlık,Yazar,Durum\nMükerrer Kitap,Yazar,Mevcut\nİçe Aktarılan,Yazar,Okunacak",
+      "Başlık,Yazar,Durum,Etiketler\nMükerrer Kitap,Yazar,Mevcut,Favori\nİçe Aktarılan,Yazar,Okunacak,Araştırma",
     ),
   });
   await page.getByRole("button", { name: "Önizle" }).click();
@@ -113,6 +141,11 @@ test("file import, duplicate merge and backup restore preview", async () => {
   await page.getByRole("button", { name: "Alan Seçerek Birleştir" }).click();
   await page.getByRole("button", { name: "Seçili Grubu Birleştir" }).click();
   await expect(page.getByText("Tekrar Edenler")).toHaveCount(0);
+  await page.getByRole("button", { name: "Etikete göre grupla" }).click();
+  await expect(
+    page.locator("tbody").getByText("Araştırma", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Etikete göre grupla" }).click();
 
   await page.getByTitle("Ayarlar").click();
   await page.getByRole("button", { name: "Şimdi Yedekle" }).click();
@@ -133,4 +166,41 @@ test("file import, duplicate merge and backup restore preview", async () => {
   await expect(page.getByText(/Geri yüklendi: 2 kitap/)).toBeVisible();
   await page.getByRole("button", { name: "Tamam" }).click();
   await expect(page.getByText("Yedekten Sonra")).toHaveCount(0);
+});
+
+test("virtualizes the 10,000-record library below the DOM limit", async () => {
+  test.setTimeout(60_000);
+  await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("kutuphanem");
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction("books", "readwrite");
+      const store = transaction.objectStore("books");
+      const now = "2026-08-11T00:00:00.000Z";
+      for (let index = 0; index < 10_000; index += 1) {
+        store.put({
+          id: `fixture-${index}`,
+          title: `Kitap ${String(index).padStart(5, "0")}`,
+          author: index % 2 ? "İlker" : "Işık",
+          status: index % 2 ? "okundu" : "mevcut",
+          genre: `Tür ${index % 20}`,
+          addedAt: now,
+          updatedAt: now,
+        });
+      }
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error);
+      transaction.onabort = () => reject(transaction.error);
+    });
+    database.close();
+  });
+  await page.reload();
+  await expect(page.getByText("10000 kitap", { exact: true })).toBeVisible();
+  const renderedRows = await page
+    .locator('tbody tr:not([aria-hidden="true"])')
+    .count();
+  expect(renderedRows).toBeLessThanOrEqual(200);
 });

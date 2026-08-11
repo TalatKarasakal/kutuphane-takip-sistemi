@@ -31,9 +31,11 @@ import { TagManager } from "../tags/TagManager";
 export function SettingsDialog({
   open,
   onClose,
+  initialSection = "general",
 }: {
   open: boolean;
   onClose: () => void;
+  initialSection?: "general" | "about";
 }) {
   const {
     theme,
@@ -48,6 +50,15 @@ export function SettingsDialog({
     set,
     reset,
   } = useSettings();
+  const aboutRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open || initialSection !== "about") return;
+    const frame = requestAnimationFrame(() => {
+      aboutRef.current?.scrollIntoView({ block: "start" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [initialSection, open]);
 
   return (
     <Modal
@@ -208,7 +219,9 @@ export function SettingsDialog({
 
         <BackupSection active={open} />
 
-        <AboutSection />
+        <div ref={aboutRef}>
+          <AboutSection initialFocus={initialSection === "about"} />
+        </div>
       </div>
     </Modal>
   );
@@ -593,7 +606,7 @@ function BackupSection({ active }: { active: boolean }) {
   );
 }
 
-function AboutSection() {
+function AboutSection({ initialFocus }: { initialFocus: boolean }) {
   const [version, setVersion] = useState("0.2.0");
   const [checking, setChecking] = useState(false);
   const [releaseUrl, setReleaseUrl] = useState("");
@@ -641,7 +654,12 @@ function AboutSection() {
             çalışır.
           </div>
         </div>
-        <button className="btn btn-outline" onClick={check} disabled={checking}>
+        <button
+          data-initial-focus={initialFocus || undefined}
+          className="btn btn-outline"
+          onClick={check}
+          disabled={checking}
+        >
           <RefreshCw size={14} className={checking ? "animate-spin" : ""} />{" "}
           Güncelleme denetle
         </button>

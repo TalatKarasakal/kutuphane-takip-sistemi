@@ -15,6 +15,7 @@ import {
   type MediaSortKey,
 } from "../../store/mediaStore";
 import { useSettings } from "../../store/settingsStore";
+import { useTags } from "../../store/tagsStore";
 import { MEDIA_STATUSES } from "../../constants/mediaStatuses";
 import { FILM_COLUMN_LABELS, TV_COLUMN_LABELS } from "../../constants/columns";
 import { MediaStatusBadge, GenreChip } from "../ui/Badge";
@@ -24,11 +25,22 @@ import { cn } from "../../lib/utils";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useResponsiveColumns } from "../../lib/virtual";
 import { useIndexedMediaIds } from "../../lib/indexedQueries";
+import { groupByPrimaryTag } from "../../lib/tagGrouping";
 
 interface Props {
   type: MediaType;
   onOpen: (m: Media) => void;
 }
+
+type MediaVirtualUnit =
+  | {
+      key: string;
+      kind: "group";
+      label: string;
+      color?: string;
+      count: number;
+    }
+  | { key: string; kind: "items"; items: Media[] };
 
 const MEDIA_STATUS_DOT: Record<MediaStatus, string> = {
   izlendi: "bg-emerald-500",
@@ -57,6 +69,8 @@ export function MediaList({ type, onOpen }: Props) {
     setStatus,
   } = useMedia();
   const { sortKey, sortDir } = filters[type];
+  const groupByTags = filters[type].groupByTags;
+  const tags = useTags((state) => state.tags);
   const indexedIds = useIndexedMediaIds(
     media,
     type,
@@ -82,14 +96,64 @@ export function MediaList({ type, onOpen }: Props) {
       ),
     [filters, indexedIds, media, type],
   );
+  const tagGroups = useMemo(
+    () =>
+      groupByTags
+        ? groupByPrimaryTag(filtered, tags)
+        : [{ id: "all", label: "", items: filtered }],
+    [filtered, groupByTags, tags],
+  );
+  const virtualRows = useMemo<MediaVirtualUnit[]>(
+    () =>
+      tagGroups.flatMap((group) => {
+        const units: MediaVirtualUnit[] = groupByTags
+          ? [
+              {
+                key: `group:${group.id}`,
+                kind: "group",
+                label: group.label,
+                color: group.color,
+                count: group.items.length,
+              },
+            ]
+          : [];
+        if (view === "card") {
+          for (
+            let index = 0;
+            index < group.items.length;
+            index += cardColumns
+          ) {
+            units.push({
+              key: `cards:${group.id}:${index}`,
+              kind: "items",
+              items: group.items.slice(index, index + cardColumns),
+            });
+          }
+        } else {
+          group.items.forEach((item) =>
+            units.push({
+              key: `media:${item.id}`,
+              kind: "items",
+              items: [item],
+            }),
+          );
+        }
+        return units;
+      }),
+    [cardColumns, groupByTags, tagGroups, view],
+  );
   const virtualizer = useVirtualizer({
-    count:
-      view === "card"
-        ? Math.ceil(filtered.length / cardColumns)
-        : filtered.length,
+    count: virtualRows.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () =>
-      view === "card" ? 320 : density === "compact" ? 38 : 48,
+    estimateSize: (index) =>
+      virtualRows[index]?.kind === "group"
+        ? 38
+        : view === "card"
+          ? 320
+          : density === "compact"
+            ? 38
+            : 48,
+    getItemKey: (index) => virtualRows[index]?.key ?? index,
     overscan: 8,
   });
 
@@ -145,20 +209,31 @@ export function MediaList({ type, onOpen }: Props) {
             className="relative"
             style={{ height: virtualizer.getTotalSize() }}
           >
-            {virtualizer.getVirtualItems().map((row) => (
-              <div
-                key={row.key}
-                ref={virtualizer.measureElement}
-                data-index={row.index}
-                className="absolute left-0 top-0 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3 pb-3"
-                style={{ transform: `translateY(${row.start}px)` }}
-              >
-                {filtered
-                  .slice(
-                    row.index * cardColumns,
-                    row.index * cardColumns + cardColumns,
-                  )
-                  .map((item) => (
+            {virtualizer.getVirtualItems().map((row) => {
+              const unit = virtualRows[row.index];
+              return unit.kind === "group" ? (
+                <div
+                  key={unit.key}
+                  ref={virtualizer.measureElement}
+                  data-index={row.index}
+                  className="absolute left-0 top-0 w-full pb-2"
+                  style={{ transform: `translateY(${row.start}px)` }}
+                >
+                  <TagGroupHeader
+                    label={unit.label}
+                    color={unit.color}
+                    count={unit.count}
+                  />
+                </div>
+              ) : (
+                <div
+                  key={unit.key}
+                  ref={virtualizer.measureElement}
+                  data-index={row.index}
+                  className="absolute left-0 top-0 grid w-full grid-cols-1 gap-3 pb-3 sm:grid-cols-2 xl:grid-cols-3"
+                  style={{ transform: `translateY(${row.start}px)` }}
+                >
+                  {unit.items.map((item) => (
                     <MediaCard
                       key={item.id}
                       item={item}
@@ -167,8 +242,9 @@ export function MediaList({ type, onOpen }: Props) {
                       onToggleSelect={() => toggleSelect(item.id)}
                     />
                   ))}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -223,7 +299,28 @@ export function MediaList({ type, onOpen }: Props) {
                   </tr>
                 )}
                 {virtualizer.getVirtualItems().map((virtualRow) => {
-                  const m = filtered[virtualRow.index];
+                  const unit = virtualRows[virtualRow.index];
+                  if (unit.kind === "group") {
+                    return (
+                      <tr
+                        key={unit.key}
+                        ref={virtualizer.measureElement}
+                        data-index={virtualRow.index}
+                      >
+                        <td
+                          colSpan={visibleCols.length + 2}
+                          className="bg-surface2/70 px-3 py-2"
+                        >
+                          <TagGroupHeader
+                            label={unit.label}
+                            color={unit.color}
+                            count={unit.count}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  }
+                  const m = unit.items[0];
                   return (
                     <tr
                       key={m.id}
@@ -303,6 +400,27 @@ const COL_LABELS: Record<string, string> = {
 };
 
 const EMPTY = <span className="text-muted/30 select-none">—</span>;
+
+function TagGroupHeader({
+  label,
+  color,
+  count,
+}: {
+  label: string;
+  color?: string;
+  count: number;
+}) {
+  return (
+    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
+      <span
+        className="h-2.5 w-2.5 rounded-full border border-border"
+        style={{ backgroundColor: color ?? "transparent" }}
+      />
+      <span>{label}</span>
+      <span className="font-normal normal-case">· {count} kayıt</span>
+    </div>
+  );
+}
 
 function renderCell(m: Media, key: string, density: string) {
   const py = density === "compact" ? "py-2" : "py-3.5";

@@ -25,7 +25,11 @@ export function BookCard({
 }) {
   const visualMode = useSettings((state) => state.visualMode);
   const tags = useTags((state) => state.tags);
-  const artwork = useArtwork("book", book.id, book.coverUrl);
+  const artwork = useArtwork(
+    "book",
+    book.id,
+    visualMode === "enriched" ? book.coverUrl : undefined,
+  );
   const selectedTags = tags.filter((tag) => book.tagIds?.includes(tag.id));
 
   return (
@@ -44,14 +48,12 @@ export function BookCard({
         />
       </label>
       <button onClick={onClick} className="text-left flex flex-col flex-1">
-        {artwork.url ? (
-          <div
-            className={`relative w-full overflow-hidden shrink-0 ${visualMode === "enriched" ? "aspect-[2/3] bg-surface2" : "h-44"}`}
-          >
+        {visualMode === "enriched" && artwork.url ? (
+          <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-surface2">
             <img
               src={artwork.url}
               alt={`${book.title} kapağı`}
-              className={`w-full h-full ${visualMode === "enriched" ? "object-contain" : "object-cover"}`}
+              className="h-full w-full object-contain"
             />
           </div>
         ) : (

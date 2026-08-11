@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { applyFilters, findDuplicateIds } from "../src/lib/filters";
 import type { Book } from "../src/types/book";
 import { createBooks } from "./fixtures/library";
+import { groupByPrimaryTag } from "../src/lib/tagGrouping";
 
 const book = (
   id: string,
@@ -64,6 +65,42 @@ describe("collection filters", () => {
         (item) => item.id,
       ),
     ).toEqual(["b"]);
+  });
+
+  it("groups records by their primary tag and leaves untagged records last", () => {
+    const groups = groupByPrimaryTag(
+      [
+        { ...book("a", "Bir"), tagIds: ["blue"] },
+        { ...book("b", "İki") },
+        { ...book("c", "Üç"), tagIds: ["red", "blue"] },
+      ],
+      [
+        {
+          id: "red",
+          name: "Favori",
+          color: "#ef4444",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        },
+        {
+          id: "blue",
+          name: "Araştırma",
+          color: "#3b82f6",
+          createdAt: "2026-01-01T00:00:00.000Z",
+          updatedAt: "2026-01-01T00:00:00.000Z",
+        },
+      ],
+    );
+    expect(groups.map((group) => group.label)).toEqual([
+      "Araştırma",
+      "Favori",
+      "Etiketsiz",
+    ]);
+    expect(groups.map((group) => group.items.map((item) => item.id))).toEqual([
+      ["a"],
+      ["c"],
+      ["b"],
+    ]);
   });
 
   it("filters and sorts the 10,000-record regression fixture under the target budget", () => {

@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { BookMarked, Filter, X, Copy, Tags, UserRound } from "lucide-react";
+import {
+  BookMarked,
+  Filter,
+  X,
+  Copy,
+  Tags,
+  UserRound,
+  Layers3,
+} from "lucide-react";
 import { useBooks } from "../../store/booksStore";
 import { useLoans } from "../../store/loansStore";
 import { useTags } from "../../store/tagsStore";
@@ -15,12 +23,14 @@ export function Sidebar() {
     genreFilter,
     tagFilter,
     tagFilterMode,
+    groupByTags,
     duplicatesOnly,
     loansOnly,
     toggleStatusFilter,
     toggleGenreFilter,
     toggleTagFilter,
     setTagFilterMode,
+    toggleGroupByTags,
     toggleDuplicatesOnly,
     toggleLoansOnly,
     clearFilters,
@@ -61,6 +71,7 @@ export function Sidebar() {
     statusFilter.length > 0 ||
     genreFilter.length > 0 ||
     tagFilter.length > 0 ||
+    groupByTags ||
     duplicatesOnly ||
     loansOnly;
 
@@ -143,6 +154,18 @@ export function Sidebar() {
                 color={tag.color}
               />
             ))}
+            <button
+              className={cn(
+                "mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border border-border px-2 py-1.5 text-xs",
+                groupByTags
+                  ? "bg-primary/10 text-primary"
+                  : "hover:bg-surface2",
+              )}
+              onClick={toggleGroupByTags}
+              aria-pressed={groupByTags}
+            >
+              <Layers3 size={12} /> Etikete göre grupla
+            </button>
           </FilterCard>
         )}
 

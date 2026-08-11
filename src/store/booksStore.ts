@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { nanoid } from "nanoid";
 import { db } from "../db/database";
 import { findDuplicateIds } from "../lib/filters";
+import { runInChunks } from "../lib/dbBatch";
 import {
   normalizeBookDraft,
   validationMessage,
@@ -34,6 +35,7 @@ interface BooksState {
   genreFilter: string[];
   tagFilter: string[];
   tagFilterMode: TagFilterMode;
+  groupByTags: boolean;
   duplicatesOnly: boolean;
   loansOnly: boolean;
   sortKey: SortKey;
@@ -60,6 +62,7 @@ interface BooksState {
   toggleGenreFilter: (genre: string) => void;
   toggleTagFilter: (tagId: string) => void;
   setTagFilterMode: (mode: TagFilterMode) => void;
+  toggleGroupByTags: () => void;
   toggleDuplicatesOnly: () => void;
   toggleLoansOnly: () => void;
   clearFilters: () => void;
@@ -69,8 +72,6 @@ interface BooksState {
   clearSelection: () => void;
   selectAll: (ids: string[]) => void;
 }
-
-const BATCH_SIZE = 500;
 
 function draftFromBook(book: Book): BookDraft {
   const { id: _id, addedAt: _addedAt, updatedAt: _updatedAt, ...draft } = book;
@@ -92,6 +93,7 @@ export const useBooks = create<BooksState>((set, get) => ({
   genreFilter: [],
   tagFilter: [],
   tagFilterMode: "or",
+  groupByTags: false,
   duplicatesOnly: false,
   loansOnly: false,
   sortKey: "addedAt",
@@ -140,9 +142,7 @@ export const useBooks = create<BooksState>((set, get) => ({
         updatedAt: now,
       }));
       await db.transaction("rw", db.books, async () => {
-        for (let index = 0; index < books.length; index += BATCH_SIZE) {
-          await db.books.bulkAdd(books.slice(index, index + BATCH_SIZE));
-        }
+        await runInChunks(books, (chunk) => db.books.bulkAdd(chunk));
       });
       const all = [...get().books, ...books];
       set({ books: all });
@@ -204,11 +204,12 @@ export const useBooks = create<BooksState>((set, get) => ({
         db.activeLoans,
         db.artworkCache,
         async () => {
-          await db.books.bulkDelete(ids);
-          await db.activeLoans.bulkDelete(ids);
+          await runInChunks(ids, (chunk) => db.books.bulkDelete(chunk));
+          await runInChunks(ids, (chunk) => db.activeLoans.bulkDelete(chunk));
           if (deletedArtwork.length)
-            await db.artworkCache.bulkDelete(
+            await runInChunks(
               deletedArtwork.map((item) => item.key),
+              (chunk) => db.artworkCache.bulkDelete(chunk),
             );
         },
       );
@@ -228,11 +229,18 @@ export const useBooks = create<BooksState>((set, get) => ({
             db.activeLoans,
             db.artworkCache,
             async () => {
-              if (deletedBooks.length) await db.books.bulkPut(deletedBooks);
+              if (deletedBooks.length)
+                await runInChunks(deletedBooks, (chunk) =>
+                  db.books.bulkPut(chunk),
+                );
               if (deletedLoans.length)
-                await db.activeLoans.bulkPut(deletedLoans);
+                await runInChunks(deletedLoans, (chunk) =>
+                  db.activeLoans.bulkPut(chunk),
+                );
               if (deletedArtwork.length)
-                await db.artworkCache.bulkPut(deletedArtwork);
+                await runInChunks(deletedArtwork, (chunk) =>
+                  db.artworkCache.bulkPut(chunk),
+                );
             },
           );
           set({ books: [...get().books, ...deletedBooks] });
@@ -247,8 +255,10 @@ export const useBooks = create<BooksState>((set, get) => ({
     try {
       const now = new Date().toISOString();
       await db.transaction("rw", db.books, async () => {
-        await Promise.all(
-          ids.map((id) => db.books.update(id, { status, updatedAt: now })),
+        await runInChunks(ids, (chunk) =>
+          Promise.all(
+            chunk.map((id) => db.books.update(id, { status, updatedAt: now })),
+          ),
         );
       });
       const idSet = new Set(ids);
@@ -267,8 +277,10 @@ export const useBooks = create<BooksState>((set, get) => ({
     try {
       const now = new Date().toISOString();
       await db.transaction("rw", db.books, async () => {
-        await Promise.all(
-          ids.map((id) => db.books.update(id, { genre, updatedAt: now })),
+        await runInChunks(ids, (chunk) =>
+          Promise.all(
+            chunk.map((id) => db.books.update(id, { genre, updatedAt: now })),
+          ),
         );
       });
       const idSet = new Set(ids);
@@ -287,8 +299,12 @@ export const useBooks = create<BooksState>((set, get) => ({
     try {
       const now = new Date().toISOString();
       await db.transaction("rw", db.books, async () => {
-        await Promise.all(
-          ids.map((id) => db.books.update(id, { publisher, updatedAt: now })),
+        await runInChunks(ids, (chunk) =>
+          Promise.all(
+            chunk.map((id) =>
+              db.books.update(id, { publisher, updatedAt: now }),
+            ),
+          ),
         );
       });
       const idSet = new Set(ids);
@@ -308,9 +324,11 @@ export const useBooks = create<BooksState>((set, get) => ({
       const now = new Date().toISOString();
       const unique = [...new Set(tagIds)];
       await db.transaction("rw", db.books, async () => {
-        await Promise.all(
-          ids.map((id) =>
-            db.books.update(id, { tagIds: unique, updatedAt: now }),
+        await runInChunks(ids, (chunk) =>
+          Promise.all(
+            chunk.map((id) =>
+              db.books.update(id, { tagIds: unique, updatedAt: now }),
+            ),
           ),
         );
       });
@@ -348,15 +366,24 @@ export const useBooks = create<BooksState>((set, get) => ({
         db.artworkCache,
         async () => {
           await db.books.put(next);
-          await db.books.bulkDelete(allIds);
-          await db.activeLoans.bulkDelete([targetId, ...allIds]);
+          await runInChunks(allIds, (chunk) => db.books.bulkDelete(chunk));
+          await runInChunks([targetId, ...allIds], (chunk) =>
+            db.activeLoans.bulkDelete(chunk),
+          );
           if (loan) await db.activeLoans.put({ ...loan, bookId: targetId });
-          for (const sourceId of allIds) {
-            await db.artworkCache
-              .where("[ownerType+ownerId]")
-              .equals(["book", sourceId])
-              .delete();
-          }
+          const artworkKeys = (
+            await Promise.all(
+              allIds.map((sourceId) =>
+                db.artworkCache
+                  .where("[ownerType+ownerId]")
+                  .equals(["book", sourceId])
+                  .primaryKeys(),
+              ),
+            )
+          ).flat();
+          await runInChunks(artworkKeys, (chunk) =>
+            db.artworkCache.bulkDelete(chunk),
+          );
         },
       );
       const removed = new Set(allIds);
@@ -400,6 +427,7 @@ export const useBooks = create<BooksState>((set, get) => ({
     });
   },
   setTagFilterMode: (tagFilterMode) => set({ tagFilterMode }),
+  toggleGroupByTags: () => set({ groupByTags: !get().groupByTags }),
   toggleDuplicatesOnly: () =>
     set({ duplicatesOnly: !get().duplicatesOnly, loansOnly: false }),
   toggleLoansOnly: () =>
@@ -409,6 +437,7 @@ export const useBooks = create<BooksState>((set, get) => ({
       statusFilter: [],
       genreFilter: [],
       tagFilter: [],
+      groupByTags: false,
       search: "",
       duplicatesOnly: false,
       loansOnly: false,

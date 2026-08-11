@@ -136,12 +136,27 @@ function assertUniqueIds(items: Array<{ id?: unknown }>, field: string): void {
 }
 
 function validTimestamp(value: unknown, field: string): string {
-  if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
+  if (typeof value !== "string") {
     throw new ValidationError([
       { field, message: "Geçerli ISO tarih-saat değeri olmalı." },
     ]);
   }
-  return value;
+  const timestamp = new Date(value);
+  const hasIsoDate = /^\d{4}-\d{2}-\d{2}T/.test(value);
+  const datePart = value.slice(0, 10);
+  const [year, month, day] = datePart.split("-").map(Number);
+  const calendarDate = new Date(Date.UTC(year, month - 1, day));
+  if (
+    Number.isNaN(timestamp.getTime()) ||
+    !hasIsoDate ||
+    Number.isNaN(calendarDate.getTime()) ||
+    calendarDate.toISOString().slice(0, 10) !== datePart
+  ) {
+    throw new ValidationError([
+      { field, message: "Geçerli ISO tarih-saat değeri olmalı." },
+    ]);
+  }
+  return timestamp.toISOString();
 }
 
 function normalizeBookRecord(
