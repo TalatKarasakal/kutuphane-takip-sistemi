@@ -19,7 +19,7 @@ Kütüphanem; kitap, film ve dizi koleksiyonlarını yerel olarak takip etmek i�
 - Kitap koleksiyonu yönetimi
   - Kitap ekleme, düzenleme, silme ve toplu işlem desteği
   - Başlık, yazar, yayınevi, tür, durum, ISBN, sayfa sayısı, yayın yılı, dil, çevirmen ve not alanları
-  - 1–5 yıldız puanı, ortak renkli etiketler, AND/OR filtreleme ve alan bazlı mükerrer birleştirme
+  - 1–5 yıldız puanı, ortak renkli etiketler, AND/OR filtreleme, etikete göre gruplama ve alan bazlı mükerrer birleştirme
   - Yalnız aktif kayıtları tutan ödünç verme/iade akışı
 
 - Film ve dizi koleksiyonu yönetimi

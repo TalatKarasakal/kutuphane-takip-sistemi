@@ -24,8 +24,8 @@
 
 ### Son İnceleme Özeti
 
-- `tracker:check`, Prettier, typecheck, ESLint, 18 unit/component testi, 2 Electron E2E senaryosu, build ve npm audit başarılı.
-- Ana JavaScript chunk'ı **387,56 KB**; barkod (**477,93 KB**) ve xlsx (**493,28 KB**) başlangıçtan ayrıldı.
+- `tracker:check`, Prettier, typecheck, ESLint, 23 unit/component testi, 3 Electron E2E senaryosu, build ve npm audit başarılı.
+- Ana JavaScript chunk'ı **392,90 KB**; barkod (**477,93 KB**) ve xlsx (**493,28 KB**) başlangıçtan ayrıldı.
 - 10.000 kayıt fixture'ında filtre/sıralama 300 ms hedefinin altında; sanallaştırılmış listeler DOM'u 200 öğenin altında tutuyor.
 - macOS Universal `.app` 490 MB, DMG 208 MB; `codesign --verify --deep --strict`, Universal mimari, ikon/Plist ve pakette yinelenen `node_modules` bulunmaması doğrulandı.
 - Tarayıcı ve Electron kontrollerinde kitap/medya CRUD, boş yazarın `Bilinmiyor` olması, mükerrer birleştirme, ödünç/iade, komut paleti ve yedek geri yükleme doğrulandı.
@@ -106,12 +106,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
 
 - **SOL-001–SOL-012 — Kapsamlı sorun çözüm paketi**
   - **Uygulayan:** Codex `[Model: GPT-5 Codex]`
-  - **Commitler:** `5fab877`, `0a104b1`, `79e3f39`, `409c917`, `f26f768`, `616181e`, `8822f79`, `5be79cc`, `db1e8ce`, `f0c0d9a`, `b1aa2f1`, `fcbf62c`.
-  - **Doğrulama:** format, typecheck, lint, 18 unit/component testi, 2 Electron E2E, build, audit ve macOS Universal paket smoke kontrolleri başarılı.
+  - **Commitler:** `5fab877`, `0a104b1`, `79e3f39`, `409c917`, `f26f768`, `616181e`, `8822f79`, `5be79cc`, `db1e8ce`, `f0c0d9a`, `b1aa2f1`, `fcbf62c`, `65a8f71`.
+  - **Doğrulama:** format, typecheck, lint, 23 unit/component testi, 3 Electron E2E, build, audit ve macOS Universal paket smoke kontrolleri başarılı.
   - **Kullanıcı kontrolü:** Ayarlar/yedek, import/mükerrer, form hata/dirty, klavye-overlay, Türkçe filtre, güvenli anahtar ve çevrimdışı mod akışlarını kontrol edin.
 - **IMP-002/003/004/005/007/008/009/010/011/012/013/014/016/017 — Seçilen geliştirmeler**
   - **Uygulayan:** Codex `[Model: GPT-5 Codex]`
-  - **Commitler:** `79e3f39`, `f26f768`, `616181e`, `8822f79`, `5be79cc`, `db1e8ce`, `f0c0d9a`, `b1aa2f1`, `fcbf62c`.
+  - **Commitler:** `79e3f39`, `f26f768`, `616181e`, `8822f79`, `5be79cc`, `db1e8ce`, `f0c0d9a`, `b1aa2f1`, `fcbf62c`, `65a8f71`.
   - **Doğrulama:** puan/etiket, aktif ödünç, ISBN/barkod, klasik-zengin görünüm, sanallaştırma, komut paleti, tema ve dağıtım senaryoları otomatik veya manuel olarak doğrulandı.
   - **Kullanıcı kontrolü:** Klasik görünümün varsayılan kalmasını, Zengin görünüm geçişini ve ödünç bölümünün yalnız aktif kayıt varken görünmesini kontrol edin.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
