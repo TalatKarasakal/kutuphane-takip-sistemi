@@ -13,104 +13,75 @@ import { Modal } from "../ui/Modal";
 import { useBooks } from "../../store/booksStore";
 import { useMedia } from "../../store/mediaStore";
 import {
-  detectBooksFromImage,
-  type DetectedBook,
-} from "../../lib/ai/detectBooks";
+  usePhotoImport,
+  type BookRow,
+  type MediaRow,
+} from "../../store/photoImportStore";
 import { aiReadiness, type AiReadiness } from "../../lib/ai/provider";
-import {
-  detectMediaFromImage,
-  type DetectedMedia,
-} from "../../lib/ai/detectMedia";
-import { duplicateKey, mediaDuplicateKey } from "../../lib/filters";
 import { STATUSES } from "../../constants/statuses";
 import { MEDIA_STATUSES } from "../../constants/mediaStatuses";
 import type { Book, BookStatus } from "../../types/book";
 import type { MediaStatus, MediaType } from "../../types/media";
 import type { MediaDraft } from "../../lib/validation";
-import type { Section } from "../layout/AppShell";
+import type { Section } from "../../types/library";
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
   onOpenSettings: () => void;
-  section: Section;
-}
-
-type Step = "pick" | "detecting" | "review";
-
-interface BookRow extends DetectedBook {
-  rid: string;
-  include: boolean;
-  status: BookStatus;
-  duplicate: boolean;
-}
-
-interface MediaRow extends DetectedMedia {
-  rid: string;
-  include: boolean;
-  status: MediaStatus;
-  duplicate: boolean;
 }
 
 /** Bölüme göre değişen metinler; geri kalan akış üç bölümde de aynıdır. */
 const COPY: Record<
   Section,
-  { title: string; dropTitle: string; dropHint: string; empty: string }
+  { title: string; dropTitle: string; dropHint: string }
 > = {
   books: {
     title: "Fotoğraftan Kitap Ekle",
     dropTitle: "Kitap fotoğrafı seç ya da buraya sürükle-bırak",
     dropHint:
       ".jpg · .png · .webp — raftaki sırtların/kapakların net göründüğü bir fotoğraf en iyi sonucu verir",
-    empty:
-      "Bu fotoğrafta kitap algılanamadı. Sırtların/kapakların daha net göründüğü bir fotoğrafla tekrar dene.",
   },
   movies: {
     title: "Fotoğraftan Film Ekle",
     dropTitle: "Film fotoğrafı seç ya da buraya sürükle-bırak",
     dropHint:
       ".jpg · .png · .webp — afiş, DVD/Blu-ray kapağı ya da yayın listesi ekran görüntüsü kullanabilirsin",
-    empty:
-      "Bu fotoğrafta film algılanamadı. Afişlerin/kapakların daha net göründüğü bir fotoğrafla tekrar dene.",
   },
   tv: {
     title: "Fotoğraftan Dizi Ekle",
     dropTitle: "Dizi fotoğrafı seç ya da buraya sürükle-bırak",
     dropHint:
       ".jpg · .png · .webp — afiş, kutu kapağı ya da yayın listesi ekran görüntüsü kullanabilirsin",
-    empty:
-      "Bu fotoğrafta dizi algılanamadı. Afişlerin/kapakların daha net göründüğü bir fotoğrafla tekrar dene.",
   },
 };
 
-const detectedBookKey = (b: Pick<Book, "title" | "author" | "isbn">) =>
-  duplicateKey({
-    id: "",
-    title: b.title,
-    author: b.author,
-    isbn: b.isbn,
-    status: "okunacak",
-    addedAt: "",
-    updatedAt: "",
-  });
+/**
+ * Algılama işi mağazada durduğu için bu diyalog yalnızca bir görünümdür:
+ * kapatılıp yeniden açılsa da çalışan iş ve gözden geçirme listesi korunur.
+ */
+export function PhotoImportDialog({ onOpenSettings }: Props) {
+  const { addMany: addBooks } = useBooks();
+  const { addMany: addMedia } = useMedia();
+  const {
+    open,
+    section,
+    step,
+    fileName,
+    error,
+    notice,
+    bookRows,
+    mediaRows,
+    closeDialog,
+    start,
+    reset,
+    patchBook,
+    patchMedia,
+    applyBookStatus,
+    applyMediaStatus,
+  } = usePhotoImport();
 
-export function PhotoImportDialog({
-  open,
-  onClose,
-  onOpenSettings,
-  section,
-}: Props) {
-  const { addMany: addBooks, books } = useBooks();
-  const { addMany: addMedia, media } = useMedia();
   const [readiness, setReadiness] = useState<AiReadiness | null>(null);
-
-  const [step, setStep] = useState<Step>("pick");
-  const [fileName, setFileName] = useState("");
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [bookRows, setBookRows] = useState<BookRow[]>([]);
-  const [mediaRows, setMediaRows] = useState<MediaRow[]>([]);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const isBooks = section === "books";
   const mediaType: MediaType = section === "movies" ? "film" : "dizi";
@@ -120,110 +91,10 @@ export function PhotoImportDialog({
     if (open) void aiReadiness().then(setReadiness);
   }, [open]);
 
-  const reset = () => {
-    setStep("pick");
-    setFileName("");
-    setError("");
-    setNotice("");
-    setBookRows([]);
-    setMediaRows([]);
-    setSaving(false);
-  };
   const close = () => {
-    reset();
-    onClose();
+    setSaveError("");
+    closeDialog();
   };
-
-  const existingBookKeys = () => {
-    const set = new Set<string>();
-    books.forEach((b) => {
-      const key = duplicateKey(b);
-      if (key) set.add(key);
-    });
-    return set;
-  };
-
-  const existingMediaKeys = () => {
-    const set = new Set<string>();
-    media.forEach((item) => {
-      const key = mediaDuplicateKey(item);
-      if (key) set.add(key);
-    });
-    return set;
-  };
-
-  const onFile = async (file: File) => {
-    setError("");
-    setNotice("");
-    setFileName(file.name);
-    setStep("detecting");
-
-    if (isBooks) {
-      const res = await detectBooksFromImage(file);
-      if (!res.ok) {
-        setError(res.error);
-        setStep("pick");
-        return;
-      }
-      if (res.books.length === 0) {
-        setNotice(copy.empty);
-        setStep("pick");
-        return;
-      }
-      const seen = existingBookKeys();
-      setBookRows(
-        res.books.map((b, i) => {
-          const key = detectedBookKey(b);
-          const duplicate = key != null && seen.has(key);
-          return {
-            ...b,
-            rid: `${i}-${b.title}`,
-            include: !duplicate,
-            status: "okunacak" as BookStatus,
-            duplicate,
-          };
-        }),
-      );
-      setStep("review");
-      return;
-    }
-
-    const res = await detectMediaFromImage(file, mediaType);
-    if (!res.ok) {
-      setError(res.error);
-      setStep("pick");
-      return;
-    }
-    if (res.items.length === 0) {
-      setNotice(copy.empty);
-      setStep("pick");
-      return;
-    }
-    const seen = existingMediaKeys();
-    setMediaRows(
-      res.items.map((item, i) => {
-        const key = mediaDuplicateKey(item);
-        const duplicate = key != null && seen.has(key);
-        return {
-          ...item,
-          rid: `${i}-${item.title}`,
-          include: !duplicate,
-          status: "izlenecek" as MediaStatus,
-          duplicate,
-        };
-      }),
-    );
-    setStep("review");
-  };
-
-  const patchBook = (rid: string, patch: Partial<BookRow>) =>
-    setBookRows((rs) =>
-      rs.map((r) => (r.rid === rid ? { ...r, ...patch } : r)),
-    );
-  const patchMedia = (rid: string, patch: Partial<MediaRow>) =>
-    setMediaRows((rs) =>
-      rs.map((r) => (r.rid === rid ? { ...r, ...patch } : r)),
-    );
 
   const includedCount = isBooks
     ? bookRows.filter((r) => r.include && r.title.trim()).length
@@ -232,7 +103,7 @@ export function PhotoImportDialog({
   const doAdd = async () => {
     if (saving || includedCount === 0) return;
     setSaving(true);
-    setError("");
+    setSaveError("");
     try {
       if (isBooks) {
         const toAdd: Omit<Book, "id" | "addedAt" | "updatedAt">[] = bookRows
@@ -266,9 +137,10 @@ export function PhotoImportDialog({
           }));
         await addMedia(toAdd);
       }
+      reset();
       close();
     } catch (caught) {
-      setError(
+      setSaveError(
         caught instanceof Error ? caught.message : "Kayıtlar eklenemedi.",
       );
     } finally {
@@ -313,6 +185,15 @@ export function PhotoImportDialog({
               )}
             </button>
           </>
+        ) : step === "detecting" ? (
+          <>
+            <button className="btn btn-ghost" onClick={reset}>
+              Vazgeç
+            </button>
+            <button className="btn btn-primary" onClick={close}>
+              Arka Planda Sürdür
+            </button>
+          </>
         ) : (
           <button className="btn btn-ghost" onClick={close}>
             Kapat
@@ -320,12 +201,12 @@ export function PhotoImportDialog({
         )
       }
     >
-      {error && step === "review" && (
+      {saveError && (
         <div
           role="alert"
           className="mb-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-700"
         >
-          {error}
+          {saveError}
         </div>
       )}
       {step === "pick" && (
@@ -340,9 +221,9 @@ export function PhotoImportDialog({
               ? "Yapay zekâ kitapları tanır, künyeyi (yayınevi, sayfa, kapak) Google Books'tan tamamlar; eklemeden önce listeyi gözden geçirip onaylarsın."
               : "Yapay zekâ yapımları tanır ve bildiği künyeyi (yönetmen, yıl, tür) doldurur; eklemeden önce listeyi gözden geçirip onaylarsın."
           }
-          onFile={onFile}
+          onFile={(file) => void start(file, section)}
           onOpenSettings={() => {
-            onClose();
+            close();
             onOpenSettings();
           }}
         />
@@ -358,18 +239,14 @@ export function PhotoImportDialog({
           <BookReviewStep
             rows={bookRows}
             onPatch={patchBook}
-            onApplyAll={(status) =>
-              setBookRows((rs) => rs.map((r) => ({ ...r, status })))
-            }
+            onApplyAll={applyBookStatus}
           />
         ) : (
           <MediaReviewStep
             rows={mediaRows}
             type={mediaType}
             onPatch={patchMedia}
-            onApplyAll={(status) =>
-              setMediaRows((rs) => rs.map((r) => ({ ...r, status })))
-            }
+            onApplyAll={applyMediaStatus}
           />
         ))}
     </Modal>
@@ -498,6 +375,10 @@ function DetectingStep({
         {local
           ? "Yerel model kullanılıyor; ilk çalıştırmada model belleğe yüklenirken birkaç dakika sürebilir."
           : "Bu birkaç saniye sürebilir."}
+      </div>
+      <div className="text-sm text-muted mt-3">
+        Bu pencereyi kapatıp uygulamayı kullanmaya devam edebilirsin; iş arka
+        planda sürer ve bitince üst çubuktan haber verilir.
       </div>
     </div>
   );

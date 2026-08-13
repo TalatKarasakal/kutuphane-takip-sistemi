@@ -39,3 +39,6 @@ export interface ArtworkCache {
 }
 
 export type TagFilterMode = "or" | "and";
+
+/** Uygulamanın üst düzey bölümleri; hem kabuk hem de mağazalar tarafından kullanılır. */
+export type Section = "books" | "movies" | "tv";

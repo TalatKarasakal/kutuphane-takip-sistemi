@@ -18,8 +18,10 @@ import { useLoans } from "../../store/loansStore";
 import { useToast } from "../../store/toastStore";
 import { applyTheme, subscribeNativeTheme } from "../../lib/theme";
 import { maybeAutoBackup } from "../../lib/backup";
+import { usePhotoImport } from "../../store/photoImportStore";
 import type { Book } from "../../types/book";
 import type { Media } from "../../types/media";
+import type { Section } from "../../types/library";
 
 const PhotoImportDialog = lazy(() =>
   import("../import/PhotoImportDialog").then((module) => ({
@@ -42,7 +44,7 @@ const SettingsDialog = lazy(() =>
   })),
 );
 
-export type Section = "books" | "movies" | "tv";
+export type { Section } from "../../types/library";
 
 export function AppShell() {
   const {
@@ -85,8 +87,13 @@ export function AppShell() {
   const [settingsTarget, setSettingsTarget] = useState<"general" | "about">(
     "general",
   );
-  const [photoImportOpen, setPhotoImportOpen] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
+
+  // Fotoğraf algılaması diyalogdan bağımsız sürer; durumu mağaza tutar.
+  const photoOpen = usePhotoImport((s) => s.open);
+  const photoStep = usePhotoImport((s) => s.step);
+  const photoSection = usePhotoImport((s) => s.section);
+  const openPhotoDialog = usePhotoImport((s) => s.openDialog);
 
   const searchRef = useRef<HTMLInputElement>(
     null,
@@ -196,6 +203,14 @@ export function AppShell() {
   const mediaType =
     section === "movies" ? ("film" as const) : ("dizi" as const);
 
+  // Sonuç başka bir bölümde başlatılmış olabilir; diyaloğu açarken o bölüme
+  // geçilir ki gözden geçirilen kayıtlar görünen listeyle aynı yeri anlatsın.
+  const openPhotoImport = () => {
+    const target = photoStep === "pick" ? section : photoSection;
+    if (target !== section) setSection(target);
+    openPhotoDialog(target);
+  };
+
   if (booksError || mediaError) {
     return (
       <div className="h-screen grid place-items-center bg-bg text-text p-8">
@@ -243,7 +258,7 @@ export function AppShell() {
             setSettingsTarget("general");
             setSettingsOpen(true);
           }}
-          onPhotoImport={() => setPhotoImportOpen(true)}
+          onPhotoImport={openPhotoImport}
         />
 
         <div className="flex-1 flex min-h-0">
@@ -304,11 +319,8 @@ export function AppShell() {
       />
 
       <Suspense fallback={null}>
-        {photoImportOpen && (
+        {(photoOpen || photoStep === "detecting") && (
           <PhotoImportDialog
-            open
-            section={section}
-            onClose={() => setPhotoImportOpen(false)}
             onOpenSettings={() => {
               setSettingsTarget("general");
               setSettingsOpen(true);
@@ -352,7 +364,7 @@ export function AppShell() {
             setMediaFormOpen(true);
           }
         }}
-        onPhotoImport={() => setPhotoImportOpen(true)}
+        onPhotoImport={openPhotoImport}
         onImport={() => setImportOpen(true)}
         onExport={() => setExportOpen(true)}
         onSettings={() => {

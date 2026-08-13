@@ -7,6 +7,7 @@ import {
   Camera,
   ChevronDown,
   LayoutGrid,
+  Loader2,
   Pencil,
   Plus,
   Search,
@@ -20,6 +21,7 @@ import { useMedia } from "../../store/mediaStore";
 import { useSettings } from "../../store/settingsStore";
 import { ColumnManager } from "../ui/ColumnManager";
 import { MenuButton } from "../ui/MenuButton";
+import { usePhotoImport } from "../../store/photoImportStore";
 import {
   BOOK_COLUMN_LABELS,
   FILM_COLUMN_LABELS,
@@ -187,6 +189,7 @@ export function Topbar({
           yalnızca iki denetim görünür. Ekle butonunun yazısı dar (pencere)
           ekranlarda gizlenir, geniş ekranda görünür. */}
       <div className="flex items-center justify-end gap-2 shrink-0 ml-2">
+        <PhotoImportIndicator onOpen={onPhotoImport} />
         <MenuButton
           title="Ayarlar"
           triggerClassName="btn btn-ghost shrink-0 data-[open=true]:bg-surface2"
@@ -246,5 +249,45 @@ export function Topbar({
         </div>
       </div>
     </header>
+  );
+}
+
+/**
+ * Arka planda süren fotoğraf algılamasını gösterir: iş çalışırken dönen
+ * simge, sonuç beklerken vurgulu bir işaret. Tıklanınca diyalog açılır.
+ */
+function PhotoImportIndicator({ onOpen }: { onOpen: () => void }) {
+  const step = usePhotoImport((state) => state.step);
+  const unseen = usePhotoImport((state) => state.unseen);
+  const open = usePhotoImport((state) => state.open);
+
+  const running = step === "detecting";
+  const ready = unseen && !open;
+  if (!running && !ready) return null;
+
+  const title = running
+    ? "Fotoğraf arka planda inceleniyor"
+    : "Fotoğraf sonucu hazır — gözden geçir";
+
+  return (
+    <button
+      className={cn(
+        "btn shrink-0",
+        ready ? "btn-primary" : "btn-ghost text-primary",
+      )}
+      onClick={onOpen}
+      title={title}
+      aria-label={title}
+      aria-busy={running}
+    >
+      {running ? (
+        <Loader2 size={15} className="animate-spin" />
+      ) : (
+        <Camera size={15} />
+      )}
+      <span className="hidden xl:inline">
+        {running ? "İnceleniyor…" : "Sonuç hazır"}
+      </span>
+    </button>
   );
 }
