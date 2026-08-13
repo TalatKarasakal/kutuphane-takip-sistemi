@@ -137,6 +137,11 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Commitler:** `89a2795`.
   - **Doğrulama:** 37 unit/component testi (diyalog kapalıyken biten iş, bırakılan işin geç sonucu, mükerrer işaretleme dâhil), typecheck, ESLint, build ve 3 Electron E2E senaryosu başarılı. Gerçek uygulamada yerel modelle uçtan uca denendi: iş başlatıldı, diyalog kapatıldı, gösterge göründü, iş sürerken yeni film eklenebildi, 147 saniye sonra "sonuç hazır" göstergesine tıklanıp üç kayıt gözden geçirilerek eklendi.
   - **Kullanıcı kontrolü:** Bir fotoğraf seçtikten sonra "Arka Planda Sürdür" ile pencereyi kapatıp uygulamayı kullanmaya devam edin; sağ üstteki gösterge işi izlemeli ve bitince gözden geçirme listesini geri getirmelidir.
+- **IMP-026 — Arayüz gözden geçirmesi**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** `bdcafe5`.
+  - **Doğrulama:** Electron'da 25 ekran görüntüsüyle tarama (kitap/film/dizi, tablo ve kart, detay, formlar, ödünç, içe/dışa aktarma, ayarların üç bölümü, komut paleti, fotoğraftan ekleme, açık/koyu tema, 1024 px dar pencere); konsol hatası yok. 38 unit/component testi, 3 Electron E2E, typecheck, ESLint ve build başarılı. Kart başlığının onay kutusuyla örtüşmediği ve seçimin kartı açmadığı testle korunuyor.
+  - **Kullanıcı kontrolü:** Kart görünümünde başlıkların tamamının okunduğunu, koyu temada tarih seçici ve açılır listelerin koyu göründüğünü, tabloda durum rozetlerinin tek satırda kaldığını kontrol edin.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:
