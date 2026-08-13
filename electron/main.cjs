@@ -19,6 +19,13 @@ if (process.env.KUTUPHANEM_E2E_USER_DATA) {
 }
 
 const ICON_PATH = path.join(__dirname, "..", "build", "icon.png");
+// Dock simgesi görünüme göre değişir: koyu temada siyah, açık temada beyaz
+// zemin. macOS yalnızca paket içindeki .icns'i sabit çizdiği için zemini
+// çalışma anında biz değiştiriyoruz.
+const DOCK_ICONS = {
+  dark: path.join(__dirname, "..", "build", "icon-dark.png"),
+  light: path.join(__dirname, "..", "build", "icon-light.png"),
+};
 const MAX_BACKUPS = 20;
 const MAX_BACKUP_BYTES = 100 * 1024 * 1024;
 const MAX_SECRET_BYTES = 8 * 1024;
@@ -30,6 +37,18 @@ const ALLOWED_EXTERNAL = new Set([
 ]);
 
 let mainWindow = null;
+
+function applyDockIcon() {
+  if (process.platform !== "darwin" || !app.dock) return;
+  const icon = nativeTheme.shouldUseDarkColors
+    ? DOCK_ICONS.dark
+    : DOCK_ICONS.light;
+  try {
+    app.dock.setIcon(fs.existsSync(icon) ? icon : ICON_PATH);
+  } catch {
+    /* best effort */
+  }
+}
 
 function isTrustedEvent(event) {
   if (!mainWindow || event.sender !== mainWindow.webContents) return false;
@@ -332,13 +351,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  if (process.platform === "darwin" && app.dock) {
-    try {
-      app.dock.setIcon(ICON_PATH);
-    } catch {
-      /* best effort */
-    }
-  }
+  applyDockIcon();
   registerBackupIpc();
   registerSecretIpc();
   registerUtilityIpc();
@@ -357,6 +370,7 @@ app.whenReady().then(() => {
   }
   createWindow();
   nativeTheme.on("updated", () => {
+    applyDockIcon();
     mainWindow?.webContents.send(
       "theme:changed",
       nativeTheme.shouldUseDarkColors ? "dark" : "light",

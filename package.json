@@ -40,6 +40,8 @@
       "dist/**/*",
       "electron/**/*",
       "build/icon.png",
+      "build/icon-dark.png",
+      "build/icon-light.png",
       "CHANGELOG.md",
       "package.json"
     ],
