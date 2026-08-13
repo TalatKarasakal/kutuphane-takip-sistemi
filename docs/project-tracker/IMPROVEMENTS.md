@@ -204,3 +204,11 @@
 - **Sorumlu:** Claude
 - **Son Güncelleme:** 2026-08-13
 - **Öneri:** `[Model: Claude Opus 5]` Algılama, özellikle yerel modelde dakikaları bulabildiği için kullanıcıyı bekletmesin. İş durumu diyalogdan çıkarılıp `store/photoImportStore` içine alınsın; pencere kapatıldığında iş sürsün, üst çubukta dönen bir gösterge işi izlesin ve sonuç hazır olunca vurgulu bir düğmeye dönüşüp gözden geçirme listesini geri getirsin. Diyalog kapalıyken biten iş bildirimle duyurulsun, bırakılan işin geç gelen sonucu ekrana basılmasın, iş başka bir bölümde başlatıldıysa göstergeye tıklandığında o bölüme geçilsin.
+
+### IMP-026 — Arayüz gözden geçirmesi ve görünüm düzeltmeleri
+
+- **Öncelik:** P1
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Claude
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Claude Opus 5]` Kullanım sürecine geçmeden önce bütün ekranları (kitap/film/dizi, tablo ve kart görünümü, detay paneli, formlar, içe/dışa aktarma, ayarlar, komut paleti, fotoğraftan ekleme, açık/koyu tema, dar pencere) tarayıp arayüz kusurlarını gider. Bulunanlar: kart görünümünde mutlak konumlu onay kutusu başlıkların ilk harflerini örtüyordu — onay kutusu akışa alındı ve kart, içeriğin üstüne serilen bir düğmeyle tıklanabilir tutuldu; koyu temada `color-scheme` bildirilmediği için tarih seçici, açılır liste ve onay kutusu gibi tarayıcı denetimleri açık temada kalıyordu; durum rozetleri tabloda iki satıra taşarak satır yüksekliğini bozuyordu.

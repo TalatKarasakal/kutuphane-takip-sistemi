@@ -36,66 +36,68 @@ export function BookCard({
     <article
       className={`card relative overflow-hidden flex flex-col transition-all hover:shadow-lg hover:-translate-y-1 ${selected ? "ring-2 ring-primary" : ""}`}
     >
-      <label
-        className="absolute left-2 top-2 z-10 rounded-md bg-surface/90 p-1 shadow-sm"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <input
-          type="checkbox"
-          checked={selected}
-          onChange={onToggleSelect}
-          aria-label={`${book.title} seç`}
-        />
-      </label>
-      <button onClick={onClick} className="text-left flex flex-col flex-1">
-        {visualMode === "enriched" && artwork.url ? (
-          <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-surface2">
-            <img
-              src={artwork.url}
-              alt={`${book.title} kapağı`}
-              className="h-full w-full object-contain"
-            />
-          </div>
-        ) : (
-          <div
-            className={`h-1 w-full shrink-0 ${STATUS_STRIPE[book.status]}`}
+      {/* Kartın tamamı tıklanabilir olsun diye düğme içeriğin üstüne serilir;
+          onay kutusu ise akışın içinde durur ki başlığı örtmesin. */}
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={`${book.title} ayrıntılarını aç`}
+        className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      />
+      {visualMode === "enriched" && artwork.url ? (
+        <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-surface2">
+          <img
+            src={artwork.url}
+            alt={`${book.title} kapağı`}
+            className="h-full w-full object-contain"
           />
-        )}
-        <div className="p-3 flex flex-col gap-2 flex-1">
+        </div>
+      ) : (
+        <div className={`h-1 w-full shrink-0 ${STATUS_STRIPE[book.status]}`} />
+      )}
+      <div className="p-3 flex flex-col gap-2 flex-1">
+        <div className="flex items-start gap-2">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={onToggleSelect}
+            aria-label={`${book.title} seç`}
+            className="relative z-20 mt-0.5 h-4 w-4 shrink-0 accent-[rgb(var(--primary))]"
+          />
           <div className="font-semibold leading-snug line-clamp-2">
             {book.title}
           </div>
-          <div className="text-xs text-muted line-clamp-1">{book.author}</div>
-          {book.rating && (
-            <div className="flex" aria-label={`${book.rating} yıldız`}>
-              {Array.from({ length: book.rating }, (_, index) => (
-                <Star
-                  key={index}
-                  size={12}
-                  className="fill-amber-400 text-amber-400"
-                />
-              ))}
-            </div>
-          )}
-          <div className="flex flex-wrap items-center gap-1 mt-auto pt-1">
-            <StatusBadge status={book.status} />
-            {book.genre && <GenreChip genre={book.genre} />}
-            {selectedTags.slice(0, 2).map((tag) => (
-              <span
-                key={tag.id}
-                className="chip text-[10px]"
-                style={{ borderColor: tag.color }}
-              >
-                <span
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: tag.color }}
-                />
-                {tag.name}
-              </span>
+        </div>
+        <div className="text-xs text-muted line-clamp-1">{book.author}</div>
+        {book.rating && (
+          <div className="flex" aria-label={`${book.rating} yıldız`}>
+            {Array.from({ length: book.rating }, (_, index) => (
+              <Star
+                key={index}
+                size={12}
+                className="fill-amber-400 text-amber-400"
+              />
             ))}
           </div>
+        )}
+        <div className="flex flex-wrap items-center gap-1 mt-auto pt-1">
+          <StatusBadge status={book.status} />
+          {book.genre && <GenreChip genre={book.genre} />}
+          {selectedTags.slice(0, 2).map((tag) => (
+            <span
+              key={tag.id}
+              className="chip text-[10px]"
+              style={{ borderColor: tag.color }}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full"
+                style={{ backgroundColor: tag.color }}
+              />
+              {tag.name}
+            </span>
+          ))}
         </div>
-      </button>
+      </div>
     </article>
   );
 }

@@ -171,6 +171,46 @@ describe("conditional and optional UI", () => {
     );
   });
 
+  it("keeps the card title clear of the select checkbox", async () => {
+    const onClick = vi.fn();
+    const onToggleSelect = vi.fn();
+    const book = {
+      id: "b1",
+      title: "Kürk Mantolu Madonna",
+      author: "Sabahattin Ali",
+      status: "mevcut" as const,
+      addedAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    };
+    render(
+      <BookCard
+        book={book}
+        onClick={onClick}
+        selected={false}
+        onToggleSelect={onToggleSelect}
+      />,
+    );
+
+    // Onay kutusu başlığı örtmemeli: ikisi de akışta ve aynı satırda durmalı.
+    const checkbox = screen.getByRole("checkbox", {
+      name: `${book.title} seç`,
+    });
+    const title = screen.getByText(book.title);
+    expect(checkbox.parentElement).toBe(title.parentElement);
+    expect(checkbox.compareDocumentPosition(title)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+
+    // Seçim kartı açmamalı; kartın kalanı açmalı.
+    await userEvent.click(checkbox);
+    expect(onToggleSelect).toHaveBeenCalledOnce();
+    expect(onClick).not.toHaveBeenCalled();
+    await userEvent.click(
+      screen.getByRole("button", { name: `${book.title} ayrıntılarını aç` }),
+    );
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
   it("shows cached book covers only in enriched mode", async () => {
     const book = {
       id: "b1",

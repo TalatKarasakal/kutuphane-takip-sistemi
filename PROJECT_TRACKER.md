@@ -12,7 +12,7 @@
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
 | Kontrol bekleyen çözüm | 26 |
-| Geliştirme fikri | 25 |
+| Geliştirme fikri | 26 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -33,6 +33,7 @@
 - Fotoğraftan ekleme kitapların yanı sıra film ve dizilerde de çalışıyor; künye modelden gelir ve gözden geçirme tablosunda onaylanır.
 - Fotoğraftan ekleme bulut yerine bu bilgisayardaki bir modelle de çalışabiliyor; yerel sağlayıcı çevrimdışı modda da kullanılabiliyor ve yalnız loopback adreslerine bağlanıyor.
 - Algılama arka planda sürüyor: diyalog kapatılınca iş devam ediyor, üst çubuktaki gösterge işi izliyor ve sonuç hazır olunca gözden geçirme listesine dönülüyor.
+- Bütün ekranlar Electron'da açık/koyu tema ve dar pencerede tarandı; konsol hatası yok. Kart başlıklarını örten onay kutusu, koyu temada açık kalan tarayıcı denetimleri ve iki satıra taşan durum rozetleri düzeltildi.
 - Tarayıcı ve Electron kontrollerinde kitap/medya CRUD, boş yazarın `Bilinmiyor` olması, mükerrer birleştirme, ödünç/iade, komut paleti ve yedek geri yükleme doğrulandı.
 - Gerçek Developer ID/notarization ve Windows imzası, imza anahtarları bekleyen tek dış doğrulama olarak açık.
 
@@ -150,7 +151,7 @@ Bir kayıt buraya taşınırken şu bilgiler zorunludur:
 
 ## 5. 🚀 Geliştirme Önerileri
 
-25 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 19'u uygulanmış ve kontrol bekliyor, 3'ü yeni önerilmiş (IMP-018, IMP-019, IMP-020), 3'ü kullanıcı kararıyla reddedilmiştir.
+26 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 20'si uygulanmış ve kontrol bekliyor, 3'ü yeni önerilmiş (IMP-018, IMP-019, IMP-020), 3'ü kullanıcı kararıyla reddedilmiştir.
 
 ---
 
