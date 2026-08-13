@@ -65,6 +65,152 @@ const MEDIA_RESPONSE_SCHEMA = {
   },
 };
 
+// ---- Yerel model (Ollama) ---------------------------------------------------
+
+/**
+ * Ollama, Gemini'nin büyük harfli şema lehçesini değil standart JSON Schema
+ * bekler. Ayrıca küçük modeller kök seviyede diziden çok nesne üretmekte daha
+ * kararlı olduğu için liste `items` altına sarılır.
+ */
+function ollamaSchema(properties) {
+  return {
+    type: "object",
+    properties: {
+      items: {
+        type: "array",
+        items: { type: "object", properties, required: ["title"] },
+      },
+    },
+    required: ["items"],
+  };
+}
+
+const BOOK_LOCAL_SCHEMA = ollamaSchema({
+  title: { type: "string" },
+  author: { type: "string" },
+  confidence: { type: "number" },
+});
+
+const MEDIA_LOCAL_SCHEMA = ollamaSchema({
+  title: { type: "string" },
+  director: { type: "string" },
+  genre: { type: "string" },
+  releaseYear: { type: "number" },
+  duration: { type: "number" },
+  seasons: { type: "number" },
+  episodeDuration: { type: "number" },
+  confidence: { type: "number" },
+});
+
+/**
+ * Yerel sağlayıcı adresini yalnız bu makineye kısıtlar ve yolu atar. Adres
+ * arayüzden geldiği için, ana sürecin rastgele bir hedefe istek atmasını
+ * engellemek adına loopback dışına çıkılmasına izin verilmez.
+ */
+function loopbackOrigin(raw) {
+  try {
+    const url = new URL(String(raw));
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    if (url.username || url.password) return null;
+    const host = url.hostname.replace(/^\[/, "").replace(/\]$/, "");
+    if (!["localhost", "127.0.0.1", "::1"].includes(host)) return null;
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
+// Yerel modeller bulut kadar hızlı değil; ilk yüklemede dakikalar sürebiliyor.
+const LOCAL_TIMEOUT_MS = 240_000;
+
+function localErrorMessage(status, bodyText) {
+  if (status === 404)
+    return "Model bulunamadı. Ayarlar → Yapay Zekâ bölümünden kurulu bir model seç.";
+  if (status === 400)
+    return `Yerel model isteği reddetti (400)${bodyText ? ": " + bodyText.slice(0, 160) : ""}`;
+  return `Yerel model hatası (${status})${bodyText ? ": " + bodyText.slice(0, 160) : ""}`;
+}
+
+/** Yerel Ollama sunucusundan şemaya uygun nesne dizisi ister. */
+async function detectWithOllama(origin, model, imageBase64, prompt, schema) {
+  const body = {
+    model,
+    messages: [{ role: "user", content: prompt, images: [imageBase64] }],
+    format: schema,
+    stream: false,
+    options: { temperature: 0.1 },
+  };
+
+  let res;
+  try {
+    res = await fetchWithTimeout(
+      `${origin}/api/chat`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      },
+      LOCAL_TIMEOUT_MS,
+    );
+  } catch (err) {
+    if (err && err.name === "AbortError")
+      throw new Error(
+        "Yerel model zaman aşımına uğradı. Daha küçük bir görsel ya da daha hızlı bir model dene.",
+      );
+    throw new Error(
+      `Yerel model sunucusuna ulaşılamadı (${origin}). Ollama'nın çalıştığından emin ol.`,
+    );
+  }
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(localErrorMessage(res.status, text));
+  }
+
+  const json = await res.json();
+  const parsed = safeParseJsonArray(json?.message?.content ?? "");
+  if (!parsed)
+    throw new Error(
+      "Yerel modelin yanıtı çözümlenemedi. Görsel desteği olan bir model seçtiğinden emin ol.",
+    );
+  return parsed;
+}
+
+/** Kurulu yerel modelleri, görsel desteği bilgisiyle listeler. */
+async function listLocalModels(rawUrl) {
+  const origin = loopbackOrigin(rawUrl);
+  if (!origin)
+    return {
+      ok: false,
+      error:
+        "Yerel model adresi yalnız bu bilgisayarda çalışan bir sunucuya (localhost) işaret edebilir.",
+    };
+  let res;
+  try {
+    res = await fetchWithTimeout(`${origin}/api/tags`, {}, 5_000);
+  } catch {
+    return {
+      ok: false,
+      error: `${origin} adresine ulaşılamadı. Ollama'nın çalıştığından emin ol.`,
+    };
+  }
+  if (!res.ok)
+    return { ok: false, error: `Model listesi alınamadı (${res.status}).` };
+  const json = await res.json().catch(() => null);
+  const models = Array.isArray(json?.models) ? json.models : [];
+  return {
+    ok: true,
+    models: models.map((model) => ({
+      name: String(model?.name ?? ""),
+      vision: (
+        model?.capabilities ??
+        model?.details?.capabilities ??
+        []
+      ).includes("vision"),
+    })),
+  };
+}
+
 async function fetchWithTimeout(url, options, ms) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), ms);
@@ -152,14 +298,33 @@ async function detectWithGemini(apiKey, imageBase64, mimeType, prompt, schema) {
   return parsed;
 }
 
-function detectBooksWithGemini(apiKey, imageBase64, mimeType) {
+/**
+ * Seçili sağlayıcıya göre görseli çözümler. Sağlayıcı ne olursa olsun geriye
+ * aynı biçimde ham nesne dizisi döner; eşleme çağıran tarafta yapılır.
+ */
+function detectWithProvider(provider, imageBase64, mimeType, prompt, schemas) {
+  if (provider.kind === "local")
+    return detectWithOllama(
+      provider.origin,
+      provider.model,
+      imageBase64,
+      prompt,
+      schemas.local,
+    );
   return detectWithGemini(
-    apiKey,
+    provider.apiKey,
     imageBase64,
     mimeType,
-    DETECT_PROMPT,
-    RESPONSE_SCHEMA,
-  ).then((parsed) =>
+    prompt,
+    schemas.gemini,
+  );
+}
+
+function detectBooks(provider, imageBase64, mimeType) {
+  return detectWithProvider(provider, imageBase64, mimeType, DETECT_PROMPT, {
+    gemini: RESPONSE_SCHEMA,
+    local: BOOK_LOCAL_SCHEMA,
+  }).then((parsed) =>
     parsed
       .map((b) => ({
         title: String(b?.title ?? "").trim(),
@@ -179,14 +344,14 @@ function boundedInt(value, min, max) {
   return parsed;
 }
 
-function detectMediaWithGemini(apiKey, imageBase64, mimeType, kind) {
+function detectMedia(provider, imageBase64, mimeType, kind) {
   const nextYear = new Date().getFullYear() + 2;
-  return detectWithGemini(
-    apiKey,
+  return detectWithProvider(
+    provider,
     imageBase64,
     mimeType,
     mediaDetectPrompt(kind),
-    MEDIA_RESPONSE_SCHEMA,
+    { gemini: MEDIA_RESPONSE_SCHEMA, local: MEDIA_LOCAL_SCHEMA },
   ).then((parsed) =>
     parsed
       .map((item) => ({
@@ -219,7 +384,9 @@ function safeParseJsonArray(text) {
     .trim();
   try {
     const v = JSON.parse(cleaned);
-    return Array.isArray(v) ? v : Array.isArray(v?.books) ? v.books : null;
+    if (Array.isArray(v)) return v;
+    if (Array.isArray(v?.items)) return v.items;
+    return Array.isArray(v?.books) ? v.books : null;
   } catch {
     const start = cleaned.indexOf("[");
     const end = cleaned.lastIndexOf("]");
@@ -312,11 +479,9 @@ async function mapWithConcurrency(items, limit, fn) {
 
 // ---- IPC kaydı --------------------------------------------------------------
 
-/** Ortak giriş doğrulaması; hata varsa {error} döndürür. */
-function validateImagePayload(payload, apiKey) {
+/** Görsel giriş doğrulaması; hata varsa mesaj, sorun yoksa null döndürür. */
+function validateImagePayload(payload) {
   const { imageBase64, mimeType } = payload || {};
-  if (!apiKey)
-    return "Gemini API anahtarı ayarlı değil. Ayarlar → Yapay Zekâ bölümünden ekle.";
   if (
     typeof imageBase64 !== "string" ||
     !imageBase64 ||
@@ -328,18 +493,55 @@ function validateImagePayload(payload, apiKey) {
   return null;
 }
 
+/**
+ * Arayüzden gelen sağlayıcı tercihini doğrulanmış bir çalıştırma bağlamına
+ * çevirir. Gizli anahtar arayüze hiç geçmediği için Gemini anahtarı burada,
+ * güvenli depodan okunur.
+ */
+function resolveProvider(payload, getApiKey) {
+  if (payload?.provider === "local") {
+    const origin = loopbackOrigin(payload?.localUrl);
+    if (!origin)
+      return {
+        error:
+          "Yerel model adresi yalnız bu bilgisayarda çalışan bir sunucuya (localhost) işaret edebilir.",
+      };
+    const model = String(payload?.localModel ?? "").trim();
+    if (!model)
+      return {
+        error:
+          "Yerel model seçilmedi. Ayarlar → Yapay Zekâ bölümünden bir model seç.",
+      };
+    return { provider: { kind: "local", origin, model } };
+  }
+  const apiKey = getApiKey();
+  if (!apiKey)
+    return {
+      error:
+        "Gemini API anahtarı ayarlı değil. Ayarlar → Yapay Zekâ bölümünden ekle.",
+    };
+  return { provider: { kind: "gemini", apiKey } };
+}
+
 function registerAiIpc({ handle, getApiKey }) {
+  handle("ai:localModels", (url) => listLocalModels(url));
+
   handle("ai:detectBooks", async (payload) => {
-    const apiKey = getApiKey();
-    const invalid = validateImagePayload(payload, apiKey);
+    const invalid = validateImagePayload(payload);
     if (invalid) return { ok: false, error: invalid };
+    const { provider, error } = resolveProvider(payload, getApiKey);
+    if (error) return { ok: false, error };
     try {
-      const raw = await detectBooksWithGemini(
-        apiKey,
+      const raw = await detectBooks(
+        provider,
         payload.imageBase64,
         payload.mimeType,
       );
       if (raw.length === 0) return { ok: true, books: [] };
+      // Çevrimdışıyken yerel model çalışmaya devam eder, ama künye
+      // zenginleştirmesi ağ gerektirdiği için atlanır.
+      if (payload.allowNetwork === false)
+        return { ok: true, books: raw.map((b) => ({ ...b, matched: false })) };
       const books = await mapWithConcurrency(raw, 5, enrichBook);
       return { ok: true, books };
     } catch (err) {
@@ -348,17 +550,18 @@ function registerAiIpc({ handle, getApiKey }) {
   });
 
   handle("ai:detectMedia", async (payload) => {
-    const apiKey = getApiKey();
-    const invalid = validateImagePayload(payload, apiKey);
+    const invalid = validateImagePayload(payload);
     if (invalid) return { ok: false, error: invalid };
     const kind = payload?.type;
     if (kind !== "film" && kind !== "dizi")
       return { ok: false, error: "Geçersiz içerik türü." };
+    const { provider, error } = resolveProvider(payload, getApiKey);
+    if (error) return { ok: false, error };
     try {
       return {
         ok: true,
-        items: await detectMediaWithGemini(
-          apiKey,
+        items: await detectMedia(
+          provider,
           payload.imageBase64,
           payload.mimeType,
           kind,
@@ -370,4 +573,5 @@ function registerAiIpc({ handle, getApiKey }) {
   });
 }
 
-module.exports = { registerAiIpc };
+// loopbackOrigin güvenlik sınırını çizdiği için testlerden de erişilebilir.
+module.exports = { registerAiIpc, loopbackOrigin };

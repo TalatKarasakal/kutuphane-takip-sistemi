@@ -228,6 +228,126 @@ export function SettingsDialog({
 }
 
 function AiSection() {
+  const { aiProvider, set } = useSettings();
+  return (
+    <Section title="Yapay Zekâ · Fotoğraftan Ekle">
+      <div className="space-y-3">
+        <Segmented
+          value={aiProvider}
+          onChange={(value) => set("aiProvider", value)}
+          options={[
+            { value: "gemini", label: "Gemini (bulut)" },
+            { value: "local", label: "Bu bilgisayar" },
+          ]}
+        />
+        {aiProvider === "gemini" ? <GeminiKeyFields /> : <LocalAiFields />}
+      </div>
+    </Section>
+  );
+}
+
+function LocalAiFields() {
+  const { localAiUrl, localAiModel, set } = useSettings();
+  const [models, setModels] = useState<
+    { name: string; vision: boolean }[] | null
+  >(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const toast = useToast();
+
+  const refresh = async () => {
+    if (!window.kutuphanem) return;
+    setBusy(true);
+    setError("");
+    const result = await window.kutuphanem.metadata.localModels(localAiUrl);
+    setBusy(false);
+    if (!result.ok) {
+      setModels(null);
+      setError(result.error ?? "Modeller alınamadı.");
+      return;
+    }
+    setModels(result.models ?? []);
+    if (!result.models?.length) {
+      setError("Sunucuya ulaşıldı ama kurulu model bulunamadı.");
+      return;
+    }
+    toast.show(`${result.models.length} yerel model bulundu`);
+  };
+
+  const selected = models?.find((model) => model.name === localAiModel);
+
+  return (
+    <div className="space-y-2">
+      <div className="text-xs text-muted">
+        Fotoğraf bu bilgisayarda çalışan bir modele gönderilir; internete çıkmaz
+        ve çevrimdışı modda da çalışır. Ollama gibi bir sunucunun açık olması ve{" "}
+        <strong>görsel destekli</strong> bir modelin kurulu olması gerekir.
+      </div>
+      <div className="flex gap-2">
+        <input
+          className="input"
+          value={localAiUrl}
+          spellCheck={false}
+          autoComplete="off"
+          aria-label="Yerel model sunucu adresi"
+          placeholder="http://localhost:11434"
+          onChange={(event) => set("localAiUrl", event.target.value)}
+        />
+        <button
+          type="button"
+          className="btn btn-outline whitespace-nowrap"
+          onClick={() => void refresh()}
+          disabled={busy || !window.kutuphanem}
+        >
+          <RefreshCw size={15} className={busy ? "animate-spin" : ""} />
+          Modelleri Getir
+        </button>
+      </div>
+
+      {models?.length ? (
+        <select
+          className="input"
+          aria-label="Yerel model"
+          value={localAiModel}
+          onChange={(event) => set("localAiModel", event.target.value)}
+        >
+          <option value="">Model seç…</option>
+          {models.map((model) => (
+            <option key={model.name} value={model.name}>
+              {model.name}
+              {model.vision ? "" : " — görsel desteği yok"}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <input
+          className="input"
+          value={localAiModel}
+          spellCheck={false}
+          autoComplete="off"
+          aria-label="Yerel model"
+          placeholder="Model adı (örn. qwen3.5:9b)"
+          onChange={(event) => set("localAiModel", event.target.value)}
+        />
+      )}
+
+      {error && <div className="text-xs text-secondary">{error}</div>}
+      {selected && !selected.vision && (
+        <div className="text-xs text-amber-600">
+          Bu model görseli okuyamaz; fotoğraftan ekleme çalışmaz. Görsel
+          destekli bir model seç.
+        </div>
+      )}
+      {!window.kutuphanem && (
+        <div className="text-xs text-amber-600">
+          Yerel model yalnız masaüstü uygulamasında kullanılabilir.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GeminiKeyFields() {
   const [draft, setDraft] = useState("");
   const [hasKey, setHasKey] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -263,66 +383,63 @@ function AiSection() {
   };
 
   return (
-    <Section title="Yapay Zekâ · Fotoğraftan Ekle">
-      <div className="space-y-2">
-        <div className="text-xs text-muted">
-          Kitap fotoğrafından otomatik ekleme için Google'ın ücretsiz Gemini
-          servisini kullanır. Anahtar işletim sisteminin güvenli deposunda
-          tutulur; yedeklere veya dışa aktarımlara dâhil edilmez.
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="password"
-            className="input"
-            placeholder={
-              hasKey
-                ? "Güvenli anahtar kayıtlı · değiştirmek için yaz…"
-                : "Gemini API anahtarını yapıştır…"
-            }
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            spellCheck={false}
-            autoComplete="off"
-          />
-          <button
-            type="button"
-            className="btn btn-outline"
-            onClick={save}
-            disabled={busy || !draft.trim()}
-          >
-            <KeyRound size={15} /> Kaydet
-          </button>
-          {hasKey && (
-            <button
-              type="button"
-              className="btn btn-ghost text-secondary"
-              onClick={clear}
-              aria-label="Gemini anahtarını sil"
-            >
-              <Trash2 size={15} />
-            </button>
-          )}
-        </div>
-        {!window.kutuphanem && (
-          <div className="text-xs text-amber-600">
-            Güvenli anahtar yönetimi yalnız masaüstü uygulamasında
-            kullanılabilir.
-          </div>
-        )}
+    <div className="space-y-2">
+      <div className="text-xs text-muted">
+        Fotoğraftan otomatik ekleme için Google'ın ücretsiz Gemini servisini
+        kullanır. Anahtar işletim sisteminin güvenli deposunda tutulur;
+        yedeklere veya dışa aktarımlara dâhil edilmez.
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="password"
+          className="input"
+          placeholder={
+            hasKey
+              ? "Güvenli anahtar kayıtlı · değiştirmek için yaz…"
+              : "Gemini API anahtarını yapıştır…"
+          }
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          spellCheck={false}
+          autoComplete="off"
+        />
         <button
           type="button"
-          onClick={() =>
-            window.kutuphanem?.appInfo.openExternal(
-              "https://aistudio.google.com/apikey",
-            )
-          }
-          className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+          className="btn btn-outline"
+          onClick={save}
+          disabled={busy || !draft.trim()}
         >
-          <Sparkles size={13} /> Ücretsiz anahtar al (Google AI Studio){" "}
-          <ExternalLink size={12} />
+          <KeyRound size={15} /> Kaydet
         </button>
+        {hasKey && (
+          <button
+            type="button"
+            className="btn btn-ghost text-secondary"
+            onClick={clear}
+            aria-label="Gemini anahtarını sil"
+          >
+            <Trash2 size={15} />
+          </button>
+        )}
       </div>
-    </Section>
+      {!window.kutuphanem && (
+        <div className="text-xs text-amber-600">
+          Güvenli anahtar yönetimi yalnız masaüstü uygulamasında kullanılabilir.
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() =>
+          window.kutuphanem?.appInfo.openExternal(
+            "https://aistudio.google.com/apikey",
+          )
+        }
+        className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+      >
+        <Sparkles size={13} /> Ücretsiz anahtar al (Google AI Studio){" "}
+        <ExternalLink size={12} />
+      </button>
+    </div>
   );
 }
 

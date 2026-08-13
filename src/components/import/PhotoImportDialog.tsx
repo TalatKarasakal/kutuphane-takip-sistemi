@@ -14,9 +14,9 @@ import { useBooks } from "../../store/booksStore";
 import { useMedia } from "../../store/mediaStore";
 import {
   detectBooksFromImage,
-  hasGeminiSecret,
   type DetectedBook,
 } from "../../lib/ai/detectBooks";
+import { aiReadiness, type AiReadiness } from "../../lib/ai/provider";
 import {
   detectMediaFromImage,
   type DetectedMedia,
@@ -102,7 +102,7 @@ export function PhotoImportDialog({
 }: Props) {
   const { addMany: addBooks, books } = useBooks();
   const { addMany: addMedia, media } = useMedia();
-  const [hasKey, setHasKey] = useState(false);
+  const [readiness, setReadiness] = useState<AiReadiness | null>(null);
 
   const [step, setStep] = useState<Step>("pick");
   const [fileName, setFileName] = useState("");
@@ -117,7 +117,7 @@ export function PhotoImportDialog({
   const copy = COPY[section];
 
   useEffect(() => {
-    if (open) void hasGeminiSecret().then(setHasKey);
+    if (open) void aiReadiness().then(setReadiness);
   }, [open]);
 
   const reset = () => {
@@ -330,7 +330,7 @@ export function PhotoImportDialog({
       )}
       {step === "pick" && (
         <PickStep
-          hasKey={hasKey}
+          readiness={readiness}
           error={error}
           notice={notice}
           dropTitle={copy.dropTitle}
@@ -347,7 +347,12 @@ export function PhotoImportDialog({
           }}
         />
       )}
-      {step === "detecting" && <DetectingStep isBooks={isBooks} />}
+      {step === "detecting" && (
+        <DetectingStep
+          isBooks={isBooks}
+          local={readiness?.provider === "local"}
+        />
+      )}
       {step === "review" &&
         (isBooks ? (
           <BookReviewStep
@@ -372,7 +377,7 @@ export function PhotoImportDialog({
 }
 
 function PickStep({
-  hasKey,
+  readiness,
   error,
   notice,
   dropTitle,
@@ -381,7 +386,7 @@ function PickStep({
   onFile,
   onOpenSettings,
 }: {
-  hasKey: boolean;
+  readiness: AiReadiness | null;
   error: string;
   notice: string;
   dropTitle: string;
@@ -392,17 +397,19 @@ function PickStep({
 }) {
   const [dragging, setDragging] = useState(false);
 
-  if (!hasKey) {
+  if (!readiness) return <div className="py-16" aria-busy="true" />;
+
+  if (!readiness.ready) {
     return (
       <div className="py-8 text-center">
         <Sparkles size={28} className="mx-auto mb-3 text-primary" />
-        <div className="font-medium mb-1">
-          Önce ücretsiz Gemini anahtarını ekle
-        </div>
+        <div className="font-medium mb-1">Yapay zekâ henüz hazır değil</div>
         <div className="text-sm text-muted max-w-md mx-auto mb-4">
-          Bu özellik fotoğraftaki kayıtları tanımak için Google'ın ücretsiz
-          Gemini servisini kullanır. Google AI Studio'dan kredi kartı gerekmeden
-          ücretsiz bir anahtar alıp Ayarlar'a yapıştırman yeterli.
+          {readiness.reason}
+        </div>
+        <div className="text-xs text-muted max-w-md mx-auto mb-4">
+          Bulut yerine bilgisayarındaki bir modeli de kullanabilirsin; o zaman
+          fotoğraf hiç bu bilgisayardan çıkmaz.
         </div>
         <button className="btn btn-primary" onClick={onOpenSettings}>
           <Settings size={15} /> Ayarları Aç
@@ -475,14 +482,22 @@ function PickStep({
   );
 }
 
-function DetectingStep({ isBooks }: { isBooks: boolean }) {
+function DetectingStep({
+  isBooks,
+  local,
+}: {
+  isBooks: boolean;
+  local: boolean;
+}) {
   return (
     <div className="py-16 text-center">
       <Loader2 size={32} className="mx-auto mb-4 text-primary animate-spin" />
       <div className="font-medium mb-1">Fotoğraf inceleniyor…</div>
       <div className="text-sm text-muted">
-        {isBooks ? "Kitaplar" : "Yapımlar"} tanınıyor ve künyeleri tamamlanıyor.
-        Bu birkaç saniye sürebilir.
+        {isBooks ? "Kitaplar" : "Yapımlar"} tanınıyor ve künyeleri tamamlanıyor.{" "}
+        {local
+          ? "Yerel model kullanılıyor; ilk çalıştırmada model belleğe yüklenirken birkaç dakika sürebilir."
+          : "Bu birkaç saniye sürebilir."}
       </div>
     </div>
   );

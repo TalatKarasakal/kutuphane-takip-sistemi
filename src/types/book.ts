@@ -32,6 +32,8 @@ export type BookField = keyof Book;
 
 export type BackupFrequency = "launch" | "daily" | "weekly";
 
+export type AiProvider = "gemini" | "local";
+
 export interface AppSettings {
   theme: "light" | "dark" | "system";
   accent: "turkuaz" | "kirmizi";
@@ -42,6 +44,12 @@ export interface AppSettings {
   visualMode: "classic" | "enriched";
   networkMode: "offline" | "on-demand";
   remoteArtwork: boolean;
+  /** Fotoğraftan eklemede kullanılacak model sağlayıcısı. */
+  aiProvider: AiProvider;
+  /** Yerel sağlayıcının HTTP adresi; yalnız bu makine (localhost) kabul edilir. */
+  localAiUrl: string;
+  /** Yerel sağlayıcıda kullanılacak görsel destekli model adı. */
+  localAiModel: string;
   bookColumns: ColumnConfig[];
   filmColumns: ColumnConfig[];
   tvColumns: ColumnConfig[];
@@ -92,6 +100,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   visualMode: "classic",
   networkMode: "on-demand",
   remoteArtwork: false,
+  aiProvider: "gemini",
+  localAiUrl: "http://localhost:11434",
+  localAiModel: "",
   bookColumns: DEFAULT_BOOK_COLS,
   filmColumns: DEFAULT_FILM_COLS,
   tvColumns: DEFAULT_TV_COLS,

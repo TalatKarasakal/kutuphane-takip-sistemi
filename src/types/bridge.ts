@@ -1,6 +1,13 @@
 import type { DetectedBook, DetectBooksResult } from "../lib/ai/detectBooks";
 import type { DetectMediaResult } from "../lib/ai/detectMedia";
+import type { AiRequestBase } from "../lib/ai/provider";
 import type { MediaType } from "./media";
+
+export interface LocalModelsResult {
+  ok: boolean;
+  models?: { name: string; vision: boolean }[];
+  error?: string;
+}
 
 export interface BackupFileInfo {
   name: string;
@@ -31,15 +38,17 @@ export interface AppBridge {
   };
   metadata: {
     lookupIsbn: (isbn: string) => Promise<IsbnLookupResult>;
-    detectBooks: (payload: {
-      imageBase64: string;
-      mimeType: string;
-    }) => Promise<DetectBooksResult>;
-    detectMedia: (payload: {
-      imageBase64: string;
-      mimeType: string;
-      type: MediaType;
-    }) => Promise<DetectMediaResult>;
+    detectBooks: (
+      payload: AiRequestBase & { imageBase64: string; mimeType: string },
+    ) => Promise<DetectBooksResult>;
+    detectMedia: (
+      payload: AiRequestBase & {
+        imageBase64: string;
+        mimeType: string;
+        type: MediaType;
+      },
+    ) => Promise<DetectMediaResult>;
+    localModels: (url: string) => Promise<LocalModelsResult>;
   };
   artwork: {
     fetch: (url: string) => Promise<{
