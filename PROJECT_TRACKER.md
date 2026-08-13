@@ -12,7 +12,7 @@
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
 | Kontrol bekleyen çözüm | 26 |
-| Geliştirme fikri | 24 |
+| Geliştirme fikri | 25 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -32,6 +32,7 @@
 - Ekleme ve ayarlar butonları açılır menü kazandı; fotoğraftan ekleme ile içe/dışa aktarma ana yüzeyden kaldırılıp bu menülere taşındı, komut paletinden de erişilebilir bırakıldı.
 - Fotoğraftan ekleme kitapların yanı sıra film ve dizilerde de çalışıyor; künye modelden gelir ve gözden geçirme tablosunda onaylanır.
 - Fotoğraftan ekleme bulut yerine bu bilgisayardaki bir modelle de çalışabiliyor; yerel sağlayıcı çevrimdışı modda da kullanılabiliyor ve yalnız loopback adreslerine bağlanıyor.
+- Algılama arka planda sürüyor: diyalog kapatılınca iş devam ediyor, üst çubuktaki gösterge işi izliyor ve sonuç hazır olunca gözden geçirme listesine dönülüyor.
 - Tarayıcı ve Electron kontrollerinde kitap/medya CRUD, boş yazarın `Bilinmiyor` olması, mükerrer birleştirme, ödünç/iade, komut paleti ve yedek geri yükleme doğrulandı.
 - Gerçek Developer ID/notarization ve Windows imzası, imza anahtarları bekleyen tek dış doğrulama olarak açık.
 
@@ -130,6 +131,11 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Doğrulama:** 32 unit/component testi (loopback sınırı ve sağlayıcı hazırlığı dâhil), typecheck, ESLint, build başarılı. Gerçek Electron uygulamasında yerel model uçtan uca denendi: model listeleme `qwen3.5:9b` için `vision: true` döndürdü, makine dışı adres reddedildi, model seçilmemiş durum hata verdi ve çevrimdışı modda üç afişlik bir görselden yönetmen, tür, yıl ve süre alanları doğru dolduruldu (62,7 s).
   - **Bilinen sınır:** Yerel model bulut kadar hızlı değil; ilk çalıştırma model belleğe yüklenirken dakikalar sürebiliyor, istek 240 saniyede zaman aşımına uğruyor.
   - **Kullanıcı kontrolü:** Ayarlar → Yapay Zekâ'da "Bu bilgisayar"ı seçip "Modelleri Getir" ile modelinizi seçin, ardından bir afiş fotoğrafıyla fotoğraftan eklemeyi deneyin. Çevrimdışı modu açıkken de çalıştığını doğrulayın.
+- **IMP-025 — Arka planda çalışan fotoğraf algılaması**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** `89a2795`.
+  - **Doğrulama:** 37 unit/component testi (diyalog kapalıyken biten iş, bırakılan işin geç sonucu, mükerrer işaretleme dâhil), typecheck, ESLint, build ve 3 Electron E2E senaryosu başarılı. Gerçek uygulamada yerel modelle uçtan uca denendi: iş başlatıldı, diyalog kapatıldı, gösterge göründü, iş sürerken yeni film eklenebildi, 147 saniye sonra "sonuç hazır" göstergesine tıklanıp üç kayıt gözden geçirilerek eklendi.
+  - **Kullanıcı kontrolü:** Bir fotoğraf seçtikten sonra "Arka Planda Sürdür" ile pencereyi kapatıp uygulamayı kullanmaya devam edin; sağ üstteki gösterge işi izlemeli ve bitince gözden geçirme listesini geri getirmelidir.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:
@@ -144,7 +150,7 @@ Bir kayıt buraya taşınırken şu bilgiler zorunludur:
 
 ## 5. 🚀 Geliştirme Önerileri
 
-24 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 18'i uygulanmış ve kontrol bekliyor, 3'ü yeni önerilmiş (IMP-018, IMP-019, IMP-020), 3'ü kullanıcı kararıyla reddedilmiştir.
+25 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 19'u uygulanmış ve kontrol bekliyor, 3'ü yeni önerilmiş (IMP-018, IMP-019, IMP-020), 3'ü kullanıcı kararıyla reddedilmiştir.
 
 ---
 

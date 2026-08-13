@@ -196,3 +196,11 @@
 - **Sorumlu:** Claude
 - **Son Güncelleme:** 2026-08-13
 - **Öneri:** `[Model: Claude Opus 5]` Fotoğraftan eklemeyi tek sağlayıcıya (Gemini) bağlı olmaktan çıkar. Ayarlar'dan "Gemini (bulut)" ile "Bu bilgisayar" arasında seçim yapılabilsin; yerel seçenekte Ollama uyumlu bir sunucuya bağlanılsın, kurulu modeller görsel desteği bilgisiyle listelensin. Görsel bilgisayardan çıkmadığı için yerel sağlayıcı çevrimdışı modda da çalışır; kitaplarda künye zenginleştirmesi ağ gerektirdiğinden çevrimdışıyken atlanır. Ana sürecin arayüzden gelen adrese güvenmemesi için hedef `localhost`/`127.0.0.1`/`::1` ile sınırlandırılır ve yalnız kökeni kullanılır.
+
+### IMP-025 — Fotoğraf algılamasını arka plan işine çevir
+
+- **Öncelik:** P2
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Claude
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Claude Opus 5]` Algılama, özellikle yerel modelde dakikaları bulabildiği için kullanıcıyı bekletmesin. İş durumu diyalogdan çıkarılıp `store/photoImportStore` içine alınsın; pencere kapatıldığında iş sürsün, üst çubukta dönen bir gösterge işi izlesin ve sonuç hazır olunca vurgulu bir düğmeye dönüşüp gözden geçirme listesini geri getirsin. Diyalog kapalıyken biten iş bildirimle duyurulsun, bırakılan işin geç gelen sonucu ekrana basılmasın, iş başka bir bölümde başlatıldıysa göstergeye tıklandığında o bölüme geçilsin.

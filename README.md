@@ -51,6 +51,7 @@ Kütüphanem; kitap, film ve dizi koleksiyonlarını yerel olarak takip etmek i�
   - Kitaplarda fotoğraftaki kayıtları algılar ve künyeyi Google Books verisiyle zenginleştirmeye çalışır
   - Film ve dizilerde afiş/kapak/liste görselinden yapımları algılar; yönetmen, tür, yıl, süre ve sezon bilgilerini doldurur
   - Bulunan kayıtlar eklenmeden önce gözden geçirme tablosunda düzenlenir; listede zaten olanlar işaretlenir
+  - Algılama arka planda sürer: pencere kapatılıp uygulama kullanılmaya devam edilebilir, üst çubuktaki gösterge işi izler ve sonuç hazır olunca geri döner
   - Bu özellik Electron masaüstü uygulamasında kullanılabilir
   - Ekleme butonunun açılır menüsünden çalıştırılır
 
