@@ -1,4 +1,5 @@
 import type { Book, BookStatus } from "../types/book";
+import type { Media } from "../types/media";
 import type { SortKey, SortDir } from "../store/booksStore";
 import type { TagFilterMode } from "../types/library";
 
@@ -25,6 +26,15 @@ export function duplicateKey(b: Book): string | null {
   const author = normStr(b.author);
   if (title && author) return `ta:${title}|${author}`;
   return null;
+}
+
+/** Film/dizi için mükerrer anahtarı: başlık + (varsa) çıkış yılı. */
+export function mediaDuplicateKey(
+  item: Pick<Media, "title" | "type" | "releaseYear">,
+): string | null {
+  const title = normStr(item.title);
+  if (!title) return null;
+  return `${item.type}:${title}|${item.releaseYear ?? ""}`;
 }
 
 export function findDuplicateIds(books: Book[]): Set<string> {

@@ -22,7 +22,7 @@ import type { Book } from "../../types/book";
 import type { Media } from "../../types/media";
 
 const PhotoImportDialog = lazy(() =>
-  import("../books/PhotoImportDialog").then((module) => ({
+  import("../import/PhotoImportDialog").then((module) => ({
     default: module.PhotoImportDialog,
   })),
 );
@@ -307,6 +307,7 @@ export function AppShell() {
         {photoImportOpen && (
           <PhotoImportDialog
             open
+            section={section}
             onClose={() => setPhotoImportOpen(false)}
             onOpenSettings={() => {
               setSettingsTarget("general");

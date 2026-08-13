@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld("kutuphanem", {
   metadata: {
     lookupIsbn: (isbn) => ipcRenderer.invoke("metadata:lookupIsbn", isbn),
     detectBooks: (payload) => ipcRenderer.invoke("ai:detectBooks", payload),
+    detectMedia: (payload) => ipcRenderer.invoke("ai:detectMedia", payload),
   },
   artwork: {
     fetch: (url) => ipcRenderer.invoke("artwork:fetch", url),

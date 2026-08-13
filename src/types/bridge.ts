@@ -1,4 +1,6 @@
 import type { DetectedBook, DetectBooksResult } from "../lib/ai/detectBooks";
+import type { DetectMediaResult } from "../lib/ai/detectMedia";
+import type { MediaType } from "./media";
 
 export interface BackupFileInfo {
   name: string;
@@ -33,6 +35,11 @@ export interface AppBridge {
       imageBase64: string;
       mimeType: string;
     }) => Promise<DetectBooksResult>;
+    detectMedia: (payload: {
+      imageBase64: string;
+      mimeType: string;
+      type: MediaType;
+    }) => Promise<DetectMediaResult>;
   };
   artwork: {
     fetch: (url: string) => Promise<{

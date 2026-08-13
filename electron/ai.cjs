@@ -27,6 +27,44 @@ const RESPONSE_SCHEMA = {
   },
 };
 
+const MEDIA_LABEL = { film: "film", dizi: "dizi" };
+
+const mediaDetectPrompt = (kind) =>
+  [
+    `Bu fotoğrafta görünen ${MEDIA_LABEL[kind]} yapımlarını tanımla.`,
+    "Afiş, DVD/Blu-ray kapağı, kutu sırtı, ekran görüntüsü ya da yayın platformu listesi olabilir.",
+    "Kısmen görünen kapakları da, okuyabildiğin kadarıyla listele.",
+    "Türkçe adları Türkçe karakterleriyle koru; yalnızca Türkçe afişte görünen ad varsa onu kullan.",
+    kind === "film"
+      ? "Yalnızca sinema filmlerini dahil et; dizileri atla."
+      : "Yalnızca dizileri dahil et; sinema filmlerini atla.",
+    "Her yapım için bildiğin künyeyi doldur: yönetmen (director), tür (genre), çıkış yılı (releaseYear).",
+    kind === "film"
+      ? "Filmin dakika cinsinden süresini (duration) biliyorsan ekle."
+      : "Dizinin sezon sayısını (seasons) ve ortalama bölüm süresini (episodeDuration, dakika) biliyorsan ekle.",
+    "Emin olmadığın alanları boş bırak; uydurma.",
+    "Emin olmadığın yapımları da düşük confidence (0 ile 1 arası) ile ekle.",
+    "Aynı yapımı iki kez yazma.",
+  ].join(" ");
+
+const MEDIA_RESPONSE_SCHEMA = {
+  type: "ARRAY",
+  items: {
+    type: "OBJECT",
+    properties: {
+      title: { type: "STRING" },
+      director: { type: "STRING" },
+      genre: { type: "STRING" },
+      releaseYear: { type: "NUMBER" },
+      duration: { type: "NUMBER" },
+      seasons: { type: "NUMBER" },
+      episodeDuration: { type: "NUMBER" },
+      confidence: { type: "NUMBER" },
+    },
+    required: ["title"],
+  },
+};
+
 async function fetchWithTimeout(url, options, ms) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), ms);
@@ -50,13 +88,13 @@ function geminiErrorMessage(status, bodyText) {
   return `Yapay zekâ servisi hatası (${status})${snippet ? ": " + snippet : ""}`;
 }
 
-/** Gemini'den ham {title, author, confidence} listesi çıkarır. */
-async function detectWithGemini(apiKey, imageBase64, mimeType) {
+/** Gemini'ye görseli gönderip şemaya uygun ham nesne dizisi ister. */
+async function detectWithGemini(apiKey, imageBase64, mimeType, prompt, schema) {
   const body = {
     contents: [
       {
         parts: [
-          { text: DETECT_PROMPT },
+          { text: prompt },
           {
             inlineData: {
               mimeType: mimeType || "image/jpeg",
@@ -68,7 +106,7 @@ async function detectWithGemini(apiKey, imageBase64, mimeType) {
     ],
     generationConfig: {
       responseMimeType: "application/json",
-      responseSchema: RESPONSE_SCHEMA,
+      responseSchema: schema,
       temperature: 0.1,
     },
   };
@@ -111,13 +149,65 @@ async function detectWithGemini(apiKey, imageBase64, mimeType) {
       "Yapay zekânın yanıtı çözümlenemedi. Daha net bir fotoğrafla tekrar dene.",
     );
 
-  return parsed
-    .map((b) => ({
-      title: String(b?.title ?? "").trim(),
-      author: String(b?.author ?? "").trim(),
-      confidence: typeof b?.confidence === "number" ? b.confidence : undefined,
-    }))
-    .filter((b) => b.title.length > 0);
+  return parsed;
+}
+
+function detectBooksWithGemini(apiKey, imageBase64, mimeType) {
+  return detectWithGemini(
+    apiKey,
+    imageBase64,
+    mimeType,
+    DETECT_PROMPT,
+    RESPONSE_SCHEMA,
+  ).then((parsed) =>
+    parsed
+      .map((b) => ({
+        title: String(b?.title ?? "").trim(),
+        author: String(b?.author ?? "").trim(),
+        confidence:
+          typeof b?.confidence === "number" ? b.confidence : undefined,
+      }))
+      .filter((b) => b.title.length > 0),
+  );
+}
+
+/** Sayısal alanı yalnız makul aralıktaysa kabul eder; aksi halde boş bırakır. */
+function boundedInt(value, min, max) {
+  const parsed = typeof value === "number" ? Math.round(value) : Number(value);
+  if (!Number.isFinite(parsed) || parsed < min || parsed > max)
+    return undefined;
+  return parsed;
+}
+
+function detectMediaWithGemini(apiKey, imageBase64, mimeType, kind) {
+  const nextYear = new Date().getFullYear() + 2;
+  return detectWithGemini(
+    apiKey,
+    imageBase64,
+    mimeType,
+    mediaDetectPrompt(kind),
+    MEDIA_RESPONSE_SCHEMA,
+  ).then((parsed) =>
+    parsed
+      .map((item) => ({
+        title: String(item?.title ?? "").trim(),
+        type: kind,
+        director: String(item?.director ?? "").trim(),
+        genre: String(item?.genre ?? "").trim(),
+        releaseYear: boundedInt(item?.releaseYear, 1888, nextYear),
+        duration:
+          kind === "film" ? boundedInt(item?.duration, 1, 2000) : undefined,
+        seasons:
+          kind === "dizi" ? boundedInt(item?.seasons, 1, 10000) : undefined,
+        episodeDuration:
+          kind === "dizi"
+            ? boundedInt(item?.episodeDuration, 1, 1000)
+            : undefined,
+        confidence:
+          typeof item?.confidence === "number" ? item.confidence : undefined,
+      }))
+      .filter((item) => item.title.length > 0),
+  );
 }
 
 /** responseMimeType=json olsa da olası kod-bloğu sarmalamasına karşı dayanıklı ayrıştırma. */
@@ -222,34 +312,58 @@ async function mapWithConcurrency(items, limit, fn) {
 
 // ---- IPC kaydı --------------------------------------------------------------
 
+/** Ortak giriş doğrulaması; hata varsa {error} döndürür. */
+function validateImagePayload(payload, apiKey) {
+  const { imageBase64, mimeType } = payload || {};
+  if (!apiKey)
+    return "Gemini API anahtarı ayarlı değil. Ayarlar → Yapay Zekâ bölümünden ekle.";
+  if (
+    typeof imageBase64 !== "string" ||
+    !imageBase64 ||
+    imageBase64.length > 15 * 1024 * 1024
+  )
+    return "Görsel okunamadı. Lütfen tekrar dene.";
+  if (!["image/jpeg", "image/png", "image/webp"].includes(mimeType))
+    return "Desteklenmeyen görsel türü.";
+  return null;
+}
+
 function registerAiIpc({ handle, getApiKey }) {
   handle("ai:detectBooks", async (payload) => {
-    const { imageBase64, mimeType } = payload || {};
     const apiKey = getApiKey();
-    if (!apiKey) {
-      return {
-        ok: false,
-        error:
-          "Gemini API anahtarı ayarlı değil. Ayarlar → Yapay Zekâ bölümünden ekle.",
-      };
-    }
-    if (
-      typeof imageBase64 !== "string" ||
-      !imageBase64 ||
-      imageBase64.length > 15 * 1024 * 1024
-    ) {
-      return { ok: false, error: "Görsel okunamadı. Lütfen tekrar dene." };
-    }
-    if (!["image/jpeg", "image/png", "image/webp"].includes(mimeType)) {
-      return { ok: false, error: "Desteklenmeyen görsel türü." };
-    }
+    const invalid = validateImagePayload(payload, apiKey);
+    if (invalid) return { ok: false, error: invalid };
     try {
-      const raw = await detectWithGemini(apiKey, imageBase64, mimeType);
-      if (raw.length === 0) {
-        return { ok: true, books: [] };
-      }
+      const raw = await detectBooksWithGemini(
+        apiKey,
+        payload.imageBase64,
+        payload.mimeType,
+      );
+      if (raw.length === 0) return { ok: true, books: [] };
       const books = await mapWithConcurrency(raw, 5, enrichBook);
       return { ok: true, books };
+    } catch (err) {
+      return { ok: false, error: String((err && err.message) || err) };
+    }
+  });
+
+  handle("ai:detectMedia", async (payload) => {
+    const apiKey = getApiKey();
+    const invalid = validateImagePayload(payload, apiKey);
+    if (invalid) return { ok: false, error: invalid };
+    const kind = payload?.type;
+    if (kind !== "film" && kind !== "dizi")
+      return { ok: false, error: "Geçersiz içerik türü." };
+    try {
+      return {
+        ok: true,
+        items: await detectMediaWithGemini(
+          apiKey,
+          payload.imageBase64,
+          payload.mimeType,
+          kind,
+        ),
+      };
     } catch (err) {
       return { ok: false, error: String((err && err.message) || err) };
     }
