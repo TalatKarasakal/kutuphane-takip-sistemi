@@ -6,5 +6,11 @@
   <true/>
   <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
   <true/>
+  <!-- Yerel ad-hoc imzada Electron çerçevesi ana ikiliyle aynı kimliği
+       taşımadığı için kitaplık doğrulaması çerçeveyi reddediyor ve uygulama
+       hiç açılmıyor. Gerçek Developer ID imzasında tüm parçalar aynı kimlikle
+       imzalandığı için bu izin zarar vermez. -->
+  <key>com.apple.security.cs.disable-library-validation</key>
+  <true/>
 </dict>
 </plist>

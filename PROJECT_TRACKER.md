@@ -12,7 +12,7 @@
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
 | Kontrol bekleyen çözüm | 26 |
-| Geliştirme fikri | 26 |
+| Geliştirme fikri | 27 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -27,7 +27,8 @@
 - `tracker:check`, Prettier, typecheck, ESLint, 23 unit/component testi, 3 Electron E2E senaryosu, build ve npm audit başarılı.
 - Ana JavaScript chunk'ı **392,90 KB**; barkod (**477,93 KB**) ve xlsx (**493,28 KB**) başlangıçtan ayrıldı.
 - 10.000 kayıt fixture'ında filtre/sıralama 300 ms hedefinin altında; sanallaştırılmış listeler DOM'u 200 öğenin altında tutuyor.
-- macOS Universal `.app` 490 MB, DMG 211 MB; `codesign --verify --deep --strict`, Universal mimari, yeni koyu zeminli ikon/Plist, varsayılan açık DMG arka planı ve pakette yinelenen `node_modules` bulunmaması doğrulandı.
+- **Paketlenen uygulama ilk kez açılabiliyor.** Önceki yapıların tamamı (kurulu sürüm dâhil) açılışta SIGTRAP ile ölüyordu; nedenleri ASCII olmayan paket adı ve ad-hoc imzada kitaplık doğrulaması olarak bulundu. Artık paket adı ASCII, görünen ad Türkçe.
+- macOS Universal `.app` ve DMG; `codesign --verify --deep --strict`, Universal mimari, koyu/açık Dock simgeleri ve pakette yinelenen `node_modules` bulunmaması doğrulandı.
 - Özgün logo korunarak uygulama simgesi macOS 26 ızgarasına oturtuldu: saydam zeminli logo katmanı, Apple'ın kendi köşe yuvarlaklığı, kenar boşluğu ve gölgesiyle koyu ve açık zeminli iki 1024×1024 ana görsele basıldı; ICNS ve ICO bunlardan üretildi.
 - Ekleme ve ayarlar butonları açılır menü kazandı; fotoğraftan ekleme ile içe/dışa aktarma ana yüzeyden kaldırılıp bu menülere taşındı, komut paletinden de erişilebilir bırakıldı.
 - Fotoğraftan ekleme kitapların yanı sıra film ve dizilerde de çalışıyor; künye modelden gelir ve gözden geçirme tablosunda onaylanır.
@@ -156,7 +157,7 @@ Bir kayıt buraya taşınırken şu bilgiler zorunludur:
 
 ## 5. 🚀 Geliştirme Önerileri
 
-26 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 20'si uygulanmış ve kontrol bekliyor, 3'ü yeni önerilmiş (IMP-018, IMP-019, IMP-020), 3'ü kullanıcı kararıyla reddedilmiştir.
+27 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 21'i uygulanmış ve kontrol bekliyor, 3'ü yeni önerilmiş (IMP-018, IMP-019, IMP-020), 3'ü kullanıcı kararıyla reddedilmiştir.
 
 ---
 

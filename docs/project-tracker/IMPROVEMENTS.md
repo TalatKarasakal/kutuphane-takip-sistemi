@@ -212,3 +212,11 @@
 - **Sorumlu:** Claude
 - **Son Güncelleme:** 2026-08-13
 - **Öneri:** `[Model: Claude Opus 5]` Kullanım sürecine geçmeden önce bütün ekranları (kitap/film/dizi, tablo ve kart görünümü, detay paneli, formlar, içe/dışa aktarma, ayarlar, komut paleti, fotoğraftan ekleme, açık/koyu tema, dar pencere) tarayıp arayüz kusurlarını gider. Bulunanlar: kart görünümünde mutlak konumlu onay kutusu başlıkların ilk harflerini örtüyordu — onay kutusu akışa alındı ve kart, içeriğin üstüne serilen bir düğmeyle tıklanabilir tutuldu; koyu temada `color-scheme` bildirilmediği için tarih seçici, açılır liste ve onay kutusu gibi tarayıcı denetimleri açık temada kalıyordu; durum rozetleri tabloda iki satıra taşarak satır yüksekliğini bozuyordu.
+
+### IMP-027 — Paketlenen macOS uygulamasının açılmaması
+
+- **Öncelik:** P0
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Claude
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Claude Opus 5]` Paketlenen uygulama hiçbir zaman açılmıyordu; kurulu sürüm de dâhil her yapı açılışta SIGTRAP ile ölüyordu, bu yüzden yalnızca geliştirme sürümü çalıştırılabiliyor ve Dock'ta "Electron" adı görünüyordu. İki bağımsız neden bulundu: (1) `productName` ASCII olmayan bir karakter içerdiğinde ("Kütüphanem") macOS paketlenen uygulamayı başlatamıyor; (2) yerel ad-hoc imzada Electron çerçevesi ana ikiliyle aynı kimliği taşımadığı için sertleştirilmiş çalışma zamanının kitaplık doğrulaması çerçeveyi reddediyor. Çözüm: paket/çalıştırılabilir adı ASCII'ye ("Kutuphanem") indirildi, kullanıcıya görünen ad `CFBundleDisplayName` ve yerelleştirilmiş `InfoPlist.strings` ile Türkçe bırakıldı, `com.apple.security.cs.disable-library-validation` izni eklendi. `CFBundleName` ASCII kalmalıdır: Electron yardımcı süreçlerini bu ada göre arıyor.

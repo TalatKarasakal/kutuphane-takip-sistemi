@@ -1,6 +1,6 @@
 {
   "name": "kutuphane-takip-sistemi",
-  "productName": "Kütüphanem",
+  "productName": "Kutuphanem",
   "description": "Yerel kitap, film ve dizi koleksiyonu takip uygulaması",
   "author": "Talat Karasakal",
   "private": true,
@@ -30,7 +30,7 @@
   },
   "build": {
     "appId": "com.talatkarasakal.kutuphanem",
-    "productName": "Kütüphanem",
+    "productName": "Kutuphanem",
     "directories": {
       "output": "release"
     },
@@ -48,6 +48,10 @@
     "afterPack": "./electron/afterPack.cjs",
     "mac": {
       "icon": "build/icon.icns",
+      "extendInfo": {
+        "CFBundleDisplayName": "Kütüphanem",
+        "LSHasLocalizedDisplayName": true
+      },
       "target": [
         {
           "target": "dmg",
