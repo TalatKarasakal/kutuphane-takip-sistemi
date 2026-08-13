@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   BookOpen,
+  Camera,
   DatabaseBackup,
   Film,
   Import,
@@ -9,6 +10,7 @@ import {
   RotateCcw,
   Search,
   Settings,
+  Share,
   Tv2,
   type LucideIcon,
 } from "lucide-react";
@@ -35,7 +37,9 @@ export function CommandPalette({
   section,
   onSection,
   onAdd,
+  onPhotoImport,
   onImport,
+  onExport,
   onSettings,
   onAbout,
   onOpenBook,
@@ -46,7 +50,9 @@ export function CommandPalette({
   section: Section;
   onSection: (section: Section) => void;
   onAdd: () => void;
+  onPhotoImport: () => void;
   onImport: () => void;
+  onExport: () => void;
   onSettings: () => void;
   onAbout: () => void;
   onOpenBook: (book: Book) => void;
@@ -92,10 +98,27 @@ export function CommandPalette({
         run: onAdd,
       },
       {
+        id: "photo",
+        label:
+          section === "books"
+            ? "Fotoğraftan kitap ekle"
+            : section === "movies"
+              ? "Fotoğraftan film ekle"
+              : "Fotoğraftan dizi ekle",
+        icon: Camera,
+        run: onPhotoImport,
+      },
+      {
         id: "import",
         label: "Dosyadan içe aktar",
         icon: Import,
         run: onImport,
+      },
+      {
+        id: "export",
+        label: "Dosyaya dışa aktar",
+        icon: Share,
+        run: onExport,
       },
       {
         id: "filters",
@@ -154,7 +177,9 @@ export function CommandPalette({
     media,
     onAdd,
     onAbout,
+    onExport,
     onImport,
+    onPhotoImport,
     onOpenBook,
     onOpenMedia,
     onSection,

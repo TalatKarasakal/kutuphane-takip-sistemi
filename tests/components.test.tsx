@@ -16,6 +16,7 @@ import { Modal } from "../src/components/ui/Modal";
 import { BookFormDialog } from "../src/components/books/BookFormDialog";
 import { BookCard } from "../src/components/books/BookCard";
 import { Sidebar } from "../src/components/layout/Sidebar";
+import { Topbar } from "../src/components/layout/Topbar";
 import { SettingsDialog } from "../src/components/settings/SettingsDialog";
 import { ImportDialog } from "../src/components/import/ImportDialog";
 import { useBooks } from "../src/store/booksStore";
@@ -193,6 +194,40 @@ describe("conditional and optional UI", () => {
     expect(
       await screen.findByRole("img", { name: /Kapaklı Kitap/ }),
     ).toBeInTheDocument();
+  });
+
+  it("keeps photo import and file transfer out of the topbar surface", async () => {
+    const handlers = {
+      onAdd: vi.fn(),
+      onImport: vi.fn(),
+      onExport: vi.fn(),
+      onSettings: vi.fn(),
+      onPhotoImport: vi.fn(),
+    };
+    render(
+      <Topbar section="movies" onSection={() => undefined} {...handlers} />,
+    );
+
+    expect(screen.queryByText("Fotoğraftan Film Ekle")).not.toBeInTheDocument();
+    expect(screen.queryByText("İçe Aktar")).not.toBeInTheDocument();
+    expect(screen.queryByText("Dışa Aktar")).not.toBeInTheDocument();
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "Film Ekle seçenekleri" }),
+    );
+    await userEvent.click(
+      screen.getByRole("menuitem", { name: "Fotoğraftan Film Ekle" }),
+    );
+    expect(handlers.onPhotoImport).toHaveBeenCalledOnce();
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Ayarlar" }));
+    await userEvent.click(screen.getByRole("menuitem", { name: "İçe Aktar" }));
+    expect(handlers.onImport).toHaveBeenCalledOnce();
+
+    await userEvent.click(screen.getByRole("button", { name: "Ayarlar" }));
+    await userEvent.click(screen.getByRole("menuitem", { name: "Dışa Aktar" }));
+    expect(handlers.onExport).toHaveBeenCalledOnce();
   });
 
   it("reports invalid import rows without hiding valid rows", async () => {

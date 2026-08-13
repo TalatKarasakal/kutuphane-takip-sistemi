@@ -5,10 +5,13 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   Camera,
+  ChevronDown,
   LayoutGrid,
+  Pencil,
   Plus,
   Search,
   Settings,
+  SlidersHorizontal,
   Table,
   type LucideProps,
 } from "lucide-react";
@@ -16,6 +19,7 @@ import { useBooks } from "../../store/booksStore";
 import { useMedia } from "../../store/mediaStore";
 import { useSettings } from "../../store/settingsStore";
 import { ColumnManager } from "../ui/ColumnManager";
+import { MenuButton } from "../ui/MenuButton";
 import {
   BOOK_COLUMN_LABELS,
   FILM_COLUMN_LABELS,
@@ -55,6 +59,12 @@ const SEARCH_PLACEHOLDER: Record<Section, string> = {
   books: "Başlık, yazar, ISBN, not içinde ara…",
   movies: "Başlık, yönetmen, not içinde ara…",
   tv: "Başlık, yönetmen, not içinde ara…",
+};
+
+const PHOTO_LABEL: Record<Section, string> = {
+  books: "Fotoğraftan Kitap Ekle",
+  movies: "Fotoğraftan Film Ekle",
+  tv: "Fotoğraftan Dizi Ekle",
 };
 
 export function Topbar({
@@ -172,52 +182,68 @@ export function Topbar({
         )}
       </div>
 
-      {/* Sağ — import/export/ayarlar/ekle. Dar (pencere) ekranlarda yazılar
-          gizlenip yalnızca ikon kalır (tooltip'ler korunur); geniş (tam ekran)
-          ekranda tam yazı görünür. Böylece butonlar pencerede orantısız
-          büyümez. */}
+      {/* Sağ — ayarlar ve ekleme. İçe/dışa aktarma ayarlar menüsünde,
+          fotoğraftan ekleme ise ekleme menüsünde gömülüdür; ana sayfada
+          yalnızca iki denetim görünür. Ekle butonunun yazısı dar (pencere)
+          ekranlarda gizlenir, geniş ekranda görünür. */}
       <div className="flex items-center justify-end gap-2 shrink-0 ml-2">
-        {section === "books" && (
-          <button
-            className="btn btn-outline whitespace-nowrap shrink-0"
-            onClick={onPhotoImport}
-            title="Fotoğraftan kitap ekle"
-          >
-            <Camera size={15} />{" "}
-            <span className="hidden xl:inline">Fotoğraftan Ekle</span>
-          </button>
-        )}
-        <button
-          className="btn btn-outline whitespace-nowrap shrink-0"
-          onClick={onImport}
-          title="İçe Aktar"
-        >
-          <ArrowDownToLine size={15} />{" "}
-          <span className="hidden xl:inline">İçe Aktar</span>
-        </button>
-        <button
-          className="btn btn-outline whitespace-nowrap shrink-0"
-          onClick={onExport}
-          title="Dışa Aktar"
-        >
-          <ArrowUpFromLine size={15} />{" "}
-          <span className="hidden xl:inline">Dışa Aktar</span>
-        </button>
-        <button
-          className="btn btn-ghost shrink-0"
-          onClick={onSettings}
+        <MenuButton
           title="Ayarlar"
-        >
-          <Settings size={15} />
-        </button>
-        <button
-          className="btn btn-primary whitespace-nowrap shrink-0"
-          onClick={onAdd}
-          title={ADD_LABEL[section]}
-        >
-          <Plus size={15} />{" "}
-          <span className="hidden lg:inline">{ADD_LABEL[section]}</span>
-        </button>
+          triggerClassName="btn btn-ghost shrink-0 data-[open=true]:bg-surface2"
+          trigger={<Settings size={15} />}
+          items={[
+            {
+              id: "import",
+              label: "İçe Aktar",
+              icon: ArrowDownToLine,
+              onSelect: onImport,
+            },
+            {
+              id: "export",
+              label: "Dışa Aktar",
+              icon: ArrowUpFromLine,
+              onSelect: onExport,
+            },
+            {
+              id: "settings",
+              label: "Ayarları Aç",
+              icon: SlidersHorizontal,
+              onSelect: onSettings,
+              separatorBefore: true,
+            },
+          ]}
+        />
+
+        <div className="flex items-stretch shrink-0">
+          <button
+            className="btn btn-primary whitespace-nowrap rounded-r-none"
+            onClick={onAdd}
+            title={ADD_LABEL[section]}
+          >
+            <Plus size={15} />{" "}
+            <span className="hidden lg:inline">{ADD_LABEL[section]}</span>
+          </button>
+          <MenuButton
+            title={`${ADD_LABEL[section]} seçenekleri`}
+            triggerClassName="btn btn-primary h-full rounded-l-none border-l border-primary-foreground/25 px-2"
+            trigger={<ChevronDown size={15} />}
+            items={[
+              {
+                id: "manual",
+                label: ADD_LABEL[section],
+                icon: Pencil,
+                onSelect: onAdd,
+              },
+              {
+                id: "photo",
+                label: PHOTO_LABEL[section],
+                icon: Camera,
+                onSelect: onPhotoImport,
+                separatorBefore: true,
+              },
+            ]}
+          />
+        </div>
       </div>
     </header>
   );

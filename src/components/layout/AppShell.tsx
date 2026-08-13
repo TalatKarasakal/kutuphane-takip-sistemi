@@ -352,7 +352,9 @@ export function AppShell() {
             setMediaFormOpen(true);
           }
         }}
+        onPhotoImport={() => setPhotoImportOpen(true)}
         onImport={() => setImportOpen(true)}
+        onExport={() => setExportOpen(true)}
         onSettings={() => {
           setSettingsTarget("general");
           setSettingsOpen(true);

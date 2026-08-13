@@ -28,6 +28,12 @@ test.afterEach(async () => {
   await app?.close();
 });
 
+/** İçe/dışa aktarma ve ayarlar artık dişli butonun menüsünde. */
+async function openSettingsMenuItem(name: string) {
+  await page.getByTitle("Ayarlar", { exact: true }).click();
+  await page.getByRole("menuitem", { name, exact: true }).click();
+}
+
 async function addBook(title: string, author = "") {
   await page.getByRole("button", { name: "Kitap Ekle", exact: true }).click();
   await page.getByLabel("Başlık *").fill(title);
@@ -50,7 +56,7 @@ test("book CRUD, active loan lifecycle and command palette", async () => {
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: "Yeni Kitap" })).toHaveCount(0);
   await page.keyboard.press("2");
-  await expect(page.getByTitle("Film Ekle")).toBeVisible();
+  await expect(page.getByTitle("Film Ekle", { exact: true })).toBeVisible();
   await page.keyboard.press("1");
   await expect(page.getByTitle("Kitap Ekle", { exact: true })).toBeVisible();
 
@@ -87,7 +93,7 @@ test("book CRUD, active loan lifecycle and command palette", async () => {
     page.getByRole("option", { name: "Filmlere geç", exact: true }),
   ).toBeVisible();
   await page.keyboard.press("Enter");
-  await expect(page.getByTitle("Film Ekle")).toBeVisible();
+  await expect(page.getByTitle("Film Ekle", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Film Ekle", exact: true }).click();
   await page.getByLabel("Başlık *").fill("Uçtan Uca Film");
   await page.locator('button[form="media-form"]').click();
@@ -126,7 +132,7 @@ test("book CRUD, active loan lifecycle and command palette", async () => {
 
 test("file import, duplicate merge and backup restore preview", async () => {
   await addBook("Mükerrer Kitap", "Yazar");
-  await page.getByTitle("İçe Aktar").click();
+  await openSettingsMenuItem("İçe Aktar");
   await page.locator('input[type="file"][accept*=".csv"]').setInputFiles({
     name: "kitaplar.csv",
     mimeType: "text/csv",
@@ -147,14 +153,14 @@ test("file import, duplicate merge and backup restore preview", async () => {
   ).toBeVisible();
   await page.getByRole("button", { name: "Etikete göre grupla" }).click();
 
-  await page.getByTitle("Ayarlar").click();
+  await openSettingsMenuItem("Ayarları Aç");
   await page.getByRole("button", { name: "Şimdi Yedekle" }).click();
   await expect(page.getByText("Yedek geçmişi")).toBeVisible();
   await expect(page.getByText(/2 kitap · 0 medya/)).toBeVisible();
   await page.getByRole("button", { name: "Tamam" }).click();
 
   await addBook("Yedekten Sonra", "Yazar");
-  await page.getByTitle("Ayarlar").click();
+  await openSettingsMenuItem("Ayarları Aç");
   await page
     .getByRole("button", { name: "Geri Yükle", exact: true })
     .first()
