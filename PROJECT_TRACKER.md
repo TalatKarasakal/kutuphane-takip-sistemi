@@ -12,7 +12,7 @@
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
 | Kontrol bekleyen çözüm | 26 |
-| Geliştirme fikri | 23 |
+| Geliştirme fikri | 24 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -31,6 +31,7 @@
 - Özgün logo korunarak uygulama simgesi macOS 26 ızgarasına oturtuldu: saydam zeminli logo katmanı, Apple'ın kendi köşe yuvarlaklığı, kenar boşluğu ve gölgesiyle koyu ve açık zeminli iki 1024×1024 ana görsele basıldı; ICNS ve ICO bunlardan üretildi.
 - Ekleme ve ayarlar butonları açılır menü kazandı; fotoğraftan ekleme ile içe/dışa aktarma ana yüzeyden kaldırılıp bu menülere taşındı, komut paletinden de erişilebilir bırakıldı.
 - Fotoğraftan ekleme kitapların yanı sıra film ve dizilerde de çalışıyor; künye modelden gelir ve gözden geçirme tablosunda onaylanır.
+- Fotoğraftan ekleme bulut yerine bu bilgisayardaki bir modelle de çalışabiliyor; yerel sağlayıcı çevrimdışı modda da kullanılabiliyor ve yalnız loopback adreslerine bağlanıyor.
 - Tarayıcı ve Electron kontrollerinde kitap/medya CRUD, boş yazarın `Bilinmiyor` olması, mükerrer birleştirme, ödünç/iade, komut paleti ve yedek geri yükleme doğrulandı.
 - Gerçek Developer ID/notarization ve Windows imzası, imza anahtarları bekleyen tek dış doğrulama olarak açık.
 
@@ -123,6 +124,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Doğrulama:** Prettier, typecheck, ESLint, 24 unit/component testi, 3 Electron E2E senaryosu ve build başarılı. Üst çubuk menüleri tarayıcı önizlemesinde tıklanarak, üretilen ICNS 256 px'te görsel olarak doğrulandı.
   - **Bilinen sınır:** macOS'un simgeyi görünüme göre kendi değiştirmesi (`.icon` görünüm özelleştirmesi) `actool` 26.6 ile elle yazılan belgede uygulanmıyor; bu yüzden koyu/açık geçişi Dock simgesi çalışma anında değiştirilerek sağlanıyor. Finder ve Launchpad koyu zeminli sabit simgeyi gösterir.
   - **Kullanıcı kontrolü:** Filmler/Diziler bölümünde ekleme menüsünden "Fotoğraftan … Ekle" ile bir afiş fotoğrafı deneyin; ayarlar menüsünden içe/dışa aktarmayı açın; sistem görünümünü koyudan açığa alıp Dock simgesinin zemininin beyazladığını kontrol edin.
+- **IMP-024 — Yerel yapay zekâ sağlayıcısı**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** `76e6671`.
+  - **Doğrulama:** 32 unit/component testi (loopback sınırı ve sağlayıcı hazırlığı dâhil), typecheck, ESLint, build başarılı. Gerçek Electron uygulamasında yerel model uçtan uca denendi: model listeleme `qwen3.5:9b` için `vision: true` döndürdü, makine dışı adres reddedildi, model seçilmemiş durum hata verdi ve çevrimdışı modda üç afişlik bir görselden yönetmen, tür, yıl ve süre alanları doğru dolduruldu (62,7 s).
+  - **Bilinen sınır:** Yerel model bulut kadar hızlı değil; ilk çalıştırma model belleğe yüklenirken dakikalar sürebiliyor, istek 240 saniyede zaman aşımına uğruyor.
+  - **Kullanıcı kontrolü:** Ayarlar → Yapay Zekâ'da "Bu bilgisayar"ı seçip "Modelleri Getir" ile modelinizi seçin, ardından bir afiş fotoğrafıyla fotoğraftan eklemeyi deneyin. Çevrimdışı modu açıkken de çalıştığını doğrulayın.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:
@@ -137,7 +144,7 @@ Bir kayıt buraya taşınırken şu bilgiler zorunludur:
 
 ## 5. 🚀 Geliştirme Önerileri
 
-23 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 17'si uygulanmış ve kontrol bekliyor, 3'ü yeni önerilmiş (IMP-018, IMP-019, IMP-020), 3'ü kullanıcı kararıyla reddedilmiştir.
+24 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 18'i uygulanmış ve kontrol bekliyor, 3'ü yeni önerilmiş (IMP-018, IMP-019, IMP-020), 3'ü kullanıcı kararıyla reddedilmiştir.
 
 ---
 

@@ -45,7 +45,9 @@ Kütüphanem; kitap, film ve dizi koleksiyonlarını yerel olarak takip etmek i�
   - ISBN elle girilebilir veya barkod görselinden okunabilir; çevrimiçi künye araması yalnız düğmeye basıldığında çalışır
 
 - Fotoğraftan içerik ekleme (kitap, film, dizi)
-  - Kullanıcının kendi Google Gemini API anahtarıyla çalışır
+  - İki sağlayıcı: kullanıcının kendi Google Gemini API anahtarı ya da bu bilgisayarda çalışan yerel bir model (Ollama)
+  - Yerel sağlayıcıda fotoğraf bilgisayardan hiç çıkmaz, anahtar ve kota gerekmez, çevrimdışı modda da çalışır
+  - Yerel sağlayıcı yalnız `localhost` adreslerine bağlanır ve görsel destekli bir model gerektirir; kurulu modeller Ayarlar'dan listelenir
   - Kitaplarda fotoğraftaki kayıtları algılar ve künyeyi Google Books verisiyle zenginleştirmeye çalışır
   - Film ve dizilerde afiş/kapak/liste görselinden yapımları algılar; yönetmen, tür, yıl, süre ve sezon bilgilerini doldurur
   - Bulunan kayıtlar eklenmeden önce gözden geçirme tablosunda düzenlenir; listede zaten olanlar işaretlenir
@@ -137,7 +139,7 @@ Kütüphanem koleksiyon verilerini yerel IndexedDB veritabanında saklar; kitap,
 
 İsteğe bağlı ağ akışları yalnız kullanıcı eylemiyle çalışır:
 
-- Fotoğraftan eklemede küçültülmüş görsel Gemini'ye; bulunan başlık/yazarlar künye zenginleştirmesi için Google Books'a gönderilir.
+- Fotoğraftan eklemede Gemini sağlayıcısı seçiliyse küçültülmüş görsel Gemini'ye; kitaplarda bulunan başlık/yazarlar künye zenginleştirmesi için Google Books'a gönderilir. Yerel sağlayıcı seçiliyse görsel yalnız bu bilgisayardaki modele gider; çevrimdışı modda künye zenginleştirmesi de atlanır.
 - ISBN aramasında yalnız girilen ISBN önce Google Books'a, sonuç yoksa OpenLibrary'ye gönderilir.
 - Harici görseller ayarı açıldığında kullanıcının kayda eklediği HTTPS kapak/poster adresi güvenli ana süreç indiricisine gönderilir.
 - “Güncelleme denetle” düğmesi GitHub Releases API'sine mevcut uygulama sürümünü açıklamadan istek yapar.

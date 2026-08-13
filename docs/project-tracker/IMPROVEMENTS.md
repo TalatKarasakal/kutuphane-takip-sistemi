@@ -188,3 +188,11 @@
 - **Sorumlu:** Claude
 - **Son Güncelleme:** 2026-08-13
 - **Öneri:** `[Model: Claude Opus 5]` Simgeyi Apple'ın macOS 26 ızgarasına oturt: logo saydam zeminli katmana ayrılır, kare/köşe yuvarlaklığı, kenar boşluğu ve gölge Icon Composer belgesi (`build/appicon.icon`) üzerinden `actool` + IconServices ile üretilir. Koyu ve açık zeminli iki ana görsel basılır; Dock simgesi `nativeTheme` değişiminde koyu temada siyah, açık temada beyaz zeminli sürüme geçer. `scripts/build-icons.sh` çizim değiştiğinde tüm çıktıları (png/icns/ico) yeniden üretir.
+
+### IMP-024 — Yerel yapay zekâ sağlayıcısı (bulut yerine bu bilgisayar)
+
+- **Öncelik:** P2
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Claude
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Claude Opus 5]` Fotoğraftan eklemeyi tek sağlayıcıya (Gemini) bağlı olmaktan çıkar. Ayarlar'dan "Gemini (bulut)" ile "Bu bilgisayar" arasında seçim yapılabilsin; yerel seçenekte Ollama uyumlu bir sunucuya bağlanılsın, kurulu modeller görsel desteği bilgisiyle listelensin. Görsel bilgisayardan çıkmadığı için yerel sağlayıcı çevrimdışı modda da çalışır; kitaplarda künye zenginleştirmesi ağ gerektirdiğinden çevrimdışıyken atlanır. Ana sürecin arayüzden gelen adrese güvenmemesi için hedef `localhost`/`127.0.0.1`/`::1` ile sınırlandırılır ve yalnız kökeni kullanılır.
