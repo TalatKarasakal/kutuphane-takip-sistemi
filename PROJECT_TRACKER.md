@@ -6,13 +6,13 @@
 
 | Alan | Durum |
 |---|---|
-| Son güncelleme | 2026-08-11 |
+| Son güncelleme | 2026-08-13 |
 | Sıradaki iş | ISS-001 için Developer ID/notarization ve Windows imza anahtarlarıyla dış doğrulama |
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
 | Kontrol bekleyen çözüm | 26 |
-| Geliştirme fikri | 17 |
+| Geliştirme fikri | 23 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -28,7 +28,9 @@
 - Ana JavaScript chunk'ı **392,90 KB**; barkod (**477,93 KB**) ve xlsx (**493,28 KB**) başlangıçtan ayrıldı.
 - 10.000 kayıt fixture'ında filtre/sıralama 300 ms hedefinin altında; sanallaştırılmış listeler DOM'u 200 öğenin altında tutuyor.
 - macOS Universal `.app` 490 MB, DMG 211 MB; `codesign --verify --deep --strict`, Universal mimari, yeni koyu zeminli ikon/Plist, varsayılan açık DMG arka planı ve pakette yinelenen `node_modules` bulunmaması doğrulandı.
-- Özgün logo korunarak yalnız uygulama simgesinin dış zemini koyulaştırıldı; 1024×1024 PNG, macOS ICNS ve Windows ICO üretildi, 64 px okunabilirliği ile paketlenen ICNS dosyasının kaynakla aynı olduğu doğrulandı.
+- Özgün logo korunarak uygulama simgesi macOS 26 ızgarasına oturtuldu: saydam zeminli logo katmanı, Apple'ın kendi köşe yuvarlaklığı, kenar boşluğu ve gölgesiyle koyu ve açık zeminli iki 1024×1024 ana görsele basıldı; ICNS ve ICO bunlardan üretildi.
+- Ekleme ve ayarlar butonları açılır menü kazandı; fotoğraftan ekleme ile içe/dışa aktarma ana yüzeyden kaldırılıp bu menülere taşındı, komut paletinden de erişilebilir bırakıldı.
+- Fotoğraftan ekleme kitapların yanı sıra film ve dizilerde de çalışıyor; künye modelden gelir ve gözden geçirme tablosunda onaylanır.
 - Tarayıcı ve Electron kontrollerinde kitap/medya CRUD, boş yazarın `Bilinmiyor` olması, mükerrer birleştirme, ödünç/iade, komut paleti ve yedek geri yükleme doğrulandı.
 - Gerçek Developer ID/notarization ve Windows imzası, imza anahtarları bekleyen tek dış doğrulama olarak açık.
 
@@ -115,6 +117,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Commitler:** `79e3f39`, `f26f768`, `616181e`, `8822f79`, `5be79cc`, `db1e8ce`, `f0c0d9a`, `b1aa2f1`, `fcbf62c`, `65a8f71`.
   - **Doğrulama:** puan/etiket, aktif ödünç, ISBN/barkod, klasik-zengin görünüm, sanallaştırma, komut paleti, tema ve dağıtım senaryoları otomatik veya manuel olarak doğrulandı.
   - **Kullanıcı kontrolü:** Klasik görünümün varsayılan kalmasını, Zengin görünüm geçişini ve ödünç bölümünün yalnız aktif kayıt varken görünmesini kontrol edin.
+- **IMP-021/022/023 — Fotoğraftan medya ekleme, menüye taşınan ikincil eylemler ve macOS simgesi**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** `adb3bd5`, `4ce468a`, `123ffce`.
+  - **Doğrulama:** Prettier, typecheck, ESLint, 24 unit/component testi, 3 Electron E2E senaryosu ve build başarılı. Üst çubuk menüleri tarayıcı önizlemesinde tıklanarak, üretilen ICNS 256 px'te görsel olarak doğrulandı.
+  - **Bilinen sınır:** macOS'un simgeyi görünüme göre kendi değiştirmesi (`.icon` görünüm özelleştirmesi) `actool` 26.6 ile elle yazılan belgede uygulanmıyor; bu yüzden koyu/açık geçişi Dock simgesi çalışma anında değiştirilerek sağlanıyor. Finder ve Launchpad koyu zeminli sabit simgeyi gösterir.
+  - **Kullanıcı kontrolü:** Filmler/Diziler bölümünde ekleme menüsünden "Fotoğraftan … Ekle" ile bir afiş fotoğrafı deneyin; ayarlar menüsünden içe/dışa aktarmayı açın; sistem görünümünü koyudan açığa alıp Dock simgesinin zemininin beyazladığını kontrol edin.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:
@@ -129,7 +137,7 @@ Bir kayıt buraya taşınırken şu bilgiler zorunludur:
 
 ## 5. 🚀 Geliştirme Önerileri
 
-17 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 14'ü uygulanmış ve kontrol bekliyor, 3'ü kullanıcı kararıyla reddedilmiştir.
+23 geliştirme fikri öncelik ve model etiketleriyle [IMPROVEMENTS.md](docs/project-tracker/IMPROVEMENTS.md) içinde tutulur. Bunların 17'si uygulanmış ve kontrol bekliyor, 3'ü yeni önerilmiş (IMP-018, IMP-019, IMP-020), 3'ü kullanıcı kararıyla reddedilmiştir.
 
 ---
 

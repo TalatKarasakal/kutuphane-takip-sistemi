@@ -32,6 +32,7 @@ Kütüphanem; kitap, film ve dizi koleksiyonlarını yerel olarak takip etmek i�
   - CSV dosyaları için `papaparse`
   - Kitap ve medya kayıtları için ayrı dışa aktarma alanları
   - Ortak doğrulama, dosya/kayıt sınırları ve CSV formül hücresi koruması
+  - Ana sayfayı meşgul etmemek için ayarlar butonunun açılır menüsünden çalıştırılır
 
 - Yedekleme
   - Kitap, medya, etiket ve aktif ödünç kayıtlarını içeren şema v2
@@ -43,10 +44,13 @@ Kütüphanem; kitap, film ve dizi koleksiyonlarını yerel olarak takip etmek i�
   - Harici görseller varsayılan olarak kapalıdır ve açıldığında güvenli HTTPS katmanı ile yerel LRU önbelleğe alınır
   - ISBN elle girilebilir veya barkod görselinden okunabilir; çevrimiçi künye araması yalnız düğmeye basıldığında çalışır
 
-- Fotoğraftan kitap ekleme
+- Fotoğraftan içerik ekleme (kitap, film, dizi)
   - Kullanıcının kendi Google Gemini API anahtarıyla çalışır
-  - Fotoğraftaki kitapları algılar ve bulunan kayıtları Google Books verisiyle zenginleştirmeye çalışır
+  - Kitaplarda fotoğraftaki kayıtları algılar ve künyeyi Google Books verisiyle zenginleştirmeye çalışır
+  - Film ve dizilerde afiş/kapak/liste görselinden yapımları algılar; yönetmen, tür, yıl, süre ve sezon bilgilerini doldurur
+  - Bulunan kayıtlar eklenmeden önce gözden geçirme tablosunda düzenlenir; listede zaten olanlar işaretlenir
   - Bu özellik Electron masaüstü uygulamasında kullanılabilir
+  - Ekleme butonunun açılır menüsünden çalıştırılır
 
 - Yerel veri saklama
   - Kitap ve medya kayıtları Dexie üzerinden IndexedDB'de tutulur

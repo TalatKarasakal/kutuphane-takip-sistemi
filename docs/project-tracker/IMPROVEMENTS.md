@@ -139,3 +139,52 @@
 - **Sorumlu:** Codex
 - **Son Güncelleme:** 2026-08-11
 - **Öneri:** `[Model: Gemini 3.6 Flash]` Kitap ve medya kayıtlarına uygulanabilir özel renkli etiket yönetimi (Tag Manager) ekle. Çoklu etiket filtreleme (AND/OR mantığı) ve etiket bazlı hızlı gruplama desteği oluştur.
+
+### IMP-018 — Gelişmiş filtreleme ve kaydedilmiş akıllı görünümler
+
+- **Öncelik:** P2
+- **Durum:** Önerildi
+- **Sorumlu:** Antigravity
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Gemini 3.6 Flash]` Sık kullanılan filtre, sıralama ve arama parametrelerinin (örn: "Okunacak Bilimkurgu", "5 Yıldızlı Filmler", "Ödünç Verilen Kitaplar") özel isimlerle "Akıllı Görünüm" olarak kaydedilmesi ve tek tıkla erişilebilmesini sağla.
+
+### IMP-019 — Dışa aktarılabilir ve yazdırılabilir katalog/envanter raporu (PDF/HTML)
+
+- **Öncelik:** P3
+- **Durum:** Önerildi
+- **Sorumlu:** Antigravity
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Gemini 3.6 Flash]` Mevcut ham veri aktarımlarının (CSV/JSON/XLSX) yanı sıra, seçili koleksiyon veya tüm kütüphane için görsel olarak düzenlenmiş, kapaklı veya detaylı envanter raporu (yazdırılabilir HTML / PDF dışa aktarım) oluşturma imkanı sağla.
+
+### IMP-020 — Fiziksel raf/konum yönetimi ve kitap serisi takibi
+
+- **Öncelik:** P2
+- **Durum:** Önerildi
+- **Sorumlu:** Antigravity
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Gemini 3.6 Flash]` Kitaplar için fiziki kütüphane raf konumu (örn: "Salon A-2 Rafı", "Çalışma Odası") ve ait olduğu seri/cilt sırası (örn: "Vakıf Serisi #2") bilgilerini modele ekleyerek raf ve seri bazlı gruplama/filtreleme olanağı sun.
+
+
+### IMP-021 — Film ve dizilerde fotoğraftan içerik ekleme
+
+- **Öncelik:** P2
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Claude
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Claude Opus 5]` Kitaplardaki "Fotoğraftan Ekle" akışını film ve dizilere genişlet. Afiş, DVD/Blu-ray kapağı veya yayın listesi ekran görüntüsünden yapımları algıla; yönetmen, tür, çıkış yılı, süre ve sezon alanlarını doldur. Kitaplardan farklı olarak anahtarsız bir film katalog servisi bulunmadığı için künye doğrudan modelden gelir ve eklemeden önce gözden geçirme tablosunda onaylanır. Ortak diyalog `components/import/PhotoImportDialog.tsx` altında birleştirilir.
+
+### IMP-022 — Ana sayfadaki ikincil eylemleri menülere taşı
+
+- **Öncelik:** P2
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Claude
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Claude Opus 5]` Üst çubuktaki "Fotoğraftan Ekle", "İçe Aktar" ve "Dışa Aktar" butonlarını ana yüzeyden kaldır. Fotoğraftan ekleme, ekleme butonuna tutturulmuş açılır menünün en altına; içe/dışa aktarma ise ayarlar butonunun menüsüne gömülür. Menüler `ui/MenuButton` ile ortak, klavye ve ekran okuyucu uyumlu (role="menu", ok tuşları, Escape) tek bir bileşenden gelir; aynı eylemler komut paletinde de erişilebilir kalır.
+
+### IMP-023 — macOS ızgarasına uygun uygulama simgesi ve göründüğe göre değişen Dock simgesi
+
+- **Öncelik:** P2
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Claude
+- **Son Güncelleme:** 2026-08-13
+- **Öneri:** `[Model: Claude Opus 5]` Simgeyi Apple'ın macOS 26 ızgarasına oturt: logo saydam zeminli katmana ayrılır, kare/köşe yuvarlaklığı, kenar boşluğu ve gölge Icon Composer belgesi (`build/appicon.icon`) üzerinden `actool` + IconServices ile üretilir. Koyu ve açık zeminli iki ana görsel basılır; Dock simgesi `nativeTheme` değişiminde koyu temada siyah, açık temada beyaz zeminli sürüme geçer. `scripts/build-icons.sh` çizim değiştiğinde tüm çıktıları (png/icns/ico) yeniden üretir.
