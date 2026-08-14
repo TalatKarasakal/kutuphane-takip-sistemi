@@ -251,7 +251,7 @@ export function ExportDialog({ open, onClose, section }: Props) {
             {exportFields.map((f) => (
               <label
                 key={f.key}
-                className="flex items-center gap-2 text-sm cursor-pointer px-2 py-1.5 rounded-md hover:bg-surface2"
+                className="flex items-center gap-2 text-sm cursor-pointer px-2 py-1.5 rounded-lg hover:bg-surface2"
               >
                 <input
                   type="checkbox"

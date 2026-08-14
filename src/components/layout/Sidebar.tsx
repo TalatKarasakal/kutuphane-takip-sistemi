@@ -79,7 +79,7 @@ export function Sidebar({
       <SidebarSearch
         value={search}
         onChange={setSearch}
-        placeholder="Başlık, yazar, ISBN, not içinde ara…"
+        placeholder="Arama"
         inputRef={searchRef}
       />
 
@@ -87,7 +87,7 @@ export function Sidebar({
         {hasActive && (
           <div className="flex justify-end">
             <button
-              className="text-xs text-primary hover:underline flex items-center gap-1"
+              className="text-xs text-secondary hover:underline flex items-center gap-1"
               onClick={clearFilters}
             >
               <X size={12} /> filtreleri temizle
@@ -119,7 +119,7 @@ export function Sidebar({
                 <button
                   key={mode}
                   className={cn(
-                    "rounded px-1.5 py-0.5 text-[10px] font-semibold",
+                    "rounded-lg px-1.5 py-0.5 text-[10px] font-semibold",
                     tagFilterMode === mode
                       ? "bg-primary text-white"
                       : "bg-surface text-muted",
@@ -174,7 +174,7 @@ export function Sidebar({
             <FilterRow
               first
               active={loansOnly}
-              accent="primary"
+              accent="secondary"
               onClick={toggleLoansOnly}
               label="Aktif ödünçler"
               count={loans.length}
@@ -182,28 +182,21 @@ export function Sidebar({
           </FilterCard>
         )}
 
-        <FilterCard title="Tür" icon={<Filter size={12} />} tone="secondary">
-          {activeGenres.length === 0 ? (
-            <div className="px-3 py-2 text-xs text-muted italic">
-              Henüz tür eklenmemiş
-            </div>
-          ) : (
-            activeGenres.map(([g, count], i) => {
-              const active = genreFilter.includes(g);
-              return (
-                <FilterRow
-                  key={g}
-                  first={i === 0}
-                  active={active}
-                  accent="secondary"
-                  onClick={() => toggleGenreFilter(g)}
-                  label={g}
-                  count={count}
-                />
-              );
-            })
-          )}
-        </FilterCard>
+        {activeGenres.length > 0 && (
+          <FilterCard title="Tür" icon={<Filter size={12} />} tone="secondary">
+            {activeGenres.map(([g, count], i) => (
+              <FilterRow
+                key={g}
+                first={i === 0}
+                active={genreFilter.includes(g)}
+                accent="secondary"
+                onClick={() => toggleGenreFilter(g)}
+                label={g}
+                count={count}
+              />
+            ))}
+          </FilterCard>
+        )}
 
         {duplicateCount > 0 && (
           <FilterCard

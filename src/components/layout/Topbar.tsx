@@ -104,15 +104,15 @@ export function Topbar({
     section === "books" ? "book" : section === "movies" ? "film" : "tv";
 
   return (
-    <header className="relative h-14 border-b border-border bg-gradient-to-r from-primary/5 via-surface/80 to-accent/5 backdrop-blur pr-5 flex items-center shrink-0">
+    <header className="relative z-30 h-14 border-b border-border bg-gradient-to-r from-primary/6 via-surface/80 to-secondary/8 backdrop-blur pr-5 flex items-center shrink-0">
       {/* Üst çubuğu içerikten ayıran ince renk çizgisi. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/50 via-accent/30 to-secondary/40"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/50 via-secondary/45 to-secondary/60"
       />
       {/* Sol — uygulama kimliği. Genişliği kenar çubuğuyla hizalıdır. */}
       <div className="w-64 shrink-0 flex items-center gap-3 pl-5 pr-4 min-w-0">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary via-accent to-secondary text-white flex items-center justify-center shadow-soft shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center shadow-soft shrink-0">
           <BrandIcon size={18} />
         </div>
         <div className="min-w-0">

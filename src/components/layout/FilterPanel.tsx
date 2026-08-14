@@ -150,7 +150,9 @@ export function SidebarSearch({
   inputRef?: React.RefObject<HTMLInputElement>;
 }) {
   return (
-    <div className="px-4 py-3 border-b border-border bg-gradient-to-br from-primary/12 via-transparent to-secondary/12">
+    // Ayraç yok: arama da filtreler de aynı panelin üstünde duruyor, araya
+    // çizgi koymak iki yakın tonu birbirinden ayırmıyor, yalnız gürültü katıyordu.
+    <div className="px-4 pt-4 pb-1">
       <div className="relative">
         <Search
           className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"

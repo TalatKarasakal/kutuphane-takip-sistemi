@@ -80,8 +80,13 @@
  * dendiği için birincil, bordo seyrek vurgu olarak ikincil oldu.
  */
 :root {
-  /* Turkuaz 800: hem beyaz üstünde hem beyaz zeminde okunur kalıyor. */
-  --primary: 14 110 102;
+  /*
+   * Turkuaz 700 ile 800 arasında bir ton. 800 (#0E6E66) koyu yeşile kaçıyordu;
+   * paletin turkuaz dediği referanslar (#14b8a6, #1abc9c) daha açık. 700
+   * (#12887E) üstünde beyaz yazı 4,33:1'de kaldığı için bir tık koyulaştırıldı:
+   * bu ton 5,1:1 veriyor ve gözle turkuaz okunuyor.
+   */
+  --primary: 16 123 114;
   --primary-foreground: 255 255 255;
   /* Bordo 700 — parlak kırmızı kullanılmaz. */
   --secondary: 140 42 34;

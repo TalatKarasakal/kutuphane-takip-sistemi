@@ -11,8 +11,8 @@
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
-| Kontrol bekleyen çözüm | 29 |
-| Geliştirme fikri | 30 |
+| Kontrol bekleyen çözüm | 30 |
+| Geliştirme fikri | 31 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -172,6 +172,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Ek düzeltme:** macOS paketi hiç üretilemiyordu. `afterPack`, paket klasörünü `Kütüphanem.app` diye yeniden adlandırıyordu; electron-builder ise paketleme sonrası `app.asar` denetimini hâlâ ürün adıyla (`Kutuphanem.app`) yaptığı için build "app.asar is corrupted" ile düşüyordu. Yeniden adlandırma kaldırıldı: Türkçe adı zaten `CFBundleDisplayName` ve `InfoPlist.strings` veriyor, klasör adını da kuran taraf (`scripts/install-mac.sh`) koyuyor. Paket yeniden üretilip `/Applications/Kütüphanem.app` olarak kuruldu; açıldığı, Türkçe adı taşıdığı ve `codesign --verify --deep --strict` geçtiği doğrulandı.
   - **Bilinen sınır:** Satır eylem sütunu, üzerine gelince çıkan "→ Okundu ✓" düğmesi için ~95 px ayırmayı sürdürüyor; bu alan boş değil, düğmenin kendisi için gerekli. Barkod taramasının uçtan uca çalıştığı kamerayla denenmedi; yalnız engelin kalktığı doğrulandı.
   - **Kullanıcı kontrolü:** Kitap ekleme formunda ISBN alanındaki barkod taramasını kamerayla deneyin. Geniş pencerede tablo sütunlarının uzun başlıkları daha iyi taşıdığını, kenar çubuğunun gövdesi ile içindeki kutuların ayrıştığını kontrol edin.
+- **IMP-031 — Yığın sırası hatası, boş tür kartı ve renk ayarları**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** çalışma ağacında.
+  - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Yığın sırası tarayıcıda `elementFromPoint` ile ölçüldü: kart görünümünde menünün üç öğesi de tıklanabilir çıktı ve "Ayarları Aç" gerçekten ayarları açtı; detay paneli üst çubuğun üstünde çiziliyor. Açık ve koyu tema tabloda ve kartta gözden geçirildi.
+  - **Bilinen sınır:** Kırmızı, düğme anlamları bozulmadan artırıldı; birincil eylem düğmeleri turkuaz kaldı çünkü aynı anlamı taşıyan diyalog düğmeleriyle tutarlı olmalı. Daha fazlası isteniyorsa birincil/ikincil rollerinin tamamen takas edilmesi gerekir, bu da paletin "bordo seyrek kullanılır" notuyla çelişir.
+  - **Kullanıcı kontrolü:** Kart görünümünde ayarlar menüsünden "Ayarları Aç"ı deneyin; tür kartının yalnız tür varken göründüğünü ve arama kutusunun altında ayraç kalmadığını doğrulayın.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:

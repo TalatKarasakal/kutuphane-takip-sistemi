@@ -60,7 +60,7 @@ export function MediaSidebar({ type, searchRef }: Props) {
       <SidebarSearch
         value={filters[type].search}
         onChange={(value) => setSearch(type, value)}
-        placeholder="Başlık, yönetmen, not içinde ara…"
+        placeholder="Arama"
         inputRef={searchRef}
       />
 
@@ -68,7 +68,7 @@ export function MediaSidebar({ type, searchRef }: Props) {
         {hasActive && (
           <div className="flex justify-end">
             <button
-              className="text-xs text-primary hover:underline flex items-center gap-1"
+              className="text-xs text-secondary hover:underline flex items-center gap-1"
               onClick={() => clearFilters(type)}
             >
               <X size={12} /> filtreleri temizle
@@ -98,7 +98,7 @@ export function MediaSidebar({ type, searchRef }: Props) {
                 <button
                   key={mode}
                   className={cn(
-                    "rounded px-1.5 py-0.5 text-[10px] font-semibold",
+                    "rounded-lg px-1.5 py-0.5 text-[10px] font-semibold",
                     tagFilterMode === mode
                       ? "bg-primary text-white"
                       : "bg-surface text-muted",
@@ -139,13 +139,9 @@ export function MediaSidebar({ type, searchRef }: Props) {
           </FilterCard>
         )}
 
-        <FilterCard title="Tür" icon={<Filter size={12} />} tone="secondary">
-          {activeGenres.length === 0 ? (
-            <div className="px-3 py-2 text-xs text-muted italic">
-              Henüz tür eklenmemiş
-            </div>
-          ) : (
-            activeGenres.map(([g, count], i) => (
+        {activeGenres.length > 0 && (
+          <FilterCard title="Tür" icon={<Filter size={12} />} tone="secondary">
+            {activeGenres.map(([g, count], i) => (
               <FilterRow
                 key={g}
                 first={i === 0}
@@ -155,9 +151,9 @@ export function MediaSidebar({ type, searchRef }: Props) {
                 label={g}
                 count={count}
               />
-            ))
-          )}
-        </FilterCard>
+            ))}
+          </FilterCard>
+        )}
       </div>
     </aside>
   );

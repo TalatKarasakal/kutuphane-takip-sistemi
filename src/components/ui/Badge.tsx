@@ -79,6 +79,7 @@ const GENRE_COLORS = [
   "bg-turkuaz-500/15 text-turkuaz-800 dark:text-turkuaz-300 border-turkuaz-500/25",
   "bg-kemik-500/20 text-kemik-800 dark:text-kemik-300 border-kemik-500/30",
   "bg-bordo-600/15 text-bordo-700 dark:text-bordo-300 border-bordo-600/25",
+  "bg-bordo-800/15 text-bordo-800 dark:text-bordo-200 border-bordo-800/25",
   "bg-petrol-500/15 text-petrol-700 dark:text-petrol-200 border-petrol-500/25",
   "bg-notr-500/15 text-notr-700 dark:text-notr-200 border-notr-500/25",
 ];
