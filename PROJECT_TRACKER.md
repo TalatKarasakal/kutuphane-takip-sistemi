@@ -143,6 +143,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Commitler:** `bdcafe5`.
   - **Doğrulama:** Electron'da 25 ekran görüntüsüyle tarama (kitap/film/dizi, tablo ve kart, detay, formlar, ödünç, içe/dışa aktarma, ayarların üç bölümü, komut paleti, fotoğraftan ekleme, açık/koyu tema, 1024 px dar pencere); konsol hatası yok. 38 unit/component testi, 3 Electron E2E, typecheck, ESLint ve build başarılı. Kart başlığının onay kutusuyla örtüşmediği ve seçimin kartı açmadığı testle korunuyor.
   - **Kullanıcı kontrolü:** Kart görünümünde başlıkların tamamının okunduğunu, koyu temada tarih seçici ve açılır listelerin koyu göründüğünü, tabloda durum rozetlerinin tek satırda kaldığını kontrol edin.
+- **IMP-027 — Paketlemenin çalışır hâle getirilmesi**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** `237f545` (macOS), Windows paketleme aynı seride.
+  - **Doğrulama:** macOS Universal `.app` ve DMG üretildi, açılışı ve `codesign --verify --deep --strict` doğrulandı. Windows NSIS kurulumu macOS üzerinde üretildi; `.exe` kaynakları (ProductName, CompanyName, FileVersion, 7 boyutlu simge) ve `app.asar` içeriği doğrulandı.
+  - **Bilinen sınır:** Windows kurulumu gerçek bir Windows makinesinde çalıştırılarak denenmedi; yalnız üretilen dosyanın içeriği doğrulandı. Developer ID/notarization ve Windows kod imzası hâlâ anahtar bekliyor.
+  - **Kullanıcı kontrolü:** DMG'den kurup uygulamanın açıldığını ve Dock'ta "Kütüphanem" yazdığını; Windows'ta kurulumun tamamlandığını, kısayolun "Kütüphanem" adıyla ve yeni simgeyle göründüğünü kontrol edin.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:

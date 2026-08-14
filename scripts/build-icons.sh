@@ -93,12 +93,12 @@ PLIST
 render_variant dark "extended-srgb:0.00000,0.00000,0.00000,1.00000"
 render_variant light "extended-srgb:1.00000,1.00000,1.00000,1.00000"
 
-python3 - "$WORK" "$ROOT/build" <<'PY'
+python3 - "$WORK" "$ROOT/build" "$SRC/Assets/Logo.png" <<'PY'
 import subprocess, sys
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageDraw
 
-work, out = Path(sys.argv[1]), Path(sys.argv[2])
+work, out, logo_path = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
 dark = Image.open(work / "master-dark.png").convert("RGBA")
 light = Image.open(work / "master-light.png").convert("RGBA")
 
@@ -113,6 +113,28 @@ for base in (16, 32, 128, 256, 512):
     dark.resize((base * 2, base * 2), Image.LANCZOS).save(iconset / f"icon_{base}x{base}@2x.png")
 subprocess.run(["iconutil", "-c", "icns", str(iconset), "-o", str(out / "icon.icns")], check=True)
 
-dark.save(out / "icon.ico", sizes=[(s, s) for s in (16, 24, 32, 48, 64, 128, 256)])
+# Windows simgesi macOS ızgarasını kullanmaz: orada maske ve gölge sistem
+# tarafından çizilmediği için macOS ana görseli küçük ve gölgeli durur.
+# Bu yüzden tam kanarlı, gölgesiz ve daha az köşe yuvarlaklığı olan ayrı bir
+# görsel basılır.
+SIZE = 1024
+canvas = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+mask = Image.new("L", (SIZE, SIZE), 0)
+ImageDraw.Draw(mask).rounded_rectangle(
+    [0, 0, SIZE - 1, SIZE - 1], radius=round(SIZE * 0.16), fill=255
+)
+canvas.paste(Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 255)), mask=mask)
+
+logo = Image.open(logo_path).convert("RGBA")
+logo = logo.crop(logo.getbbox())
+scale = (SIZE * 0.80) / max(logo.size)
+logo = logo.resize(
+    (round(logo.width * scale), round(logo.height * scale)), Image.LANCZOS
+)
+canvas.alpha_composite(
+    logo, ((SIZE - logo.width) // 2, (SIZE - logo.height) // 2)
+)
+canvas.save(out / "icon.ico", sizes=[(s, s) for s in (16, 24, 32, 48, 64, 128, 256)])
+
 print("Simgeler üretildi:", ", ".join(sorted(p.name for p in out.iterdir())))
 PY

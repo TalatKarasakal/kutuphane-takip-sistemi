@@ -84,7 +84,9 @@
     "nsis": {
       "oneClick": false,
       "perMachine": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Kütüphanem",
+      "uninstallDisplayName": "Kütüphanem"
     },
     "linux": {
       "icon": "build/icon.png",
