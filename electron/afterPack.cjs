@@ -26,35 +26,21 @@ function writeLocalizedName(appPath) {
   }
 }
 
-/**
- * Paketin klasör adını Türkçeye çevirir. İçerideki ASCII adlara dokunmadığı
- * ve imza yalnız `Contents/` içeriğini kapsadığı için imzayı bozmaz.
- * Dönüş: kullanılacak son .app yolu.
- */
-function renameBundle(appPath) {
-  const target = path.join(path.dirname(appPath), `${DISPLAY_NAME}.app`);
-  if (appPath === target) return appPath;
-  fs.rmSync(target, { recursive: true, force: true });
-  fs.renameSync(appPath, target);
-  return target;
-}
-
 exports.default = async function afterPack(context) {
   if (context.electronPlatformName !== "darwin") return;
   if (require("os").platform() !== "darwin") return; // codesign is macOS-only
   if (context.appOutDir.endsWith("-temp")) return; // Universal birleştirmeden önce iki mimariyi ayrı imzalama.
 
   const appName = context.packager.appInfo.productFilename;
-  let appPath = path.join(context.appOutDir, `${appName}.app`);
+  const appPath = path.join(context.appOutDir, `${appName}.app`);
 
   // İmzadan önce yazılmalı; sonradan eklenen dosya imzayı geçersiz kılar.
+  // Türkçe ad buradan gelir: paketin klasör adı ASCII kalsa da Finder ve Dock
+  // `CFBundleDisplayName`i gösterir (package.json'da LSHasLocalizedDisplayName).
+  // Klasörü burada yeniden adlandırmak electron-builder'ın paketleme sonrası
+  // yaptığı `app.asar` denetimini kırıyordu: denetim paketi hâlâ ürün adıyla
+  // arıyor. Türkçe klasör adını çıktıyı kuran taraf verir (scripts/install-mac.sh).
   writeLocalizedName(appPath);
-
-  // DMG adımı paketi ürün adıyla aradığı için orada yeniden adlandıramayız;
-  // doğrudan kullanılan çıktılarda (ör. `--dir`) paket Türkçe adını alır.
-  if (!context.targets.some((target) => target.name === "dmg")) {
-    appPath = renameBundle(appPath);
-  }
 
   if (process.env.CSC_LINK || process.env.CSC_NAME) return; // electron-builder gerçek kimlikle imzalar
 
