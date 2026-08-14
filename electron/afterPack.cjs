@@ -20,7 +20,7 @@ function writeLocalizedName(appPath) {
     // .strings dosyaları BOM'lu UTF-16 bekler; BOM olmadan macOS okuyamıyor.
     fs.writeFileSync(
       path.join(dir, "InfoPlist.strings"),
-      `﻿"CFBundleDisplayName" = "${DISPLAY_NAME}";\n"CFBundleName" = "${DISPLAY_NAME}";\n`,
+      `\uFEFF"CFBundleDisplayName" = "${DISPLAY_NAME}";\n"CFBundleName" = "${DISPLAY_NAME}";\n`,
       "utf16le",
     );
   }
