@@ -36,12 +36,14 @@ export default {
           DEFAULT: "var(--accent)",
           hot: "var(--accent-hot)",
           soft: "var(--accent-soft)",
-          /** Metin taşımayan işaretler; aydınlık temada saf turkuaz. */
-          mark: "var(--accent-mark)",
           line: "var(--accent-line)",
         },
         navy: "var(--navy)",
-        glow: "var(--glow)",
+        glow: {
+          DEFAULT: "var(--glow)",
+          soft: "var(--glow-soft)",
+          line: "var(--glow-line)",
+        },
         success: "var(--success)",
         /** Bordo. Karanlık temada vurguyla aynı, aydınlıkta yalnız durum rengi. */
         warn: "var(--warn)",

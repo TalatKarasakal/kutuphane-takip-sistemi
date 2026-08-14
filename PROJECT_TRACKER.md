@@ -11,8 +11,8 @@
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
-| Kontrol bekleyen çözüm | 34 |
-| Geliştirme fikri | 35 |
+| Kontrol bekleyen çözüm | 35 |
+| Geliştirme fikri | 36 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -35,7 +35,7 @@
 - Fotoğraftan ekleme bulut yerine bu bilgisayardaki bir modelle de çalışabiliyor; yerel sağlayıcı çevrimdışı modda da kullanılabiliyor ve yalnız loopback adreslerine bağlanıyor.
 - Algılama arka planda sürüyor: diyalog kapatılınca iş devam ediyor, üst çubuktaki gösterge işi izliyor ve sonuç hazır olunca gözden geçirme listesine dönülüyor.
 - Arama kenar çubuğunun tepesine, uygulama kimliği üst çubuğa alındı; yüzey kademeleri (zemin/panel/yüzey) ayrıştırıldı ve CSP'nin engellediği barkod worker'ı açıldı.
-- Aydınlıkta turkuaz iki tonda: beyaz metin taşıyan yüzeyler koyu, metin taşımayan işaretler parlak. Satır hover'ındaki hızlı durum düğmesi kaldırıldı.
+- Aydınlıkta vurgu lacivert (simgenin zeminiyle aynı aile); "Okunacak" rozeti vurguyla karışmasın diye dolgusuz. Satır hover'ındaki hızlı durum düğmesi kaldırıldı.
 - Vurgu rengi temaya bağlı: aydınlıkta turkuaz, karanlıkta bordo; bordo aydınlıkta yalnız durum/uyarı rengi (`--warn`).
 - Arayüz, `docs/design/arayuz-token-seti.md` içindeki token setine göre yeniden kuruldu: beş yüzey kademesi, sıcak kağıt/soğuk mürekkep aydınlık tema, bordo birincil vurgu, tek tip tür etiketi, 52 px zebra tablo ve özel seçim kutusu.
 - Yerel model artık raf fotoğraflarını okuyabiliyor: istek bağlamı büyütüldü, düşünme adımı kapatıldı ve yanıt iki alandan da çözümleniyor; önceden yalnız tek kitabın karşıdan çekildiği kare çalışıyordu. Aynı anda birden çok fotoğraf sıraya alınıp sırayla işlenebiliyor.
@@ -204,6 +204,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Tarayıcıda ölçüldü: `--accent` #0F7E74 üzerinde beyaz metin 4,93:1, `--accent-mark` #16A398 satır zeminine karşı 3,04:1 (grafik öğe eşiği), başlık çubuğu ve seçim kutusu dolgusu işaret tonunda, tabloda "→" içeren hızlı eylem düğmesi kalmadı. Koyu temanın görünümü değişmedi.
   - **Bilinen sınır:** Satır çubuğu durum rengini koruyor; spesifikasyondaki liste onu da işaret tonuna alıyordu ama bu satırdaki durum kodlamasını kaldıracaktı, kullanıcı mevcut hâlin kalmasını seçti.
   - **Kullanıcı kontrolü:** Aydınlık temada turkuazın butonlarda koyu, işaretlerde parlak olduğunu; satır üzerine gelince yalnız zeminin değiştiğini doğrulayın.
+- **IMP-036 — Aydınlık temada vurgu lacivert**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** çalışma ağacında.
+  - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Tarayıcıda ölçüldü: `--accent` #1E3A6E, ekleme düğmesinde beyaz metin 11,14:1; `--accent-mark` artık tanımsız; simge kutusu vurgu renginde; "Okunacak" rozeti açık zeminli/kenarlıklı ve 5,78:1, "Okundu" 5,12:1, "Satın Alınacak" 8,35:1. Koyu temanın görünümü değişmedi.
+  - **Bilinen sınır:** Tablo satırlarının solundaki dikey çubuk, spesifikasyonun listesinde `--accent` altında sayılmasına rağmen durum rengini korudu — bir önceki turda kullanıcı bu maddede durum kodlamasının kalmasına karar vermişti.
+  - **Kullanıcı kontrolü:** Aydınlık temada vurgunun lacivert olduğunu, "Okunacak" rozetinin vurgudan ayırt edilebildiğini ve koyu temanın değişmediğini doğrulayın.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:

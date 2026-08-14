@@ -284,3 +284,11 @@
 - **Sorumlu:** Claude
 - **Son Güncelleme:** 2026-08-14
 - **Öneri:** `[Model: Claude Opus 5]` `docs/design/turkuaz-tonu.md` uyarınca aydınlık temada vurgu iki tona ayrıldı: beyaz metin taşıyan yüzeyler `--accent` (#0F7E74, ölçülen 4,93:1), metin taşımayan işaretler yeni `--accent-mark` (#16A398, grafik öğe olarak 3,04:1). İşaret tonu şu yerlere uygulandı: bölüm başlığı çubukları, aktif filtrenin sol çubuğu, seçim kutusunun işaretli dolgusu, odak halkası, aktif sıralama oku, üst bardaki aktif bölüm ve görünüm düğmesi. Karanlık temaya dokunulmadı; orada `--accent-mark` vurguyla aynı değerde tanımlandı, böylece sınıflar iki temada da çalışıyor. Tablo satırlarının solundaki dikey çubuk kullanıcı kararıyla durum rengini korudu — turkuaza çevrilseydi satırdaki durum kodlaması kalkacaktı. İkinci iş: satır hover'ında beliren hızlı durum değiştirme düğmesi ("→ Okundu ✓") ekrana sığmayıp kırpıldığı için kaldırıldı; `NEXT_STATUS`/`NEXT_LABEL` eşlemeleri, eylem hücresi, karşılığı olan boş başlık sütunu ve tıklama işleyicisi temizlendi, `colSpan` değerleri düzeltildi. Hover artık yalnız zemin değişimi. Durum değiştirme toplu seçim çubuğundan ve detay görünümünden sürüyor.
+
+### IMP-036 — Aydınlık temada vurgu lacivert
+
+- **Öncelik:** P2
+- **Durum:** Uygulandı · Kontrol Bekliyor
+- **Sorumlu:** Claude
+- **Son Güncelleme:** 2026-08-14
+- **Öneri:** `[Model: Claude Opus 5]` `docs/design/lacivert-vurgu.md` uyarınca aydınlık temada vurgu turkuazdan lacivere geçti: `--accent` #1E3A6E, `--accent-hot` #162C55, `--accent-soft` rgba(30,58,110,0.12). Bir önceki turda eklenen `--accent-mark` token'ı tamamen kaldırıldı — lacivert beyaz metinle zaten yüksek kontrast verdiği için ikili ton ayrımına gerek kalmadı; kullandığı yerler (bölüm başlığı çubukları, aktif filtre çubuğu, seçim kutusu dolgusu, odak halkası, sıralama oku, aktif görünüm düğmesi) `--accent`e döndü. Lacivert vurgu ile "Okunacak" durumu (`--glow`) aynı aileden geldiği için rozet aydınlık temada dolgusuz hâle getirildi: açık zemin (`--glow-soft`), kenarlık (`--glow-line`) ve renkli yazı. Karanlık temada vurgu bordo olduğu için çakışma yok, rozet orada dolgulu kaldı. Uygulama simgesi aydınlık temada artık `--accent` üzerinden besleniyor (önceden ayrı `--navy` token'ı kullanıyordu); karanlıkta bordo tonunda kalmaya devam ediyor.

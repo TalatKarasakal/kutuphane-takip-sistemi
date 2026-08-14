@@ -19,7 +19,8 @@ export const MEDIA_STATUSES: {
     label: "İzlenecek",
     tone: {
       dot: "bg-glow",
-      badge: "border-glow bg-glow text-white",
+      badge:
+        "border-glow-line bg-glow-soft text-glow dark:border-glow dark:bg-glow dark:text-white",
     },
   },
 ];

@@ -580,9 +580,9 @@ function ThSort({
         {label}
         {active ? (
           sortDir === "asc" ? (
-            <ArrowUp size={12} className="text-accent-mark" />
+            <ArrowUp size={12} className="text-accent" />
           ) : (
-            <ArrowDown size={12} className="text-accent-mark" />
+            <ArrowDown size={12} className="text-accent" />
           )
         ) : (
           <ArrowUpDown size={12} className="opacity-40" />

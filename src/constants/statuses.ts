@@ -15,6 +15,10 @@ export interface StatusTone {
    * "Satın Alınacak" yalnız kenarlıklıdır — bordo dolgu, karanlık temada
    * birincil eylem düğmesiyle yarışıyor.
    *
+   * "Okunacak" aydınlık temada dolgusuzdur: orada vurgu lacivert olduğu için
+   * dolgulu mavi rozet vurguyla karışıyordu; karanlıkta vurgu bordo olduğundan
+   * dolgulu kalabiliyor.
+   *
    * Dolgulu rozetlerde yazı rengi zemine göre seçilir: aydınlık temanın koyu
    * dolgularında beyaz, karanlık temanın parlak yeşilinde koyu mürekkep
    * (beyaz orada 2,8:1'de kalıyor). "Satın Alınacak" karanlık temada dolgusuz
@@ -42,7 +46,8 @@ export const STATUSES: {
     label: "Okunacak",
     tone: {
       dot: "bg-glow",
-      badge: "border-glow bg-glow text-white",
+      badge:
+        "border-glow-line bg-glow-soft text-glow dark:border-glow dark:bg-glow dark:text-white",
     },
   },
   {
