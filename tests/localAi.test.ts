@@ -1,12 +1,16 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRequire } from "node:module";
 import { aiReadiness } from "../src/lib/ai/provider";
 import { useSettings } from "../src/store/settingsStore";
 import { DEFAULT_SETTINGS } from "../src/types/book";
 
 const require = createRequire(import.meta.url);
-const { loopbackOrigin } = require("../electron/ai.cjs") as {
+const { loopbackOrigin, registerAiIpc } = require("../electron/ai.cjs") as {
   loopbackOrigin: (raw: unknown) => string | null;
+  registerAiIpc: (deps: {
+    handle: (channel: string, fn: (payload: unknown) => unknown) => void;
+    getApiKey: () => string;
+  }) => void;
 };
 
 afterEach(() => {
@@ -43,6 +47,94 @@ describe("yerel model adresi", () => {
     ]) {
       expect(loopbackOrigin(raw)).toBeNull();
     }
+  });
+});
+
+/** Kayıtlı IPC işleyicilerini toplayıp `ai:detectBooks`i doğrudan çağırır. */
+function detectBooksHandler() {
+  const handlers = new Map<string, (payload: unknown) => unknown>();
+  registerAiIpc({
+    handle: (channel, fn) => handlers.set(channel, fn),
+    getApiKey: () => "",
+  });
+  return handlers.get("ai:detectBooks")!;
+}
+
+/** Ollama'yı taklit eder; /api/show yeteneği ve /api/chat yanıtı ayarlanabilir. */
+function fakeOllama({
+  capabilities,
+  message,
+}: {
+  capabilities: string[];
+  message: Record<string, string>;
+}) {
+  const chatBodies: Record<string, unknown>[] = [];
+  const fetchMock = vi.fn(async (url: string, init?: { body?: string }) => {
+    if (String(url).endsWith("/api/show"))
+      return new Response(JSON.stringify({ capabilities }), { status: 200 });
+    chatBodies.push(JSON.parse(init?.body ?? "{}"));
+    return new Response(JSON.stringify({ message }), { status: 200 });
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  return { chatBodies };
+}
+
+const localPayload = (localModel: string) => ({
+  provider: "local",
+  localUrl: "http://127.0.0.1:11434",
+  localModel,
+  // Ağ zenginleştirmesi bu testin konusu değil; atlanması için kapatılır.
+  allowNetwork: false,
+  imageBase64: "AAAA",
+  mimeType: "image/jpeg",
+});
+
+describe("yerel model isteği", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("bağlamı büyütür ve düşünmeyi destekleyen modelde kapatır", async () => {
+    const { chatBodies } = fakeOllama({
+      capabilities: ["vision", "thinking"],
+      message: { content: JSON.stringify({ items: [{ title: "Devlet" }] }) },
+    });
+
+    const result = (await detectBooksHandler()(
+      localPayload("dusunen-model"),
+    )) as { ok: boolean; books: { title: string }[] };
+
+    expect(result.ok).toBe(true);
+    expect(result.books.map((b) => b.title)).toEqual(["Devlet"]);
+    // Ollama varsayılanı (4096) raf fotoğrafına yetmiyordu; taşınca yanıt boş dönüyordu.
+    expect(chatBodies[0].options).toMatchObject({ num_ctx: 8192 });
+    expect(chatBodies[0].think).toBe(false);
+  });
+
+  it("düşünmeyi desteklemeyen modele think alanı göndermez", async () => {
+    const { chatBodies } = fakeOllama({
+      capabilities: ["vision"],
+      message: { content: JSON.stringify({ items: [{ title: "Hamlet" }] }) },
+    });
+
+    await detectBooksHandler()(localPayload("dusunmeyen-model"));
+
+    expect(chatBodies[0]).not.toHaveProperty("think");
+  });
+
+  it("yanıtı thinking alanına yazan modeli de çözümler", async () => {
+    fakeOllama({
+      capabilities: ["vision", "thinking"],
+      message: {
+        content: "",
+        thinking: JSON.stringify({ items: [{ title: "Odysseia" }] }),
+      },
+    });
+
+    const result = (await detectBooksHandler()(
+      localPayload("thinking-yazan-model"),
+    )) as { ok: boolean; books: { title: string }[] };
+
+    expect(result.ok).toBe(true);
+    expect(result.books.map((b) => b.title)).toEqual(["Odysseia"]);
   });
 });
 

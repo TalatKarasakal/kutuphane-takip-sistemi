@@ -6,13 +6,13 @@
 
 | Alan | Durum |
 |---|---|
-| Son güncelleme | 2026-08-13 |
+| Son güncelleme | 2026-08-14 |
 | Sıradaki iş | ISS-001 için Developer ID/notarization ve Windows imza anahtarlarıyla dış doğrulama |
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
-| Kontrol bekleyen çözüm | 26 |
-| Geliştirme fikri | 27 |
+| Kontrol bekleyen çözüm | 27 |
+| Geliştirme fikri | 28 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -34,6 +34,7 @@
 - Fotoğraftan ekleme kitapların yanı sıra film ve dizilerde de çalışıyor; künye modelden gelir ve gözden geçirme tablosunda onaylanır.
 - Fotoğraftan ekleme bulut yerine bu bilgisayardaki bir modelle de çalışabiliyor; yerel sağlayıcı çevrimdışı modda da kullanılabiliyor ve yalnız loopback adreslerine bağlanıyor.
 - Algılama arka planda sürüyor: diyalog kapatılınca iş devam ediyor, üst çubuktaki gösterge işi izliyor ve sonuç hazır olunca gözden geçirme listesine dönülüyor.
+- Yerel model artık raf fotoğraflarını okuyabiliyor: istek bağlamı büyütüldü, düşünme adımı kapatıldı ve yanıt iki alandan da çözümleniyor; önceden yalnız tek kitabın karşıdan çekildiği kare çalışıyordu. Aynı anda birden çok fotoğraf sıraya alınıp sırayla işlenebiliyor.
 - Bütün ekranlar Electron'da açık/koyu tema ve dar pencerede tarandı; konsol hatası yok. Kart başlıklarını örten onay kutusu, koyu temada açık kalan tarayıcı denetimleri ve iki satıra taşan durum rozetleri düzeltildi.
 - Tarayıcı ve Electron kontrollerinde kitap/medya CRUD, boş yazarın `Bilinmiyor` olması, mükerrer birleştirme, ödünç/iade, komut paleti ve yedek geri yükleme doğrulandı.
 - Gerçek Developer ID/notarization ve Windows imzası, imza anahtarları bekleyen tek dış doğrulama olarak açık.
@@ -149,6 +150,13 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Doğrulama:** macOS Universal `.app` ve DMG üretildi, açılışı ve `codesign --verify --deep --strict` doğrulandı. Windows NSIS kurulumu macOS üzerinde üretildi; `.exe` kaynakları (ProductName, CompanyName, FileVersion, 7 boyutlu simge) ve `app.asar` içeriği doğrulandı.
   - **Bilinen sınır:** DMG içindeki paket ASCII adla kalır (DMG adımı yeniden adlandırmayı kaldırmıyor); sürükleyip bıraktıktan sonra Finder'da yeniden adlandırmak ya da `scripts/install-mac.sh` kullanmak gerekir. Windows kurulumu gerçek bir Windows makinesinde çalıştırılarak denenmedi; yalnız üretilen dosyanın içeriği doğrulandı. Developer ID/notarization ve Windows kod imzası hâlâ anahtar bekliyor.
   - **Kullanıcı kontrolü:** DMG'den kurup uygulamanın açıldığını ve Dock'ta "Kütüphanem" yazdığını; Windows'ta kurulumun tamamlandığını, kısayolun "Kütüphanem" adıyla ve yeni simgeyle göründüğünü kontrol edin.
+- **IMP-028 — Yerel modelin raf fotoğraflarını okuması ve fotoğraf sırası**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** çalışma ağacında.
+  - **Doğrulama:** 46 unit/component testi (bağlam büyütme, `think` yeteneğine göre gönderim, `thinking` alanından çözümleme, sıra birikimi, fotoğraflar arası mükerrer, düşen fotoğrafın sırayı durdurmaması dâhil), typecheck, ESLint, Prettier ve build başarılı. `electron/ai.cjs` gerçek Ollama ve `~/Documents/Kütüphane` altındaki gerçek fotoğraflarla uçtan uca çalıştırıldı: düzeltmeden önce raf fotoğraflarının tamamı boş yanıt döndürüyordu, sonrasında denenen 9 fotoğrafın 9'u okundu. Ölçüt konulan dört fotoğrafta 37 kitaptan 34'ü doğru, uydurma yok. Sıra akışı tarayıcıda üç fotoğrafla sürülüp doğrulandı: ilerleme çubuğu, kaynak dosya adları, fotoğraflar arası mükerrer işareti ve toplu ekleme sayacı çalışıyor; konsol hatası yok.
+  - **Model karşılaştırması:** `qwen3-vl:8b` kurulup aynı ölçütte denendi ve kullanıcının kurulu `qwen3.5:9b` modelinden geride kaldı (Türkçe karakterlerde ve kapsamda). Model değiştirilmedi; `qwen3.5:9b` öneri olarak kalıyor.
+  - **Bilinen sınır:** Yerel modelde her fotoğraf yaklaşık 30–100 saniye sürüyor, sıra bu süreleri toplar. OCR hataları (harf sapmaları) sürüyor; gözden geçirme tablosu bunun için var.
+  - **Kullanıcı kontrolü:** Fotoğraftan ekleme penceresinden birden çok raf fotoğrafı seçip sıranın ilerlediğini, sonuçların tek listede toplandığını ve satırlarda kaynak fotoğraf adının göründüğünü kontrol edin.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:

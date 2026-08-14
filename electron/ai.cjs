@@ -14,6 +14,20 @@ const DETECT_PROMPT = [
   "Aynı kitabı iki kez yazma.",
 ].join(" ");
 
+/**
+ * Yerel modeller için ayrı istem. Küçük modeller "kitabı tanı" gibi bilgiye
+ * dayanan yönergelerde uydurmaya kayıyor; sırttaki metni okumaya odaklanan bu
+ * sürüm ölçümde uydurmayı sıfırlayıp isabeti belirgin biçimde artırdı.
+ */
+const LOCAL_DETECT_PROMPT = [
+  "Bu fotoğraftaki kitapları, üzerlerinde YAZAN metni okuyarak listele.",
+  "Raf ya da yığın fotoğrafıysa her kitap sırtını sırayla tek tek oku; tek bir kapak fotoğrafıysa yalnız o kitabı yaz.",
+  "Sırtta/kapakta yazan eser adını title, yazar adını author alanına yaz.",
+  "Yalnızca gerçekten okuyabildiğin metni yaz; tahmin etme, uydurma, tamamlama yapma.",
+  "Türkçe harfleri (ç ğ ı İ ö ş ü â) olduğu gibi koru.",
+  "Yayınevi adı, seri adı (örn. Klasikler Dizisi) ve cilt/roma numaraları başlık değildir; bunları atla.",
+].join(" ");
+
 const RESPONSE_SCHEMA = {
   type: "ARRAY",
   items: {
@@ -123,6 +137,47 @@ function loopbackOrigin(raw) {
 // Yerel modeller bulut kadar hızlı değil; ilk yüklemede dakikalar sürebiliyor.
 const LOCAL_TIMEOUT_MS = 240_000;
 
+/**
+ * Ollama'nın varsayılan bağlamı (4096) bir raf fotoğrafına yetmiyor: görselin
+ * token'ları tek başına ~2000, istem ve düşünme adımı da eklenince pencere
+ * taşıyor ve model boş yanıt döndürüyordu — kullanıcı tarafında bu "fotoğrafta
+ * kitap algılanamadı" olarak görünüyor. 8192 ölçümde tüm örnek raflara yetti.
+ */
+const LOCAL_NUM_CTX = 8192;
+
+/**
+ * Model yeteneklerini (`vision`, `thinking`) önbellekli olarak sorar.
+ * `think` alanı desteklemeyen bir modele gönderilirse Ollama isteği reddettiği
+ * için, göndermeden önce yeteneğe bakmak gerekiyor.
+ */
+const capabilityCache = new Map();
+
+async function modelCapabilities(origin, model) {
+  const key = `${origin}|${model}`;
+  const cached = capabilityCache.get(key);
+  if (cached) return cached;
+  let caps = [];
+  try {
+    const res = await fetchWithTimeout(
+      `${origin}/api/show`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model }),
+      },
+      10_000,
+    );
+    if (res.ok) {
+      const json = await res.json();
+      if (Array.isArray(json?.capabilities)) caps = json.capabilities;
+    }
+  } catch {
+    /* en iyi çaba: yetenek okunamazsa varsayılan (think göndermeden) devam */
+  }
+  capabilityCache.set(key, caps);
+  return caps;
+}
+
 function localErrorMessage(status, bodyText) {
   if (status === 404)
     return "Model bulunamadı. Ayarlar → Yapay Zekâ bölümünden kurulu bir model seç.";
@@ -133,13 +188,17 @@ function localErrorMessage(status, bodyText) {
 
 /** Yerel Ollama sunucusundan şemaya uygun nesne dizisi ister. */
 async function detectWithOllama(origin, model, imageBase64, prompt, schema) {
+  const caps = await modelCapabilities(origin, model);
   const body = {
     model,
     messages: [{ role: "user", content: prompt, images: [imageBase64] }],
     format: schema,
     stream: false,
-    options: { temperature: 0.1 },
+    options: { temperature: 0, num_ctx: LOCAL_NUM_CTX },
   };
+  // Düşünme adımı burada işe yaramıyor, bağlamı ve süreyi yiyor; destekleyen
+  // modellerde kapatılır. Desteklemeyen modelde alan gönderilmez.
+  if (caps.includes("thinking")) body.think = false;
 
   let res;
   try {
@@ -168,12 +227,15 @@ async function detectWithOllama(origin, model, imageBase64, prompt, schema) {
   }
 
   const json = await res.json();
-  const parsed = safeParseJsonArray(json?.message?.content ?? "");
-  if (!parsed)
-    throw new Error(
-      "Yerel modelin yanıtı çözümlenemedi. Görsel desteği olan bir model seçtiğinden emin ol.",
-    );
-  return parsed;
+  // Bazı modeller (ör. qwen3-vl) think:false altında yanıtı `content` yerine
+  // `thinking` alanına yazıyor; ikisini de denemek gerekiyor.
+  for (const field of [json?.message?.content, json?.message?.thinking]) {
+    const parsed = safeParseJsonArray(field ?? "");
+    if (parsed) return parsed;
+  }
+  throw new Error(
+    "Yerel modelin yanıtı çözümlenemedi. Görsel desteği olan bir model seçtiğinden emin ol.",
+  );
 }
 
 /** Kurulu yerel modelleri, görsel desteği bilgisiyle listeler. */
@@ -302,38 +364,52 @@ async function detectWithGemini(apiKey, imageBase64, mimeType, prompt, schema) {
  * Seçili sağlayıcıya göre görseli çözümler. Sağlayıcı ne olursa olsun geriye
  * aynı biçimde ham nesne dizisi döner; eşleme çağıran tarafta yapılır.
  */
-function detectWithProvider(provider, imageBase64, mimeType, prompt, schemas) {
+function detectWithProvider(provider, imageBase64, mimeType, prompts, schemas) {
   if (provider.kind === "local")
     return detectWithOllama(
       provider.origin,
       provider.model,
       imageBase64,
-      prompt,
+      prompts.local ?? prompts.gemini,
       schemas.local,
     );
   return detectWithGemini(
     provider.apiKey,
     imageBase64,
     mimeType,
-    prompt,
+    prompts.gemini,
     schemas.gemini,
   );
 }
 
 function detectBooks(provider, imageBase64, mimeType) {
-  return detectWithProvider(provider, imageBase64, mimeType, DETECT_PROMPT, {
-    gemini: RESPONSE_SCHEMA,
-    local: BOOK_LOCAL_SCHEMA,
-  }).then((parsed) =>
+  return detectWithProvider(
+    provider,
+    imageBase64,
+    mimeType,
+    { gemini: DETECT_PROMPT, local: LOCAL_DETECT_PROMPT },
+    { gemini: RESPONSE_SCHEMA, local: BOOK_LOCAL_SCHEMA },
+  ).then((parsed) =>
     parsed
       .map((b) => ({
-        title: String(b?.title ?? "").trim(),
-        author: String(b?.author ?? "").trim(),
+        title: cleanText(b?.title),
+        author: cleanText(b?.author),
         confidence:
           typeof b?.confidence === "number" ? b.confidence : undefined,
       }))
       .filter((b) => b.title.length > 0),
   );
+}
+
+/**
+ * Modelin metnini tek satıra indirger. Çok satırlı kitap sırtlarında modeller
+ * satır sonlarını olduğu gibi aktarabiliyor; bu hâliyle başlık alanına yazılsa
+ * listede ve aramada bozuk görünürdü.
+ */
+function cleanText(value) {
+  return String(value ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** Sayısal alanı yalnız makul aralıktaysa kabul eder; aksi halde boş bırakır. */
@@ -350,15 +426,15 @@ function detectMedia(provider, imageBase64, mimeType, kind) {
     provider,
     imageBase64,
     mimeType,
-    mediaDetectPrompt(kind),
+    { gemini: mediaDetectPrompt(kind) },
     { gemini: MEDIA_RESPONSE_SCHEMA, local: MEDIA_LOCAL_SCHEMA },
   ).then((parsed) =>
     parsed
       .map((item) => ({
-        title: String(item?.title ?? "").trim(),
+        title: cleanText(item?.title),
         type: kind,
-        director: String(item?.director ?? "").trim(),
-        genre: String(item?.genre ?? "").trim(),
+        director: cleanText(item?.director),
+        genre: cleanText(item?.genre),
         releaseYear: boundedInt(item?.releaseYear, 1888, nextYear),
         duration:
           kind === "film" ? boundedInt(item?.duration, 1, 2000) : undefined,

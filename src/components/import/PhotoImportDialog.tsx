@@ -36,21 +36,21 @@ const COPY: Record<
 > = {
   books: {
     title: "Fotoğraftan Kitap Ekle",
-    dropTitle: "Kitap fotoğrafı seç ya da buraya sürükle-bırak",
+    dropTitle: "Kitap fotoğraflarını seç ya da buraya sürükle-bırak",
     dropHint:
-      ".jpg · .png · .webp — raftaki sırtların/kapakların net göründüğü bir fotoğraf en iyi sonucu verir",
+      ".jpg · .png · .webp — birden çok fotoğraf seçebilirsin, sırayla işlenir. Sırtların/kapakların net göründüğü fotoğraflar en iyi sonucu verir",
   },
   movies: {
     title: "Fotoğraftan Film Ekle",
-    dropTitle: "Film fotoğrafı seç ya da buraya sürükle-bırak",
+    dropTitle: "Film fotoğraflarını seç ya da buraya sürükle-bırak",
     dropHint:
-      ".jpg · .png · .webp — afiş, DVD/Blu-ray kapağı ya da yayın listesi ekran görüntüsü kullanabilirsin",
+      ".jpg · .png · .webp — birden çok fotoğraf seçebilirsin, sırayla işlenir. Afiş, DVD/Blu-ray kapağı ya da yayın listesi ekran görüntüsü kullanabilirsin",
   },
   tv: {
     title: "Fotoğraftan Dizi Ekle",
-    dropTitle: "Dizi fotoğrafı seç ya da buraya sürükle-bırak",
+    dropTitle: "Dizi fotoğraflarını seç ya da buraya sürükle-bırak",
     dropHint:
-      ".jpg · .png · .webp — afiş, kutu kapağı ya da yayın listesi ekran görüntüsü kullanabilirsin",
+      ".jpg · .png · .webp — birden çok fotoğraf seçebilirsin, sırayla işlenir. Afiş, kutu kapağı ya da yayın listesi ekran görüntüsü kullanabilirsin",
   },
 };
 
@@ -66,6 +66,8 @@ export function PhotoImportDialog({ onOpenSettings }: Props) {
     section,
     step,
     fileName,
+    queueTotal,
+    queueDone,
     error,
     notice,
     bookRows,
@@ -160,7 +162,16 @@ export function PhotoImportDialog({ onOpenSettings }: Props) {
       open={open}
       onClose={close}
       size="xl"
-      title={copy.title + (fileName && step !== "pick" ? ` · ${fileName}` : "")}
+      title={
+        copy.title +
+        (step === "pick"
+          ? ""
+          : queueTotal > 1
+            ? ` · ${queueTotal} fotoğraf`
+            : fileName
+              ? ` · ${fileName}`
+              : "")
+      }
       footer={
         step === "review" ? (
           <>
@@ -221,7 +232,7 @@ export function PhotoImportDialog({ onOpenSettings }: Props) {
               ? "Yapay zekâ kitapları tanır, künyeyi (yayınevi, sayfa, kapak) Google Books'tan tamamlar; eklemeden önce listeyi gözden geçirip onaylarsın."
               : "Yapay zekâ yapımları tanır ve bildiği künyeyi (yönetmen, yıl, tür) doldurur; eklemeden önce listeyi gözden geçirip onaylarsın."
           }
-          onFile={(file) => void start(file, section)}
+          onFiles={(files) => void start(files, section)}
           onOpenSettings={() => {
             close();
             onOpenSettings();
@@ -232,6 +243,10 @@ export function PhotoImportDialog({ onOpenSettings }: Props) {
         <DetectingStep
           isBooks={isBooks}
           local={readiness?.provider === "local"}
+          fileName={fileName}
+          queueTotal={queueTotal}
+          queueDone={queueDone}
+          found={isBooks ? bookRows.length : mediaRows.length}
         />
       )}
       {step === "review" &&
@@ -260,7 +275,7 @@ function PickStep({
   dropTitle,
   dropHint,
   enrichHint,
-  onFile,
+  onFiles,
   onOpenSettings,
 }: {
   readiness: AiReadiness | null;
@@ -269,7 +284,7 @@ function PickStep({
   dropTitle: string;
   dropHint: string;
   enrichHint: string;
-  onFile: (f: File) => void;
+  onFiles: (files: File[]) => void;
   onOpenSettings: () => void;
 }) {
   const [dragging, setDragging] = useState(false);
@@ -330,8 +345,8 @@ function PickStep({
           e.preventDefault();
           e.stopPropagation();
           setDragging(false);
-          const f = e.dataTransfer.files?.[0];
-          if (f) onFile(f);
+          const files = Array.from(e.dataTransfer.files ?? []);
+          if (files.length) onFiles(files);
         }}
       >
         <ImagePlus size={28} className="mx-auto mb-3 text-primary" />
@@ -339,11 +354,12 @@ function PickStep({
         <div className="text-sm text-muted mb-4">{dropHint}</div>
         <input
           type="file"
+          multiple
           accept="image/png,image/jpeg,image/webp"
           className="hidden"
           onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) onFile(f);
+            const files = Array.from(e.target.files ?? []);
+            if (files.length) onFiles(files);
             e.target.value = "";
           }}
         />
@@ -362,18 +378,52 @@ function PickStep({
 function DetectingStep({
   isBooks,
   local,
+  fileName,
+  queueTotal,
+  queueDone,
+  found,
 }: {
   isBooks: boolean;
   local: boolean;
+  fileName: string;
+  queueTotal: number;
+  queueDone: number;
+  found: number;
 }) {
+  const multiple = queueTotal > 1;
   return (
     <div className="py-16 text-center">
       <Loader2 size={32} className="mx-auto mb-4 text-primary animate-spin" />
-      <div className="font-medium mb-1">Fotoğraf inceleniyor…</div>
-      <div className="text-sm text-muted">
+      <div className="font-medium mb-1">
+        {multiple
+          ? `Fotoğraf ${queueDone + 1} / ${queueTotal} inceleniyor…`
+          : "Fotoğraf inceleniyor…"}
+      </div>
+      {multiple && (
+        <>
+          <div
+            className="mx-auto mt-3 mb-3 h-1.5 w-64 overflow-hidden rounded-full bg-surface2"
+            role="progressbar"
+            aria-valuenow={queueDone}
+            aria-valuemin={0}
+            aria-valuemax={queueTotal}
+            aria-label="Fotoğraf sırası ilerlemesi"
+          >
+            <div
+              className="h-full bg-primary transition-[width] duration-300"
+              style={{ width: `${(queueDone / queueTotal) * 100}%` }}
+            />
+          </div>
+          <div className="text-sm text-muted truncate px-4">
+            {fileName}
+            {found > 0 && ` · şu ana dek ${found} kayıt bulundu`}
+          </div>
+        </>
+      )}
+      <div className="text-sm text-muted mt-2">
         {isBooks ? "Kitaplar" : "Yapımlar"} tanınıyor ve künyeleri tamamlanıyor.{" "}
         {local
-          ? "Yerel model kullanılıyor; ilk çalıştırmada model belleğe yüklenirken birkaç dakika sürebilir."
+          ? "Yerel model kullanılıyor; her fotoğraf yaklaşık yarım dakika sürebilir, ilk çalıştırmada model belleğe yüklenirken daha uzun."
           : "Bu birkaç saniye sürebilir."}
       </div>
       <div className="text-sm text-muted mt-3">
@@ -428,6 +478,8 @@ function BookReviewStep({
   onPatch: (rid: string, patch: Partial<BookRow>) => void;
   onApplyAll: (status: BookStatus) => void;
 }) {
+  // Kaynak fotoğraf yalnız birden çok fotoğraf işlendiyse anlamlı bir bilgi.
+  const multiSource = new Set(rows.map((r) => r.source)).size > 1;
   return (
     <ReviewShell
       selectedCount={rows.filter((r) => r.include && r.title.trim()).length}
@@ -508,6 +560,11 @@ function BookReviewStep({
                       {r.publicationYear}
                     </span>
                   )}
+                  {multiSource && r.source && (
+                    <span className="text-[11px] text-muted truncate max-w-[10rem]">
+                      {r.source}
+                    </span>
+                  )}
                 </div>
               </td>
               <td className="px-3 py-2">
@@ -568,6 +625,7 @@ function MediaReviewStep({
   onPatch: (rid: string, patch: Partial<MediaRow>) => void;
   onApplyAll: (status: MediaStatus) => void;
 }) {
+  const multiSource = new Set(rows.map((r) => r.source)).size > 1;
   return (
     <ReviewShell
       selectedCount={rows.filter((r) => r.include && r.title.trim()).length}
@@ -634,6 +692,11 @@ function MediaReviewStep({
                   {type === "dizi" && r.seasons && (
                     <span className="text-[11px] text-muted">
                       {r.seasons} sezon
+                    </span>
+                  )}
+                  {multiSource && r.source && (
+                    <span className="text-[11px] text-muted truncate max-w-[10rem]">
+                      {r.source}
                     </span>
                   )}
                 </div>
