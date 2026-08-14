@@ -185,8 +185,8 @@ export function BookList({ onOpen }: Props) {
         : view === "card"
           ? 320
           : density === "compact"
-            ? 38
-            : 48,
+            ? 52
+            : 56,
     getItemKey: (index) => virtualRows[index]?.key ?? index,
     overscan: 8,
   });
@@ -211,13 +211,13 @@ export function BookList({ onOpen }: Props) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center p-10">
-          <div className="w-14 h-14 mx-auto rounded-full bg-primary/15 text-primary-ink flex items-center justify-center mb-4">
+          <div className="w-14 h-14 mx-auto rounded-full bg-accent-soft text-accent flex items-center justify-center mb-4">
             {isFiltered ? <SearchX size={24} /> : <BookOpen size={24} />}
           </div>
           <h3 className="font-semibold mb-1">
             {isFiltered ? "Sonuç bulunamadı" : "Henüz kitap yok"}
           </h3>
-          <p className="text-sm text-muted max-w-xs">
+          <p className="text-sm text-mute max-w-xs">
             {isFiltered
               ? "Arama veya filtrelerle eşleşen kitap yok."
               : "Sağ üstten kitap ekleyebilir, Excel/CSV/JSON dosyasından içe aktarabilirsin."}
@@ -302,12 +302,13 @@ export function BookList({ onOpen }: Props) {
       ) : (
         <div className="p-5">
           <div className="card overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-surface2 text-muted text-xs uppercase tracking-wider border-b border-border">
+            <table className="w-full table-fixed text-sm">
+              <thead className="sticky top-0 z-10 bg-panel text-mute text-xs uppercase tracking-wider border-b border-line-strong">
                 <tr>
                   <th className="w-10 px-3 py-3.5 text-left">
                     <input
                       type="checkbox"
+                      className="row-check"
                       aria-label="Gösterilen kitapların tümünü seç"
                       checked={allSelected}
                       onChange={() =>
@@ -330,7 +331,7 @@ export function BookList({ onOpen }: Props) {
                           ? "right"
                           : undefined
                       }
-                      width={NARROW_COLS[col.key]}
+                      width={COL_WIDTH[col.key]}
                     />
                   ))}
                   <th className="w-12" />
@@ -356,7 +357,7 @@ export function BookList({ onOpen }: Props) {
                       >
                         <td
                           colSpan={visibleCols.length + 2}
-                          className="bg-surface2/70 px-3 py-2"
+                          className="bg-hover/70 px-3 py-2"
                         >
                           <TagGroupHeader
                             label={unit.label}
@@ -375,7 +376,8 @@ export function BookList({ onOpen }: Props) {
                       data-index={virtualRow.index}
                       tabIndex={0}
                       className={cn(
-                        "group border-t border-border/50 hover:bg-primary/5 cursor-pointer transition-colors",
+                        "group cursor-pointer border-b border-line transition-colors hover:bg-hover",
+                        virtualRow.index % 2 === 0 ? "bg-row" : "bg-row-alt",
                         density === "compact" ? "text-[13px]" : "",
                       )}
                       onClick={() => onOpen(b)}
@@ -392,6 +394,7 @@ export function BookList({ onOpen }: Props) {
                       >
                         <input
                           type="checkbox"
+                          className="row-check"
                           aria-label={`${b.title} seç`}
                           checked={selectedIds.has(b.id)}
                           onChange={() => toggleSelect(b.id)}
@@ -403,7 +406,7 @@ export function BookList({ onOpen }: Props) {
                       <td className="pr-3" onClick={(e) => e.stopPropagation()}>
                         {NEXT_STATUS[b.status] && (
                           <button
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-lg bg-surface2 hover:bg-primary/15 hover:text-primary-ink whitespace-nowrap"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-lg bg-hover hover:bg-accent-soft hover:text-accent whitespace-nowrap"
                             onClick={() =>
                               setStatus([b.id], NEXT_STATUS[b.status]!)
                             }
@@ -432,7 +435,7 @@ export function BookList({ onOpen }: Props) {
               </tbody>
             </table>
           </div>
-          <div className="mt-2 text-xs text-muted">
+          <div className="mt-2 text-xs text-mute">
             {filtered.length} kitap gösteriliyor
           </div>
         </div>
@@ -446,7 +449,7 @@ export function BookList({ onOpen }: Props) {
   );
 }
 
-const EMPTY = <span className="text-muted/30 select-none">—</span>;
+const EMPTY = <span className="text-mute select-none">—</span>;
 
 function TagGroupHeader({
   label,
@@ -458,9 +461,9 @@ function TagGroupHeader({
   count: number;
 }) {
   return (
-    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
+    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-mute">
       <span
-        className="h-2.5 w-2.5 rounded-full border border-border"
+        className="h-2.5 w-2.5 rounded-full border border-line"
         style={{ backgroundColor: color ?? "transparent" }}
       />
       <span>{label}</span>
@@ -482,20 +485,28 @@ function renderCell(b: Book, key: string, density: string) {
                 STATUS_TONE[b.status].dot,
               )}
             />
-            {b.title}
+            <span className="truncate" title={b.title}>
+              {b.title}
+            </span>
           </div>
         </td>
       );
     case "author":
       return (
         <td key={key} className={cn("px-4", py)}>
-          {b.author || EMPTY}
+          <span className="block truncate" title={b.author || undefined}>
+            {b.author || EMPTY}
+          </span>
         </td>
       );
+    // Yayınevi iki satıra sarıp satırı şişiriyordu; tek satırda kesilir,
+    // tam adı ipucunda kalır.
     case "publisher":
       return (
-        <td key={key} className={cn("px-4", py, "text-muted")}>
-          {b.publisher || EMPTY}
+        <td key={key} className={cn("px-4", py, "text-mute")}>
+          <span className="block truncate" title={b.publisher || undefined}>
+            {b.publisher || EMPTY}
+          </span>
         </td>
       );
     case "genre":
@@ -521,7 +532,7 @@ function renderCell(b: Book, key: string, density: string) {
         <td key={key} className={cn("px-4", py)}>
           {b.rating ? (
             <span className="inline-flex items-center gap-1">
-              <Star size={12} className="fill-kemik-500 text-kemik-500" />
+              <Star size={12} className="fill-accent text-accent" />
               {b.rating}
             </span>
           ) : (
@@ -541,20 +552,24 @@ function renderCell(b: Book, key: string, density: string) {
 }
 
 /**
- * Sayı ve rozet sütunları içeriklerinden daha fazlasına ihtiyaç duymuyor;
- * genişlikleri sabitlenince geniş ekranda artan alan başlık ve yazar
- * sütunlarına akıyor. Aksi hâlde fazlalık sondaki eylem sütununda birikiyordu.
+ * Sütun genişlikleri. Metin sütunları oranla esner (Başlık 2fr, Yazar ve
+ * Yayınevi 1.4fr), sayı ve rozet sütunları içeriklerine göre sabit kalır.
  */
-const NARROW_COLS: Record<string, string> = {
-  pageCount: "w-28",
-  publicationYear: "w-28",
-  rating: "w-32",
-  releaseYear: "w-28",
-  duration: "w-28",
-  seasons: "w-28",
-  episodeDuration: "w-32",
-  watchYear: "w-28",
+const COL_WIDTH: Record<string, string> = {
+  title: "w-[34%]",
+  author: "w-[24%]",
+  publisher: "w-[24%]",
+  pageCount: "w-24",
+  publicationYear: "w-24",
+  rating: "w-28",
+  releaseYear: "w-24",
+  duration: "w-24",
+  seasons: "w-24",
+  episodeDuration: "w-28",
+  watchYear: "w-24",
   status: "w-44",
+  genre: "w-40",
+  director: "w-[24%]",
 };
 
 function ThSort({
@@ -590,9 +605,9 @@ function ThSort({
         {label}
         {active ? (
           sortDir === "asc" ? (
-            <ArrowUp size={12} />
+            <ArrowUp size={12} className="text-accent" />
           ) : (
-            <ArrowDown size={12} />
+            <ArrowDown size={12} className="text-accent" />
           )
         ) : (
           <ArrowUpDown size={12} className="opacity-40" />
@@ -624,19 +639,17 @@ function BulkBar({
   publishers: string[];
 }) {
   return (
-    <div className="sticky top-0 z-10 bg-secondary/10 border-b border-secondary/25 px-5 py-2 flex items-center gap-3 text-sm flex-wrap">
-      <span className="font-medium text-primary-ink shrink-0">
-        {count} seçili
-      </span>
+    <div className="sticky top-0 z-10 bg-accent-soft border-b border-line-strong px-5 py-2 flex items-center gap-3 text-sm flex-wrap">
+      <span className="font-medium text-accent shrink-0">{count} seçili</span>
 
-      <div className="w-px h-4 bg-primary/20 shrink-0" />
+      <div className="w-px h-4 bg-accent/20 shrink-0" />
 
       <div className="flex items-center gap-1 flex-wrap">
-        <span className="text-muted text-xs shrink-0">Durum:</span>
+        <span className="text-mute text-xs shrink-0">Durum:</span>
         {STATUSES.map((s) => (
           <button
             key={s.value}
-            className="chip hover:bg-primary/20 text-xs"
+            className="chip hover:bg-accent/20 text-xs"
             onClick={() => onStatus(s.value)}
           >
             {s.label}
@@ -644,7 +657,7 @@ function BulkBar({
         ))}
       </div>
 
-      <div className="w-px h-4 bg-primary/20 shrink-0" />
+      <div className="w-px h-4 bg-accent/20 shrink-0" />
 
       <BulkPicker label="Tür" options={genres} onPick={onGenre} />
       <BulkPicker label="Yayınevi" options={publishers} onPick={onPublisher} />
@@ -655,7 +668,7 @@ function BulkBar({
             <UserRound size={14} /> Ödünç Ver
           </button>
         )}
-        <button className="btn btn-ghost text-secondary" onClick={onDelete}>
+        <button className="btn btn-ghost text-accent" onClick={onDelete}>
           <Trash2 size={14} /> Sil
         </button>
         <button className="btn btn-ghost" onClick={onClear}>
@@ -698,14 +711,14 @@ function BulkPicker({
   return (
     <div ref={ref} className="relative">
       <button
-        className="chip hover:bg-primary/20 text-xs flex items-center gap-1"
+        className="chip hover:bg-accent/20 text-xs flex items-center gap-1"
         onClick={() => setOpen((o) => !o)}
       >
         {label} <ChevronDown size={11} />
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-1 z-20 bg-surface border border-border rounded-xl shadow-lg min-w-[180px] py-1 text-sm">
-          <div className="px-3 py-1.5 border-b border-border">
+        <div className="absolute top-full left-0 mt-1 z-20 bg-panel border border-line rounded-xl shadow-lg min-w-[180px] py-1 text-sm">
+          <div className="px-3 py-1.5 border-b border-line">
             <div className="flex items-center gap-1">
               <input
                 autoFocus
@@ -732,7 +745,7 @@ function BulkPicker({
               {options.map((o) => (
                 <button
                   key={o}
-                  className="w-full text-left px-3 py-2 hover:bg-surface2 transition-colors text-xs"
+                  className="w-full text-left px-3 py-2 hover:bg-hover transition-colors text-xs"
                   onClick={() => pick(o)}
                 >
                   {o}
@@ -740,9 +753,9 @@ function BulkPicker({
               ))}
             </div>
           )}
-          <div className="border-t border-border">
+          <div className="border-t border-line">
             <button
-              className="w-full text-left px-3 py-2 hover:bg-surface2 transition-colors text-xs text-muted flex items-center gap-1"
+              className="w-full text-left px-3 py-2 hover:bg-hover transition-colors text-xs text-mute flex items-center gap-1"
               onClick={() => pick(undefined)}
             >
               <X size={11} /> Temizle (boş bırak)

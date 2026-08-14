@@ -75,7 +75,7 @@ export function Sidebar({
     loansOnly;
 
   return (
-    <aside className="w-64 shrink-0 border-r border-edge bg-panel flex flex-col">
+    <aside className="w-64 shrink-0 border-r border-line bg-sidebar flex flex-col">
       <SidebarSearch
         value={search}
         onChange={setSearch}
@@ -87,7 +87,7 @@ export function Sidebar({
         {hasActive && (
           <div className="flex justify-end">
             <button
-              className="text-xs text-secondary hover:underline flex items-center gap-1"
+              className="text-xs text-accent hover:underline flex items-center gap-1"
               onClick={clearFilters}
             >
               <X size={12} /> filtreleri temizle
@@ -96,10 +96,9 @@ export function Sidebar({
         )}
 
         <FilterCard title="Durum">
-          {STATUSES.map((s, i) => (
+          {STATUSES.map((s) => (
             <FilterRow
               key={s.value}
-              first={i === 0}
               active={statusFilter.includes(s.value)}
               // Durum satırları kendi renkleriyle işaretlenir; listedeki ve
               // karttaki renk şeridiyle aynı dili konuşurlar.
@@ -107,13 +106,12 @@ export function Sidebar({
               onClick={() => toggleStatusFilter(s.value)}
               label={s.label}
               count={counts[s.value] ?? 0}
-              share={books.length ? (counts[s.value] ?? 0) / books.length : 0}
             />
           ))}
         </FilterCard>
 
         {tags.length > 0 && (
-          <FilterCard title="Etiketler" icon={<Tags size={12} />} tone="accent">
+          <FilterCard title="Etiketler" icon={<Tags size={12} />}>
             <div className="flex justify-end gap-1 px-2 pb-1">
               {(["or", "and"] as const).map((mode) => (
                 <button
@@ -121,8 +119,8 @@ export function Sidebar({
                   className={cn(
                     "rounded-lg px-1.5 py-0.5 text-[10px] font-semibold",
                     tagFilterMode === mode
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-surface text-muted",
+                      ? "bg-accent text-white"
+                      : "bg-panel text-mute",
                   )}
                   onClick={() => setTagFilterMode(mode)}
                   aria-pressed={tagFilterMode === mode}
@@ -136,12 +134,10 @@ export function Sidebar({
                 </button>
               ))}
             </div>
-            {tags.map((tag, index) => (
+            {tags.map((tag) => (
               <FilterRow
                 key={tag.id}
-                first={index === 0}
                 active={tagFilter.includes(tag.id)}
-                accent="primary"
                 onClick={() => toggleTagFilter(tag.id)}
                 label={tag.name}
                 count={
@@ -152,10 +148,8 @@ export function Sidebar({
             ))}
             <button
               className={cn(
-                "mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border border-border px-2 py-1.5 text-xs",
-                groupByTags
-                  ? "bg-primary/10 text-primary-ink"
-                  : "hover:bg-surface2",
+                "mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border border-line px-2 py-1.5 text-xs",
+                groupByTags ? "bg-accent-soft text-accent" : "hover:bg-hover",
               )}
               onClick={toggleGroupByTags}
               aria-pressed={groupByTags}
@@ -166,15 +160,9 @@ export function Sidebar({
         )}
 
         {loans.length > 0 && (
-          <FilterCard
-            title="Ödünç Verilenler"
-            icon={<UserRound size={12} />}
-            tone="warm"
-          >
+          <FilterCard title="Ödünç Verilenler" icon={<UserRound size={12} />}>
             <FilterRow
-              first
               active={loansOnly}
-              accent="secondary"
               onClick={toggleLoansOnly}
               label="Aktif ödünçler"
               count={loans.length}
@@ -183,13 +171,11 @@ export function Sidebar({
         )}
 
         {activeGenres.length > 0 && (
-          <FilterCard title="Tür" icon={<Filter size={12} />} tone="secondary">
-            {activeGenres.map(([g, count], i) => (
+          <FilterCard title="Tür" icon={<Filter size={12} />}>
+            {activeGenres.map(([g, count]) => (
               <FilterRow
                 key={g}
-                first={i === 0}
                 active={genreFilter.includes(g)}
-                accent="secondary"
                 onClick={() => toggleGenreFilter(g)}
                 label={g}
                 count={count}
@@ -199,15 +185,9 @@ export function Sidebar({
         )}
 
         {duplicateCount > 0 && (
-          <FilterCard
-            title="Tekrar Edenler"
-            icon={<Copy size={12} />}
-            tone="secondary"
-          >
+          <FilterCard title="Tekrar Edenler" icon={<Copy size={12} />}>
             <FilterRow
-              first
               active={duplicatesOnly}
-              accent="secondary"
               onClick={toggleDuplicatesOnly}
               label="Yalnızca tekrarları göster"
               count={duplicateCount}

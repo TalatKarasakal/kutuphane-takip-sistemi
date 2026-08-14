@@ -54,7 +54,7 @@ export function Modal({
           SIZE[size],
         )}
       >
-        <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-line">
           <h3 id={titleId} className="text-base font-semibold">
             {title}
           </h3>
@@ -68,7 +68,7 @@ export function Modal({
         </div>
         <div className="flex-1 overflow-auto px-5 py-4">{children}</div>
         {footer && (
-          <div className="px-5 py-3 border-t border-border flex items-center justify-end gap-2">
+          <div className="px-5 py-3 border-t border-line flex items-center justify-end gap-2">
             {footer}
           </div>
         )}

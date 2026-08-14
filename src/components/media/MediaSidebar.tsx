@@ -56,7 +56,7 @@ export function MediaSidebar({ type, searchRef }: Props) {
     groupByTags;
 
   return (
-    <aside className="w-64 shrink-0 border-r border-edge bg-panel flex flex-col">
+    <aside className="w-64 shrink-0 border-r border-line bg-sidebar flex flex-col">
       <SidebarSearch
         value={filters[type].search}
         onChange={(value) => setSearch(type, value)}
@@ -68,7 +68,7 @@ export function MediaSidebar({ type, searchRef }: Props) {
         {hasActive && (
           <div className="flex justify-end">
             <button
-              className="text-xs text-secondary hover:underline flex items-center gap-1"
+              className="text-xs text-accent hover:underline flex items-center gap-1"
               onClick={() => clearFilters(type)}
             >
               <X size={12} /> filtreleri temizle
@@ -77,22 +77,20 @@ export function MediaSidebar({ type, searchRef }: Props) {
         )}
 
         <FilterCard title="Durum">
-          {MEDIA_STATUSES.map((s, i) => (
+          {MEDIA_STATUSES.map((s) => (
             <FilterRow
               key={s.value}
-              first={i === 0}
               active={statusFilter.includes(s.value)}
               tone={s.tone}
               onClick={() => toggleStatusFilter(type, s.value)}
               label={s.label}
               count={counts[s.value] ?? 0}
-              share={items.length ? (counts[s.value] ?? 0) / items.length : 0}
             />
           ))}
         </FilterCard>
 
         {tags.length > 0 && (
-          <FilterCard title="Etiketler" icon={<Tags size={12} />} tone="accent">
+          <FilterCard title="Etiketler" icon={<Tags size={12} />}>
             <div className="flex justify-end gap-1 px-2 pb-1">
               {(["or", "and"] as const).map((mode) => (
                 <button
@@ -100,8 +98,8 @@ export function MediaSidebar({ type, searchRef }: Props) {
                   className={cn(
                     "rounded-lg px-1.5 py-0.5 text-[10px] font-semibold",
                     tagFilterMode === mode
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-surface text-muted",
+                      ? "bg-accent text-white"
+                      : "bg-panel text-mute",
                   )}
                   onClick={() => setTagFilterMode(type, mode)}
                   aria-pressed={tagFilterMode === mode}
@@ -110,12 +108,10 @@ export function MediaSidebar({ type, searchRef }: Props) {
                 </button>
               ))}
             </div>
-            {tags.map((tag, index) => (
+            {tags.map((tag) => (
               <FilterRow
                 key={tag.id}
-                first={index === 0}
                 active={tagFilter.includes(tag.id)}
-                accent="primary"
                 onClick={() => toggleTagFilter(type, tag.id)}
                 label={tag.name}
                 count={
@@ -126,10 +122,8 @@ export function MediaSidebar({ type, searchRef }: Props) {
             ))}
             <button
               className={cn(
-                "mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border border-border px-2 py-1.5 text-xs",
-                groupByTags
-                  ? "bg-primary/10 text-primary-ink"
-                  : "hover:bg-surface2",
+                "mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border border-line px-2 py-1.5 text-xs",
+                groupByTags ? "bg-accent-soft text-accent" : "hover:bg-hover",
               )}
               onClick={() => toggleGroupByTags(type)}
               aria-pressed={groupByTags}
@@ -140,13 +134,11 @@ export function MediaSidebar({ type, searchRef }: Props) {
         )}
 
         {activeGenres.length > 0 && (
-          <FilterCard title="Tür" icon={<Filter size={12} />} tone="secondary">
-            {activeGenres.map(([g, count], i) => (
+          <FilterCard title="Tür" icon={<Filter size={12} />}>
+            {activeGenres.map(([g, count]) => (
               <FilterRow
                 key={g}
-                first={i === 0}
                 active={genreFilter.includes(g)}
-                accent="secondary"
                 onClick={() => toggleGenreFilter(type, g)}
                 label={g}
                 count={count}

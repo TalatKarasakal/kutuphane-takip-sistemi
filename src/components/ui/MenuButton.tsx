@@ -101,7 +101,7 @@ export function MenuButton({
           role="menu"
           aria-label={title}
           className={cn(
-            "absolute top-full mt-1 z-50 w-56 rounded-xl border border-border bg-surface p-1.5 shadow-lg",
+            "absolute top-full mt-1 z-50 w-56 rounded-xl border border-line bg-panel p-1.5 shadow-lg",
             align === "right" ? "right-0" : "left-0",
           )}
         >
@@ -115,7 +115,7 @@ export function MenuButton({
                 <button
                   type="button"
                   role="menuitem"
-                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm hover:bg-surface2 focus:bg-surface2 focus:outline-none"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm hover:bg-hover focus:bg-hover focus:outline-none"
                   onClick={() => {
                     setOpen(false);
                     item.onSelect();
@@ -131,7 +131,7 @@ export function MenuButton({
                     }
                   }}
                 >
-                  <Icon size={15} className="shrink-0 text-muted" />
+                  <Icon size={15} className="shrink-0 text-mute" />
                   <span className="truncate">{item.label}</span>
                 </button>
               </div>

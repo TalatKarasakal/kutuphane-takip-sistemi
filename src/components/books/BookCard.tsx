@@ -36,10 +36,10 @@ export function BookCard({
         type="button"
         onClick={onClick}
         aria-label={`${book.title} ayrıntılarını aç`}
-        className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       />
       {visualMode === "enriched" && artwork.url ? (
-        <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-surface2">
+        <div className="relative aspect-[2/3] w-full shrink-0 overflow-hidden bg-hover">
           <img
             src={artwork.url}
             alt={`${book.title} kapağı`}
@@ -58,21 +58,17 @@ export function BookCard({
             checked={selected}
             onChange={onToggleSelect}
             aria-label={`${book.title} seç`}
-            className="relative z-20 mt-0.5 h-4 w-4 shrink-0 accent-[rgb(var(--primary))]"
+            className="row-check relative z-20 mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent)]"
           />
           <div className="font-semibold leading-snug line-clamp-2">
             {book.title}
           </div>
         </div>
-        <div className="text-xs text-muted line-clamp-1">{book.author}</div>
+        <div className="text-xs text-mute line-clamp-1">{book.author}</div>
         {book.rating && (
           <div className="flex" aria-label={`${book.rating} yıldız`}>
             {Array.from({ length: book.rating }, (_, index) => (
-              <Star
-                key={index}
-                size={12}
-                className="fill-kemik-500 text-kemik-500"
-              />
+              <Star key={index} size={12} className="fill-accent text-accent" />
             ))}
           </div>
         )}

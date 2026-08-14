@@ -68,74 +68,84 @@
 @tailwind utilities;
 
 /*
- * Renkler kişisel tasarım paletinden gelir (kariyer-vault,
- * 08-Tercihler/tasarim-tercihleri.md — "Palet A"). Ham rampalar
- * tailwind.config.ts içinde; burada yalnız temaya göre değişen anlamsal
- * belirteçler tanımlanır.
- *
- * Palet A vurguyu Bordo'ya, ikincil vurguyu Turkuaz'a verir. Burada roller
- * ters çevrildi: bir uygulama arayüzünde birincil vurgu düğme, sekme ve odak
- * halkası gibi çok sayıda yerde görünür, palet notu ise bordoyu "seyrek
- * kullanılır" diye işaretler. Turkuaz "kırmızıdan daha serbest kullanılabilir"
- * dendiği için birincil, bordo seyrek vurgu olarak ikincil oldu.
+ * Renk sistemi `docs/design/arayuz-token-seti.md` içindeki token setidir.
+ * Değerler birebir oradan gelir; arayüzde hiçbir yerde doğrudan hex yazılmaz.
+ * Beş yüzey kademesi var: pencere zemini < kenar çubuğu < üst bar < panel < satır.
  */
-:root {
-  /*
-   * Dolgu yüzeyleri (Kitap Ekle gibi) paletin turkuazını olduğu gibi taşır.
-   * Bu parlaklıkta beyaz yazı okunmadığı için (2,3:1) üstündeki yazı koyudur;
-   * yazı ve simge olarak kullanılan turkuaz ise ayrı, koyu bir kademedir.
-   */
-  --primary: 31 182 166; /* Turkuaz 500 */
-  --primary-foreground: 6 18 26; /* Petrol 950 */
-  --primary-ink: 14 110 102; /* Turkuaz 800 — yazı/simge için */
-  /* Bordo 700 — parlak kırmızı kullanılmaz. */
-  --secondary: 140 42 34;
-  --secondary-foreground: 255 255 255;
-  /* Elektrik Mavi 600: kimlik kutucuğunun mavisi, bağlantı ve odak halkası. */
-  --accent: 24 115 196;
+:root[data-theme="dark"] {
+  /* Yüzey kademeleri — en koyudan en açığa */
+  --bg-app: #070b14; /* pencere zemini, en dış katman */
+  --bg-sidebar: #0b1220; /* sol kenar çubuğu */
+  --bg-topbar: #0e1626; /* üst bar — kenar çubuğundan açık */
+  --bg-panel: #111a2c; /* içerik paneli, tablo kabı */
+  --bg-row: #131e33; /* tablo satırı / kart yüzeyi */
+  --bg-row-alt: #0f1728; /* zebra: tek satırlar */
+  --bg-hover: #1a2740; /* satır hover */
+  --bg-active: #1e2e4a; /* seçili satır */
 
-  /*
-   * Yüzey kademeleri: zemin < panel < yüzey. Panel hem üst çubuğun hem kenar
-   * çubuğunun tonudur, böylece uygulama çerçevesi tek parça okunur ve içerik
-   * alanından ayrışır. Önceki değerler fazla maviydi; Nötr ailesine çekildi.
-   */
-  --bg: 241 244 247; /* zemin — içerik alanı */
-  --panel: 223 230 236; /* üst çubuk ve kenar çubuğu */
-  --surface: 255 255 255; /* kart, tablo, filtre kutusu */
-  --surface-2: 242 245 248; /* tablo başlığı, üzerine gelme */
-  --border: 211 219 226; /* kutu ve satır kenarlıkları */
-  --edge: 126 143 158; /* çerçeveyi içerikten ayıran ana çizgi; 1 px ayıraç için 3:1 hedefi */
-  --text: 22 29 35; /* Nötr 900 */
-  --muted: 82 99 115;
+  /* Metin */
+  --text: #e9eef7;
+  --text-dim: rgba(233, 238, 247, 0.68);
+  --text-mute: rgba(233, 238, 247, 0.54);
 
-  --font-app: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-size-app: 15px;
+  /* Çizgiler */
+  --line: rgba(214, 224, 240, 0.1);
+  --line-strong: rgba(214, 224, 240, 0.2);
 
-  /* Tarayıcının kendi çizdiği denetimler (tarih seçici, açılır liste, onay
-     kutusu, kaydırma çubuğu) tema ile aynı tarafta kalsın. */
+  /* Vurgular */
+  --accent: #b23a4b; /* bordo — birincil vurgu */
+  --accent-hot: #c8323c; /* bordo, yalnızca hover/aktif */
+  --accent-soft: rgba(178, 58, 75, 0.16); /* bordo dolgu */
+  --navy: #12243f; /* ikincil dolgu */
+  --glow: #3e72b8; /* çelik mavisi — bilgi/bağlantı */
+  --success: #3dae7a;
+
+  /* Karanlık temada derinlik kenarlık ve yüzey farkıyla kurulur. */
+  --elev-1: none;
+  --elev-2: none;
+
+  color-scheme: dark;
+}
+
+/*
+ * Aydınlık tema: kağıt sıcak, mürekkep soğuk. Soğuk mavi-gri zemin
+ * kullanılmaz. Öntanımlı tema budur; `data-theme` yazılmadan da geçerlidir.
+ */
+:root,
+:root[data-theme="light"] {
+  --bg-app: #e7e2d8; /* pencere zemini, en koyu kağıt */
+  --bg-sidebar: #ede9e1;
+  --bg-topbar: #f2efe8;
+  --bg-panel: #f8f6f1;
+  --bg-row: #fdfcf9;
+  --bg-row-alt: #f5f2ec;
+  --bg-hover: #efeae0;
+  --bg-active: #f4ede9; /* bordoya çekilmiş kağıt */
+
+  --text: #14203a; /* lacivert mürekkep */
+  --text-dim: rgba(20, 32, 58, 0.8);
+  --text-mute: rgba(20, 32, 58, 0.62);
+
+  --line: rgba(20, 32, 58, 0.16);
+  --line-strong: rgba(20, 32, 58, 0.3);
+
+  --accent: #8e2433;
+  --accent-hot: #a3202c;
+  --accent-soft: rgba(142, 36, 51, 0.12);
+  --navy: #2b3b5e;
+  --glow: #2a5a9e;
+  --success: #1e7f52;
+
+  /* Aydınlık temada derinlik gölgeyle kurulur, parlamayla değil. */
+  --elev-1: 0 1px 2px rgba(20, 32, 58, 0.07), 0 2px 8px rgba(20, 32, 58, 0.06);
+  --elev-2: 0 2px 4px rgba(20, 32, 58, 0.08), 0 12px 28px rgba(20, 32, 58, 0.1);
+
   color-scheme: light;
 }
 
-html[data-theme="dark"] {
-  --primary: 31 182 166; /* Turkuaz 500 */
-  --primary-foreground: 6 18 26;
-  --primary-ink: 69 201 187; /* Turkuaz 400 — koyu zeminde okunur */
-  --secondary: 163 43 34; /* Bordo 600 */
-  --secondary-foreground: 255 255 255;
-  --accent: 79 163 227; /* Elektrik Mavi 400 */
-
-  --bg: 6 16 23; /* zemin — içerik alanı */
-  --panel: 18 40 58; /* üst çubuk ve kenar çubuğu, zeminden ayrışır */
-  --surface: 20 45 63; /* kart, tablo, filtre kutusu */
-  --surface-2: 30 63 86; /* tablo başlığı, üzerine gelme */
-  --border: 44 86 114;
-  --edge: 61 110 143; /* çerçeveyi içerikten ayıran ana çizgi */
-  --text: 205 222 232;
-  /* Palet, koyu zeminde ikincil metin için Petrol 400'ü işaret ediyor; küçük
-     puntoda kontrastı yetmediği için bir kademe açığı (300) kullanılıyor. */
-  --muted: 110 151 176;
-
-  color-scheme: dark;
+:root {
+  --font-app: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-size-app: 15px;
 }
 
 html {
@@ -144,9 +154,15 @@ html {
 }
 
 body {
-  @apply bg-bg text-text antialiased;
+  @apply bg-app text-text antialiased;
   margin: 0;
   min-height: 100vh;
+}
+
+/* Odak halkası her yerde aynı: bordo, 2 px, 2 px boşlukla. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 *::-webkit-scrollbar {
@@ -157,40 +173,129 @@ body {
   background: transparent;
 }
 *::-webkit-scrollbar-thumb {
-  background: rgb(var(--border));
+  background: var(--line-strong);
   border-radius: 8px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--muted));
+  background: var(--text-mute);
 }
 
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-transparent disabled:opacity-50 disabled:cursor-not-allowed;
   }
+  /* Birincil eylem bordodur; turkuaz yalnız durum göstergesinde kalır. */
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:brightness-110;
+    background: var(--accent);
+    color: #fff;
   }
-  .btn-secondary {
-    @apply bg-secondary text-secondary-foreground hover:brightness-110;
+  .btn-primary:hover:not(:disabled) {
+    background: var(--accent-hot);
   }
   .btn-ghost {
-    @apply bg-transparent hover:bg-surface2 text-text;
+    @apply bg-transparent text-text;
+  }
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--bg-hover);
   }
   .btn-outline {
-    @apply border-border bg-surface hover:bg-surface2 text-text;
+    @apply text-text;
+    background: var(--bg-row);
+    border-color: var(--line-strong);
+  }
+  .btn-outline:hover:not(:disabled) {
+    background: var(--bg-hover);
   }
   .input {
-    @apply w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60;
+    @apply w-full rounded-lg px-3 py-2 text-sm text-text transition-colors;
+    background: var(--bg-row);
+    border: 1px solid var(--line-strong);
+  }
+  .input::placeholder {
+    color: var(--text-mute);
+  }
+  .input:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-color: var(--accent);
   }
   /* Rozetler tek satırda kalsın: tabloda satır yüksekliğini bozmasınlar. */
   .chip {
-    @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium border border-border bg-surface2 text-text;
+    @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium;
+    border: 1px solid var(--line-strong);
+    background: var(--accent-soft);
+    color: var(--text-dim);
   }
   .card {
-    @apply rounded-xl border border-border bg-surface shadow-soft;
+    @apply rounded-xl;
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    box-shadow: var(--elev-1);
   }
   .label {
-    @apply block text-xs font-medium text-muted mb-1;
+    @apply block text-xs font-medium mb-1;
+    color: var(--text-mute);
+  }
+
+  /*
+   * Satır seçim kutusu: yerleşik görünüm arayüzle bütünleşmiyordu.
+   * İşaretliyken bordo dolgu ve beyaz onay imi.
+   */
+  .row-check {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    transition:
+      border-color 140ms,
+      background 140ms;
+  }
+  .row-check:hover {
+    border-color: var(--accent);
+  }
+  .row-check:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .row-check:checked::after {
+    content: "";
+    display: block;
+    width: 4px;
+    height: 8px;
+    margin: 1px auto 0;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  /* Kenar çubuğu filtreleri: her grup kendi kabında, sınırı görünür. */
+  .filter-group {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px;
+  }
+  .filter-item {
+    @apply flex w-full items-center justify-between gap-2 text-sm transition-colors;
+    padding: 8px 10px;
+    border-radius: 4px;
+    color: var(--text-dim);
+    border-left: 3px solid transparent;
+  }
+  .filter-item:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+  }
+  .filter-item.is-active {
+    background: var(--accent-soft);
+    color: var(--text);
+    border-left-color: var(--accent);
+  }
+  .filter-count {
+    color: var(--text-mute);
+    font-variant-numeric: tabular-nums;
   }
 }

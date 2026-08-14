@@ -38,7 +38,7 @@ export function BookDetailDrawer({ book, onClose, onEdit, onDelete }: Props) {
           book && (
             <>
               <button
-                className="btn btn-ghost text-secondary"
+                className="btn btn-ghost text-accent"
                 onClick={() => {
                   onDelete(book.id);
                   onClose();
@@ -71,7 +71,7 @@ export function BookDetailDrawer({ book, onClose, onEdit, onDelete }: Props) {
         {book && (
           <div className="space-y-4">
             {visualMode === "enriched" && artwork.url && (
-              <div className="mx-auto aspect-[2/3] max-h-72 overflow-hidden rounded-xl bg-surface2">
+              <div className="mx-auto aspect-[2/3] max-h-72 overflow-hidden rounded-xl bg-hover">
                 <img
                   src={artwork.url}
                   alt={`${book.title} kapağı`}
@@ -82,7 +82,7 @@ export function BookDetailDrawer({ book, onClose, onEdit, onDelete }: Props) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-lg font-semibold">{book.title}</div>
-                <div className="text-muted">{book.author}</div>
+                <div className="text-mute">{book.author}</div>
               </div>
               <StatusBadge status={book.status} />
             </div>
@@ -98,7 +98,7 @@ export function BookDetailDrawer({ book, onClose, onEdit, onDelete }: Props) {
                     size={17}
                     className={
                       index < book.rating!
-                        ? "fill-kemik-500 text-kemik-500"
+                        ? "fill-accent text-accent"
                         : "text-border"
                     }
                   />
@@ -125,11 +125,11 @@ export function BookDetailDrawer({ book, onClose, onEdit, onDelete }: Props) {
             )}
 
             {loan && (
-              <div className="rounded-xl border border-primary/25 bg-primary/10 p-3 text-sm">
+              <div className="rounded-xl border border-accent/25 bg-accent-soft p-3 text-sm">
                 <div className="font-semibold">
                   {loan.borrower} kişisine ödünç verildi
                 </div>
-                <div className="mt-1 text-xs text-muted">
+                <div className="mt-1 text-xs text-mute">
                   {loan.loanedAt}
                   {loan.dueAt ? ` · Planlanan iade: ${loan.dueAt}` : ""}
                 </div>
@@ -155,13 +155,13 @@ export function BookDetailDrawer({ book, onClose, onEdit, onDelete }: Props) {
             {book.notes && (
               <div>
                 <div className="label">Notlar</div>
-                <div className="whitespace-pre-wrap rounded-lg bg-surface2 p-3 text-sm">
+                <div className="whitespace-pre-wrap rounded-lg bg-hover p-3 text-sm">
                   {book.notes}
                 </div>
               </div>
             )}
 
-            <div className="text-xs text-muted pt-2 border-t border-border">
+            <div className="text-xs text-mute pt-2 border-t border-line">
               Eklendi: {new Date(book.addedAt).toLocaleString("tr-TR")}
               {book.updatedAt !== book.addedAt &&
                 ` · Güncellendi: ${new Date(book.updatedAt).toLocaleString("tr-TR")}`}

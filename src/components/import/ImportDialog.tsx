@@ -393,7 +393,7 @@ export function ImportDialog({ open, onClose, section }: Props) {
       {error && (
         <div
           role="alert"
-          className="mb-3 rounded-lg border border-secondary/30 bg-secondary/10 px-3 py-2 text-sm text-secondary"
+          className="mb-3 rounded-lg border border-accent/30 bg-accent-soft px-3 py-2 text-sm text-accent"
         >
           {error}
         </div>
@@ -401,9 +401,9 @@ export function ImportDialog({ open, onClose, section }: Props) {
       {step === "pick" && <PickStep onFile={onFile} />}
       {step === "sheet" && <SheetStep sheets={sheets} onPick={onPickSheet} />}
       {notice && step !== "pick" && (
-        <div className="mb-3 flex items-start gap-2 rounded-lg border border-kemik-600/40 bg-kemik-500/15 px-3 py-2 text-sm">
-          <AlertTriangle size={16} className="mt-0.5 text-kemik-600 shrink-0" />
-          <div className="text-kemik-800 dark:text-kemik-300">{notice}</div>
+        <div className="mb-3 flex items-start gap-2 rounded-lg border border-line-strong bg-accent-soft px-3 py-2 text-sm">
+          <AlertTriangle size={16} className="mt-0.5 text-mute shrink-0" />
+          <div className="text-dim">{notice}</div>
         </div>
       )}
       {step === "map" && (
@@ -468,7 +468,7 @@ function PickStep({ onFile }: { onFile: (f: File) => void }) {
   return (
     <div className="py-6">
       <label
-        className={`block border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${dragging ? "border-primary bg-primary/10" : "border-border hover:bg-surface2"}`}
+        className={`block border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${dragging ? "border-accent bg-accent-soft" : "border-line hover:bg-hover"}`}
         onDragEnter={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -492,11 +492,11 @@ function PickStep({ onFile }: { onFile: (f: File) => void }) {
           if (f) onFile(f);
         }}
       >
-        <Upload size={28} className="mx-auto mb-3 text-primary-ink" />
+        <Upload size={28} className="mx-auto mb-3 text-accent" />
         <div className="font-medium mb-1">
           Dosya seç ya da buraya sürükle-bırak
         </div>
-        <div className="text-sm text-muted mb-4">
+        <div className="text-sm text-mute mb-4">
           .xlsx · .xls · .ods · .csv · .tsv · .json
         </div>
         <input
@@ -545,7 +545,7 @@ function Hint({
       <div className="flex items-center gap-2 mb-1 font-medium text-sm">
         {icon} {label}
       </div>
-      <div className="text-xs text-muted">{text}</div>
+      <div className="text-xs text-mute">{text}</div>
     </div>
   );
 }
@@ -559,18 +559,18 @@ function SheetStep({
 }) {
   return (
     <div className="py-4">
-      <div className="text-sm text-muted mb-3">
+      <div className="text-sm text-mute mb-3">
         Birden fazla sayfa bulundu — içe aktarmak istediğin sayfayı seç:
       </div>
       <div className="grid grid-cols-2 gap-2">
         {sheets.map((s, i) => (
           <button
             key={i}
-            className="card p-3 text-left hover:bg-surface2"
+            className="card p-3 text-left hover:bg-hover"
             onClick={() => onPick(i)}
           >
             <div className="font-medium">{s.name}</div>
-            <div className="text-xs text-muted">
+            <div className="text-xs text-mute">
               {Math.max(0, s.rows.length - 1)} satır
             </div>
           </button>
@@ -613,7 +613,7 @@ function MapStep({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 text-sm">
-        <span className="text-muted">Başlık satırı:</span>
+        <span className="text-mute">Başlık satırı:</span>
         <select
           className="input max-w-[140px]"
           value={headerRowIdx}
@@ -625,21 +625,21 @@ function MapStep({
             </option>
           ))}
         </select>
-        <span className="text-xs text-muted">
+        <span className="text-xs text-mute">
           Dosyadaki sütun adlarının hangi satırda olduğunu seç.
         </span>
       </div>
 
       <div>
         <div className="text-sm font-medium mb-2">Sütun Eşleme</div>
-        <div className="card divide-y divide-border">
+        <div className="card divide-y divide-line">
           {headers.map((h, i) => (
             <div key={i} className="flex items-center gap-3 px-3 py-2">
               <div className="w-1/3 min-w-0">
                 <div className="text-sm font-medium truncate">
                   {String(h || `Sütun ${i + 1}`)}
                 </div>
-                <div className="text-xs text-muted truncate">
+                <div className="text-xs text-mute truncate">
                   Örn:{" "}
                   {dataRows
                     .slice(0, 2)
@@ -684,7 +684,7 @@ function MapStep({
             {statusRawValues.map((v) => (
               <div key={v} className="flex items-center gap-3">
                 <code className="chip">{v}</code>
-                <span className="text-muted text-xs">→</span>
+                <span className="text-mute text-xs">→</span>
                 <select
                   className="input max-w-xs"
                   value={statusMap[v] ?? statusOptions[0]?.value ?? ""}
@@ -723,17 +723,17 @@ function PreviewStep({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
-        <div className="chip bg-turkuaz-500/15 border-turkuaz-500/25 text-turkuaz-800 dark:text-turkuaz-300">
+        <div className="chip !bg-transparent border-success text-success">
           <CheckCircle2 size={12} /> {rows.length} geçerli
         </div>
         {errors.length > 0 && (
-          <div className="chip bg-bordo-600/15 border-bordo-600/25 text-bordo-700 dark:text-bordo-300">
+          <div className="chip !bg-transparent border-accent text-accent">
             <AlertTriangle size={12} /> {errors.length} hatalı
           </div>
         )}
       </div>
       {errors.length > 0 && (
-        <div className="card p-3 max-h-32 overflow-auto text-xs text-muted">
+        <div className="card p-3 max-h-32 overflow-auto text-xs text-mute">
           {errors.slice(0, 20).map((e) => (
             <div key={e.row}>
               Satır {e.row}: {e.reason}
@@ -743,7 +743,7 @@ function PreviewStep({
       )}
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-surface2 text-xs uppercase text-muted">
+          <thead className="bg-hover text-xs uppercase text-mute">
             <tr>
               {isMedia ? (
                 <>
@@ -770,9 +770,9 @@ function PreviewStep({
               ? (rows as Omit<Media, "id" | "addedAt" | "updatedAt">[])
                   .slice(0, 20)
                   .map((r, i) => (
-                    <tr key={i} className="border-t border-border">
+                    <tr key={i} className="border-t border-line">
                       <td className="px-3 py-2 font-medium">{r.title}</td>
-                      <td className="px-3 py-2 text-muted">
+                      <td className="px-3 py-2 text-mute">
                         {r.director ?? "—"}
                       </td>
                       <td className="px-3 py-2">{r.status}</td>
@@ -791,10 +791,10 @@ function PreviewStep({
               : (rows as Omit<Book, "id" | "addedAt" | "updatedAt">[])
                   .slice(0, 20)
                   .map((r, i) => (
-                    <tr key={i} className="border-t border-border">
+                    <tr key={i} className="border-t border-line">
                       <td className="px-3 py-2 font-medium">{r.title}</td>
                       <td className="px-3 py-2">{r.author}</td>
-                      <td className="px-3 py-2 text-muted">
+                      <td className="px-3 py-2 text-mute">
                         {r.publisher ?? "—"}
                       </td>
                       <td className="px-3 py-2">{r.genre ?? "—"}</td>
@@ -808,7 +808,7 @@ function PreviewStep({
         </table>
       </div>
       {rows.length > 20 && (
-        <div className="text-xs text-muted">
+        <div className="text-xs text-mute">
           İlk 20 satır gösterildi. İçe aktarılacak toplam: {rows.length}
         </div>
       )}

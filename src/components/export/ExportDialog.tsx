@@ -227,7 +227,7 @@ export function ExportDialog({ open, onClose, section }: Props) {
             <div className="label m-0">Alanlar</div>
             <div className="flex gap-2 text-xs">
               <button
-                className="text-primary-ink hover:underline"
+                className="text-accent hover:underline"
                 onClick={() => {
                   if (isMedia)
                     setMediaFields(MEDIA_EXPORT_FIELDS.map((f) => f.key));
@@ -237,7 +237,7 @@ export function ExportDialog({ open, onClose, section }: Props) {
                 Tümü
               </button>
               <button
-                className="text-primary-ink hover:underline"
+                className="text-accent hover:underline"
                 onClick={() => {
                   if (isMedia) setMediaFields([]);
                   else setBookFields([]);
@@ -251,10 +251,11 @@ export function ExportDialog({ open, onClose, section }: Props) {
             {exportFields.map((f) => (
               <label
                 key={f.key}
-                className="flex items-center gap-2 text-sm cursor-pointer px-2 py-1.5 rounded-lg hover:bg-surface2"
+                className="flex items-center gap-2 text-sm cursor-pointer px-2 py-1.5 rounded-lg hover:bg-hover"
               >
                 <input
                   type="checkbox"
+                  className="row-check"
                   checked={currentFields.includes(f.key as never)}
                   onChange={() => toggleField(f.key)}
                 />

@@ -211,7 +211,7 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
         {generalError && (
           <div
             role="alert"
-            className="sm:col-span-2 rounded-lg bg-secondary/10 border border-secondary/30 px-3 py-2 text-sm text-secondary"
+            className="sm:col-span-2 rounded-lg bg-accent-soft border border-accent/30 px-3 py-2 text-sm text-accent"
           >
             {generalError}
           </div>
@@ -382,8 +382,8 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
                   size={20}
                   className={
                     rating <= (form.rating ?? 0)
-                      ? "fill-kemik-500 text-kemik-500"
-                      : "text-muted"
+                      ? "fill-accent text-accent"
+                      : "text-mute"
                   }
                 />
               </button>
@@ -474,10 +474,7 @@ function Field({
         {describedChild}
       </label>
       {error && (
-        <span
-          id={resolvedErrorId}
-          className="text-xs text-secondary mt-1 block"
-        >
+        <span id={resolvedErrorId} className="text-xs text-accent mt-1 block">
           {error}
         </span>
       )}

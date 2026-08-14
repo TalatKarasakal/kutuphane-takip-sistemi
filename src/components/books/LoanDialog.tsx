@@ -85,7 +85,7 @@ export function LoanDialog({
         {error && (
           <div
             role="alert"
-            className="rounded-lg bg-secondary/10 border border-secondary/30 px-3 py-2 text-sm text-secondary"
+            className="rounded-lg bg-accent-soft border border-accent/30 px-3 py-2 text-sm text-accent"
           >
             {error}
           </div>
@@ -121,7 +121,7 @@ export function LoanDialog({
             />
           </label>
         </div>
-        <p className="text-xs text-muted">
+        <p className="text-xs text-mute">
           İade alındığında bu aktif kayıt silinir; ödünç geçmişi tutulmaz.
         </p>
       </form>

@@ -11,8 +11,8 @@
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
-| Kontrol bekleyen çözüm | 31 |
-| Geliştirme fikri | 32 |
+| Kontrol bekleyen çözüm | 32 |
+| Geliştirme fikri | 33 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -35,7 +35,7 @@
 - Fotoğraftan ekleme bulut yerine bu bilgisayardaki bir modelle de çalışabiliyor; yerel sağlayıcı çevrimdışı modda da kullanılabiliyor ve yalnız loopback adreslerine bağlanıyor.
 - Algılama arka planda sürüyor: diyalog kapatılınca iş devam ediyor, üst çubuktaki gösterge işi izliyor ve sonuç hazır olunca gözden geçirme listesine dönülüyor.
 - Arama kenar çubuğunun tepesine, uygulama kimliği üst çubuğa alındı; yüzey kademeleri (zemin/panel/yüzey) ayrıştırıldı ve CSP'nin engellediği barkod worker'ı açıldı.
-- Arayüz renkleri kişisel tasarım paletine (Petrol/Turkuaz/Bordo/Elektrik Mavi/Nötr/Kemik) taşındı; vurgu rengi seçimi kaldırıldı, durum renkleri korunup palete oturtuldu.
+- Arayüz, `docs/design/arayuz-token-seti.md` içindeki token setine göre yeniden kuruldu: beş yüzey kademesi, sıcak kağıt/soğuk mürekkep aydınlık tema, bordo birincil vurgu, tek tip tür etiketi, 52 px zebra tablo ve özel seçim kutusu.
 - Yerel model artık raf fotoğraflarını okuyabiliyor: istek bağlamı büyütüldü, düşünme adımı kapatıldı ve yanıt iki alandan da çözümleniyor; önceden yalnız tek kitabın karşıdan çekildiği kare çalışıyordu. Aynı anda birden çok fotoğraf sıraya alınıp sırayla işlenebiliyor.
 - Bütün ekranlar Electron'da açık/koyu tema ve dar pencerede tarandı; konsol hatası yok. Kart başlıklarını örten onay kutusu, koyu temada açık kalan tarayıcı denetimleri ve iki satıra taşan durum rozetleri düzeltildi.
 - Tarayıcı ve Electron kontrollerinde kitap/medya CRUD, boş yazarın `Bilinmiyor` olması, mükerrer birleştirme, ödünç/iade, komut paleti ve yedek geri yükleme doğrulandı.
@@ -184,6 +184,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Kontrast oranları tarayıcıda hesaplandı: Kitap Ekle düğmesi 7,5:1, birincil yazı tonu yüzeyde 6,1:1 (koyuda 7,0), ikincil metin panelde 4,9:1 (koyuda 4,8), ayıraç çizgisi zeminde 3:1 civarı. Açık ve koyu tema tabloda gözden geçirildi.
   - **Bilinen sınır:** Kitap Ekle düğmesindeki yazı koyu; paletin turkuazı bu parlaklıkta beyaz yazıyı taşımıyor (2,3:1). Beyaz yazı isteniyorsa dolgunun koyulaştırılması gerekir, o da turkuazı yeşile kaydırır.
   - **Kullanıcı kontrolü:** Açık temada zeminin maviliğinin kalktığını, üst çubuk/kenar çubuğu ile içerik alanının ton farkını ve iki ayıraç çizgisinin aynı ve görünür olduğunu kontrol edin.
+- **IMP-033 — Token setine göre arayüz revizyonu**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** çalışma ağacında.
+  - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Kontrol listesi tarayıcıda madde madde ölçüldü: beş yüzey kademesi beklenen hex değerlerini veriyor (#E7E2D8 / #EDE9E1 / #F2EFE8 / #F8F6F1 / #FDFCF9), satır yüksekliği 52 px, zebra iki tonu dönüşümlü kullanıyor, başlık `position: sticky`, seçim kutusu `appearance: none` ve işaretliyken bordo dolgu + beyaz onay imi ile çiziliyor. Kodda token dışında hex kalmadı, `mix-blend-mode` hiç yok.
+  - **Bilinen sınır:** Spesifikasyonun kontrol listesi WCAG AA istiyor ama §4'teki iki eşleme koyu temada bunu tutmuyor: `--accent` yazı olarak 2,85:1, `--glow` 3,41:1. Renk üretmemek için tonlar korunup koyu temada rozet yazısı `--text-dim`e (7,25:1) alındı; renk kenarlıkta ve noktada duruyor. Aydınlık temada renkli yazı eşiği geçtiği için orada değişmedi. Etiket rengi seçicisindeki hazır renkler de token ailelerine çekildi; bunlar arayüz token'ı değil kullanıcı verisi olduğu için hex kalmak zorunda, kayıtlı etiketler kendi rengini koruyor.
+  - **Kullanıcı kontrolü:** Her iki temada tablo, kart ve kenar çubuğunu; seçim kutusunun işaretli hâlini; tür etiketlerinin tek tip, durum etiketlerinin renkli olduğunu doğrulayın.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:

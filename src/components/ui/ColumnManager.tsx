@@ -41,7 +41,7 @@ export function ColumnManager({ columns, labels, onChange }: Props) {
   return (
     <div className="relative" ref={ref}>
       <button
-        className={cn("btn btn-ghost", open && "bg-surface2")}
+        className={cn("btn btn-ghost", open && "bg-hover")}
         onClick={() => setOpen((v) => !v)}
         title="Sütunları düzenle"
       >
@@ -49,21 +49,21 @@ export function ColumnManager({ columns, labels, onChange }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-50 bg-surface border border-border rounded-xl shadow-lg p-1.5 w-56">
-          <div className="px-2 py-1 text-xs font-semibold text-muted uppercase tracking-wide mb-1">
+        <div className="absolute right-0 top-full mt-1 z-50 bg-panel border border-line rounded-xl shadow-lg p-1.5 w-56">
+          <div className="px-2 py-1 text-xs font-semibold text-mute uppercase tracking-wide mb-1">
             Sütunlar
           </div>
           {columns.map((col, idx) => (
             <div
               key={col.key}
-              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-surface2 group"
+              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-hover group"
             >
               <input
                 type="checkbox"
                 checked={col.visible}
                 disabled={col.key === "title"}
                 onChange={() => toggle(col.key)}
-                className="cursor-pointer"
+                className="row-check cursor-pointer"
               />
               <span className="flex-1 text-sm truncate">
                 {labels[col.key] ?? col.key}
@@ -72,14 +72,14 @@ export function ColumnManager({ columns, labels, onChange }: Props) {
                 <button
                   onClick={() => move(idx, -1)}
                   disabled={idx === 0}
-                  className="p-0.5 text-muted hover:text-text disabled:opacity-30 leading-none"
+                  className="p-0.5 text-mute hover:text-text disabled:opacity-30 leading-none"
                 >
                   <ChevronUp size={11} />
                 </button>
                 <button
                   onClick={() => move(idx, 1)}
                   disabled={idx === columns.length - 1}
-                  className="p-0.5 text-muted hover:text-text disabled:opacity-30 leading-none"
+                  className="p-0.5 text-mute hover:text-text disabled:opacity-30 leading-none"
                 >
                   <ChevronDown size={11} />
                 </button>

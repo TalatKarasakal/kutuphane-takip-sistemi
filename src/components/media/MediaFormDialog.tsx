@@ -186,7 +186,7 @@ export function MediaFormDialog({
         {generalError && (
           <div
             role="alert"
-            className="sm:col-span-2 rounded-lg bg-secondary/10 border border-secondary/30 px-3 py-2 text-sm text-secondary"
+            className="sm:col-span-2 rounded-lg bg-accent-soft border border-accent/30 px-3 py-2 text-sm text-accent"
           >
             {generalError}
           </div>
@@ -431,10 +431,7 @@ function Field({
         {describedChild}
       </label>
       {error && (
-        <span
-          id={resolvedErrorId}
-          className="text-xs text-secondary mt-1 block"
-        >
+        <span id={resolvedErrorId} className="text-xs text-accent mt-1 block">
           {error}
         </span>
       )}

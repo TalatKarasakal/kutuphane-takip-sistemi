@@ -10,17 +10,14 @@ export const MEDIA_STATUSES: {
     value: "izlendi",
     label: "İzlendi",
     tone: {
-      dot: "bg-turkuaz-500",
-      tint: "bg-turkuaz-500/15 text-turkuaz-800 dark:text-turkuaz-300",
+      dot: "bg-success",
+      badge: "border-success text-success dark:text-dim",
     },
   },
   {
     value: "izlenecek",
     label: "İzlenecek",
-    tone: {
-      dot: "bg-elektrik-500",
-      tint: "bg-elektrik-500/15 text-elektrik-800 dark:text-elektrik-300",
-    },
+    tone: { dot: "bg-glow", badge: "border-glow text-glow dark:text-dim" },
   },
 ];
 

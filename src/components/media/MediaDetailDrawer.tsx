@@ -29,7 +29,7 @@ export function MediaDetailDrawer({ item, onClose, onEdit, onDelete }: Props) {
         item && (
           <>
             <button
-              className="btn btn-ghost text-secondary"
+              className="btn btn-ghost text-accent"
               onClick={() => {
                 onDelete(item.id);
                 onClose();
@@ -47,7 +47,7 @@ export function MediaDetailDrawer({ item, onClose, onEdit, onDelete }: Props) {
       {item && (
         <div className="space-y-4">
           {visualMode === "enriched" && artwork.url && (
-            <div className="mx-auto aspect-[2/3] max-h-72 overflow-hidden rounded-xl bg-surface2">
+            <div className="mx-auto aspect-[2/3] max-h-72 overflow-hidden rounded-xl bg-hover">
               <img
                 src={artwork.url}
                 alt={`${item.title} posteri`}
@@ -109,13 +109,13 @@ export function MediaDetailDrawer({ item, onClose, onEdit, onDelete }: Props) {
           {item.notes && (
             <div>
               <div className="label">Notlar</div>
-              <div className="whitespace-pre-wrap rounded-lg bg-surface2 p-3 text-sm">
+              <div className="whitespace-pre-wrap rounded-lg bg-hover p-3 text-sm">
                 {item.notes}
               </div>
             </div>
           )}
 
-          <div className="text-xs text-muted pt-2 border-t border-border">
+          <div className="text-xs text-mute pt-2 border-t border-line">
             Eklendi: {new Date(item.addedAt).toLocaleString("tr-TR")}
             {item.updatedAt !== item.addedAt &&
               ` · Güncellendi: ${new Date(item.updatedAt).toLocaleString("tr-TR")}`}

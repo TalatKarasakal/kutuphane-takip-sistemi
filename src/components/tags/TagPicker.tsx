@@ -39,7 +39,7 @@ export function TagPicker({
         aria-label="Etiketler"
       >
         {tags.length === 0 && (
-          <span className="text-xs text-muted">Henüz etiket yok.</span>
+          <span className="text-xs text-mute">Henüz etiket yok.</span>
         )}
         {tags.map((tag) => {
           const active = value.includes(tag.id);
@@ -77,7 +77,7 @@ export function TagPicker({
           type="color"
           value={color}
           onChange={(event) => setColor(event.target.value)}
-          className="h-9 w-11 rounded-lg border border-border bg-surface p-1"
+          className="h-9 w-11 rounded-lg border border-line bg-panel p-1"
           aria-label="Etiket rengi"
         />
         <button

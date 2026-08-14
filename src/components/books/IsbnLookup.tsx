@@ -70,7 +70,7 @@ export function IsbnLookup({
   };
 
   return (
-    <div className="sm:col-span-2 rounded-xl border border-border p-3 space-y-2">
+    <div className="sm:col-span-2 rounded-xl border border-line p-3 space-y-2">
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
@@ -104,7 +104,7 @@ export function IsbnLookup({
             event.target.value = "";
           }}
         />
-        <span className="text-xs text-muted">
+        <span className="text-xs text-mute">
           <ImagePlus size={12} className="inline mr-1" />
           Aramada yalnız ISBN, Google Books/OpenLibrary servislerine gönderilir.
         </span>
@@ -115,14 +115,14 @@ export function IsbnLookup({
             <button
               type="button"
               key={`${result.isbn}-${index}`}
-              className="rounded-lg border border-border p-2 text-left hover:bg-surface2"
+              className="rounded-lg border border-line p-2 text-left hover:bg-hover"
               onClick={() => {
                 onApply(result);
                 setResults([]);
               }}
             >
               <div className="font-medium text-sm">{result.title}</div>
-              <div className="text-xs text-muted">
+              <div className="text-xs text-mute">
                 {result.author || "Bilinmiyor"}
                 {result.publisher ? ` · ${result.publisher}` : ""}
                 {result.publicationYear ? ` · ${result.publicationYear}` : ""}

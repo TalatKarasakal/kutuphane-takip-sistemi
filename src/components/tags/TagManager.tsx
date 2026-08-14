@@ -9,9 +9,9 @@ export function TagManager() {
   >({});
 
   return (
-    <div className="rounded-xl border border-border divide-y divide-border">
+    <div className="rounded-xl border border-line divide-y divide-line">
       {tags.length === 0 && (
-        <div className="p-3 text-xs text-muted">
+        <div className="p-3 text-xs text-mute">
           Etiketler kitap veya medya formundan oluşturulabilir.
         </div>
       )}
@@ -28,7 +28,7 @@ export function TagManager() {
                   [tag.id]: { ...draft, color: event.target.value },
                 })
               }
-              className="h-8 w-10 rounded border border-border bg-surface p-1"
+              className="h-8 w-10 rounded border border-line bg-panel p-1"
               aria-label={`${tag.name} rengi`}
             />
             <input
@@ -59,7 +59,7 @@ export function TagManager() {
             </button>
             <button
               type="button"
-              className="btn btn-ghost text-secondary"
+              className="btn btn-ghost text-accent"
               aria-label="Etiketi sil"
               onClick={() => remove(tag.id)}
             >

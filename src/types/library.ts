@@ -1,12 +1,18 @@
+/**
+ * Etiket rengi seçicide sunulan hazır renkler. Bunlar arayüz token'ı değil
+ * veridir — kullanıcı seçer, veritabanında saklanır — bu yüzden hex olarak
+ * durur. Değerler yine de token setinin ailelerinden alınmıştır; önceki liste
+ * palet dışı canlı renkler içeriyordu. Kayıtlı etiketler kendi rengini korur.
+ */
 export const TAG_COLORS = [
-  "#14b8a6",
-  "#ef4444",
-  "#3b82f6",
-  "#8b5cf6",
-  "#f59e0b",
-  "#22c55e",
-  "#ec4899",
-  "#64748b",
+  "#8e2433", // bordo — vurgu
+  "#a3202c", // bordo, sıcak uç
+  "#2b3b5e", // lacivert
+  "#2a5a9e", // çelik mavisi
+  "#1e7f52", // yeşil
+  "#6b5e42", // sıcak nötr
+  "#8a6a3d", // kehribar nötr
+  "#5a6470", // gri
 ] as const;
 
 export interface Tag {

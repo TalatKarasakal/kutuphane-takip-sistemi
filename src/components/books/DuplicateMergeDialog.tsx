@@ -122,7 +122,7 @@ export function DuplicateMergeDialog({
       }
     >
       {groups.length === 0 ? (
-        <p className="text-sm text-muted">
+        <p className="text-sm text-mute">
           Birleştirilecek mükerrer kayıt kalmadı.
         </p>
       ) : (
@@ -156,7 +156,7 @@ export function DuplicateMergeDialog({
               ))}
             </select>
           </label>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-mute">
             Her alan için korunacak değeri seç. Etiketler otomatik olarak
             birleştirilir; diğer kayıtlar atomik olarak silinir.
           </p>

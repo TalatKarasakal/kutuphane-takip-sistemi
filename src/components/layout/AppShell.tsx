@@ -213,10 +213,10 @@ export function AppShell() {
 
   if (booksError || mediaError) {
     return (
-      <div className="h-screen grid place-items-center bg-bg text-text p-8">
+      <div className="h-screen grid place-items-center bg-app text-text p-8">
         <div className="card max-w-md p-6 text-center">
           <h1 className="font-semibold">Yerel veriler yüklenemedi</h1>
-          <p className="mt-2 text-sm text-muted">{booksError ?? mediaError}</p>
+          <p className="mt-2 text-sm text-mute">{booksError ?? mediaError}</p>
           <button
             className="btn btn-primary mt-4"
             onClick={() => window.location.reload()}
@@ -230,14 +230,14 @@ export function AppShell() {
 
   if (!booksLoaded || !mediaLoaded || !tagsLoaded || !loansLoaded) {
     return (
-      <div className="h-screen grid place-items-center bg-bg text-text">
-        <div className="text-sm text-muted">Kütüphaneniz yükleniyor…</div>
+      <div className="h-screen grid place-items-center bg-app text-text">
+        <div className="text-sm text-mute">Kütüphaneniz yükleniyor…</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-bg text-text">
+    <div className="bg-app text-text">
       <div className="h-screen flex flex-col" data-app-content>
         <Topbar
           section={section}

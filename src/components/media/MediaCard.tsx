@@ -31,10 +31,10 @@ export function MediaCard({
         type="button"
         onClick={onClick}
         aria-label={`${item.title} ayrıntılarını aç`}
-        className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       />
       {visualMode === "enriched" && artwork.url ? (
-        <div className="aspect-[2/3] shrink-0 bg-surface2">
+        <div className="aspect-[2/3] shrink-0 bg-hover">
           <img
             src={artwork.url}
             alt={`${item.title} posteri`}
@@ -53,14 +53,14 @@ export function MediaCard({
             checked={selected}
             onChange={onToggleSelect}
             aria-label={`${item.title} seç`}
-            className="relative z-20 mt-0.5 h-4 w-4 shrink-0 accent-[rgb(var(--primary))]"
+            className="row-check relative z-20 mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent)]"
           />
           <div className="font-semibold leading-snug line-clamp-2">
             {item.title}
           </div>
         </div>
         {item.director && (
-          <div className="text-xs text-muted line-clamp-1">{item.director}</div>
+          <div className="text-xs text-mute line-clamp-1">{item.director}</div>
         )}
         <div className="flex flex-wrap items-center gap-1 mt-auto pt-1">
           <MediaStatusBadge status={item.status} />

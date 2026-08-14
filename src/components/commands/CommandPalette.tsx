@@ -210,7 +210,7 @@ export function CommandPalette({
       <div className="relative">
         <Search
           size={16}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-mute"
         />
         <input
           autoFocus
@@ -239,7 +239,7 @@ export function CommandPalette({
         />
       </div>
       <div
-        className="mt-3 max-h-[55vh] overflow-auto rounded-xl border border-border p-1"
+        className="mt-3 max-h-[55vh] overflow-auto rounded-xl border border-line p-1"
         role="listbox"
         aria-label="Komut sonuçları"
       >
@@ -250,25 +250,25 @@ export function CommandPalette({
               key={command.id}
               role="option"
               aria-selected={index === active}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm ${index === active ? "bg-primary/15 text-primary-ink" : "hover:bg-surface2"}`}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm ${index === active ? "bg-accent-soft text-accent" : "hover:bg-hover"}`}
               onMouseEnter={() => setActive(index)}
               onClick={() => void run(command)}
             >
               <Icon size={16} />
               <span className="flex-1 truncate">{command.label}</span>
               {command.hint && (
-                <span className="text-xs text-muted">{command.hint}</span>
+                <span className="text-xs text-mute">{command.hint}</span>
               )}
             </button>
           );
         })}
         {visible.length === 0 && (
-          <p className="p-4 text-center text-sm text-muted">
+          <p className="p-4 text-center text-sm text-mute">
             Eşleşme bulunamadı.
           </p>
         )}
       </div>
-      <p className="mt-2 text-xs text-muted">
+      <p className="mt-2 text-xs text-mute">
         ↑↓ ile seç · Enter ile çalıştır · Esc ile kapat
       </p>
     </Modal>

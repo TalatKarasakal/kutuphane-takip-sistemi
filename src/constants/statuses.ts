@@ -1,13 +1,21 @@
 import type { BookStatus } from "../types/book";
 
 /**
- * Durumun renk kimliği. `dot` listedeki/karttaki renk şeridi ve kenar
- * çubuğundaki nokta için, `tint` seçili filtre satırı için kullanılır.
- * Renkler kişisel paletin ailelerinden gelir (bkz. `src/index.css`).
+ * Durumun renk kimliği. Tür etiketleri tek tip nötr görünürken durum
+ * etiketleri renk taşır: renk burada anlam ifade ediyor. Değerler
+ * `docs/design/arayuz-token-seti.md` §4'ten gelir.
+ *
+ * `dot` listedeki/karttaki renk şeridi ve kenar çubuğundaki nokta içindir.
  */
 export interface StatusTone {
+  /** Renk şeridi ve nokta için arka plan sınıfı. */
   dot: string;
-  tint: string;
+  /**
+   * Rozetin kenarlığı ve yazısı. Koyu temada vurgu ve çelik mavisi yazı olarak
+   * AA'nın altında kaldığı için (2,85 ve 3,41) orada renk kenarlıkta ve noktada
+   * kalır, yazı `--text-dim`e düşer; aydınlıkta renkli yazı eşiği geçiyor.
+   */
+  badge: string;
 }
 
 export const STATUSES: {
@@ -19,32 +27,33 @@ export const STATUSES: {
     value: "okundu",
     label: "Okundu",
     tone: {
-      dot: "bg-turkuaz-500",
-      tint: "bg-turkuaz-500/15 text-turkuaz-800 dark:text-turkuaz-300",
+      dot: "bg-success",
+      badge: "border-success text-success dark:text-dim",
     },
   },
   {
     value: "okunacak",
     label: "Okunacak",
     tone: {
-      dot: "bg-elektrik-500",
-      tint: "bg-elektrik-500/15 text-elektrik-800 dark:text-elektrik-300",
+      dot: "bg-glow",
+      badge: "border-glow text-glow dark:text-dim",
     },
   },
   {
+    // Dolgusuz, yalnız kenarlıklı: elde bulunmak bir aşama değil, nötr bir not.
     value: "mevcut",
     label: "Elimde Mevcut",
     tone: {
-      dot: "bg-kemik-500",
-      tint: "bg-kemik-500/20 text-kemik-800 dark:text-kemik-300",
+      dot: "bg-mute",
+      badge: "border-line-strong text-mute",
     },
   },
   {
     value: "satin-alinacak",
     label: "Satın Alınacak",
     tone: {
-      dot: "bg-bordo-600",
-      tint: "bg-bordo-600/15 text-bordo-700 dark:text-bordo-300",
+      dot: "bg-accent",
+      badge: "border-accent text-accent dark:text-dim",
     },
   },
 ];

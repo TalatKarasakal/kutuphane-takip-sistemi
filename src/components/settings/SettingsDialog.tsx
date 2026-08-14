@@ -115,9 +115,9 @@ export function SettingsDialog({
             step={1}
             value={fontSize}
             onChange={(e) => set("fontSize", Number(e.target.value))}
-            className="w-full accent-[rgb(var(--primary))]"
+            className="w-full accent-[var(--accent)]"
           />
-          <div className="flex justify-between text-[11px] text-muted mt-1">
+          <div className="flex justify-between text-[11px] text-mute mt-1">
             <span>12</span>
             <span>17</span>
             <span>22</span>
@@ -155,7 +155,7 @@ export function SettingsDialog({
               { value: "enriched", label: "Zengin" },
             ]}
           />
-          <div className="text-xs text-muted mt-2">
+          <div className="text-xs text-mute mt-2">
             Zengin görünüm kapakları, portre kartlarını ve medya posterlerini
             gösterir.
           </div>
@@ -176,12 +176,13 @@ export function SettingsDialog({
             </span>
             <input
               type="checkbox"
+              className="row-check"
               checked={remoteArtwork}
               disabled={networkMode === "offline"}
               onChange={(event) => set("remoteArtwork", event.target.checked)}
             />
           </label>
-          <div className="text-xs text-muted mt-2">
+          <div className="text-xs text-mute mt-2">
             Çevrimdışı mod Gemini, ISBN, görsel ve güncelleme isteklerini
             engeller.
           </div>
@@ -254,7 +255,7 @@ function LocalAiFields() {
 
   return (
     <div className="space-y-2">
-      <div className="text-xs text-muted">
+      <div className="text-xs text-mute">
         Fotoğraf bu bilgisayarda çalışan bir modele gönderilir; internete çıkmaz
         ve çevrimdışı modda da çalışır. Ollama gibi bir sunucunun açık olması ve{" "}
         <strong>görsel destekli</strong> bir modelin kurulu olması gerekir.
@@ -307,15 +308,15 @@ function LocalAiFields() {
         />
       )}
 
-      {error && <div className="text-xs text-secondary">{error}</div>}
+      {error && <div className="text-xs text-accent">{error}</div>}
       {selected && !selected.vision && (
-        <div className="text-xs text-kemik-700">
+        <div className="text-xs text-mute">
           Bu model görseli okuyamaz; fotoğraftan ekleme çalışmaz. Görsel
           destekli bir model seç.
         </div>
       )}
       {!window.kutuphanem && (
-        <div className="text-xs text-kemik-700">
+        <div className="text-xs text-mute">
           Yerel model yalnız masaüstü uygulamasında kullanılabilir.
         </div>
       )}
@@ -360,7 +361,7 @@ function GeminiKeyFields() {
 
   return (
     <div className="space-y-2">
-      <div className="text-xs text-muted">
+      <div className="text-xs text-mute">
         Fotoğraftan otomatik ekleme için Google'ın ücretsiz Gemini servisini
         kullanır. Anahtar işletim sisteminin güvenli deposunda tutulur;
         yedeklere veya dışa aktarımlara dâhil edilmez.
@@ -390,7 +391,7 @@ function GeminiKeyFields() {
         {hasKey && (
           <button
             type="button"
-            className="btn btn-ghost text-secondary"
+            className="btn btn-ghost text-accent"
             onClick={clear}
             aria-label="Gemini anahtarını sil"
           >
@@ -399,7 +400,7 @@ function GeminiKeyFields() {
         )}
       </div>
       {!window.kutuphanem && (
-        <div className="text-xs text-kemik-700">
+        <div className="text-xs text-mute">
           Güvenli anahtar yönetimi yalnız masaüstü uygulamasında kullanılabilir.
         </div>
       )}
@@ -410,7 +411,7 @@ function GeminiKeyFields() {
             "https://aistudio.google.com/apikey",
           )
         }
-        className="inline-flex items-center gap-1.5 text-xs text-primary-ink hover:underline"
+        className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline"
       >
         <Sparkles size={13} /> Ücretsiz anahtar al (Google AI Studio){" "}
         <ExternalLink size={12} />
@@ -525,7 +526,7 @@ function BackupSection({ active }: { active: boolean }) {
     <>
       <Section title="Yedekleme">
         <div className="space-y-3">
-          <div className="text-xs text-muted">
+          <div className="text-xs text-mute">
             {lastBackupAt
               ? `Son yedek: ${new Date(lastBackupAt).toLocaleString("tr-TR")}`
               : "Henüz yedek alınmadı."}
@@ -537,7 +538,7 @@ function BackupSection({ active }: { active: boolean }) {
             <span className="text-sm">Otomatik yedekle</span>
             <input
               type="checkbox"
-              className="accent-[rgb(var(--primary))] w-4 h-4"
+              className="row-check accent-[var(--accent)] w-4 h-4"
               checked={autoBackup}
               onChange={(e) => set("autoBackup", e.target.checked)}
             />
@@ -588,7 +589,7 @@ function BackupSection({ active }: { active: boolean }) {
             />
           </div>
 
-          <div className="flex items-start gap-2 text-xs text-muted">
+          <div className="flex items-start gap-2 text-xs text-mute">
             <DatabaseBackup size={14} className="mt-0.5 shrink-0" />
             <span>
               Yedekler kitap, film/dizi, etiket ve aktif ödünç verilerini
@@ -599,11 +600,11 @@ function BackupSection({ active }: { active: boolean }) {
           </div>
 
           {electron && (
-            <div className="rounded-xl border border-border overflow-hidden">
-              <div className="px-3 py-2 flex items-center justify-between bg-surface2 text-xs font-semibold">
+            <div className="rounded-xl border border-line overflow-hidden">
+              <div className="px-3 py-2 flex items-center justify-between bg-hover text-xs font-semibold">
                 <span>Yedek geçmişi</span>
                 <button
-                  className="text-primary-ink"
+                  className="text-accent"
                   onClick={refresh}
                   aria-label="Yedek geçmişini yenile"
                 >
@@ -611,13 +612,13 @@ function BackupSection({ active }: { active: boolean }) {
                 </button>
               </div>
               {historyError ? (
-                <div className="p-3 text-xs text-secondary">{historyError}</div>
+                <div className="p-3 text-xs text-accent">{historyError}</div>
               ) : history.length === 0 ? (
-                <div className="p-3 text-xs text-muted">
+                <div className="p-3 text-xs text-mute">
                   Henüz uygulama içi yedek yok.
                 </div>
               ) : (
-                <div className="max-h-56 overflow-auto divide-y divide-border">
+                <div className="max-h-56 overflow-auto divide-y divide-line">
                   {history.map((preview) => (
                     <div
                       key={preview.info.path}
@@ -625,13 +626,13 @@ function BackupSection({ active }: { active: boolean }) {
                     >
                       <DatabaseBackup
                         size={15}
-                        className="text-primary-ink shrink-0"
+                        className="text-accent shrink-0"
                       />
                       <div className="min-w-0 flex-1">
                         <div className="font-medium">
                           {new Date(preview.exportedAt).toLocaleString("tr-TR")}
                         </div>
-                        <div className="text-muted">
+                        <div className="text-mute">
                           {preview.books < 0
                             ? "Geçersiz yedek"
                             : `${preview.books} kitap · ${preview.media} medya · ${preview.tags} etiket · ${preview.activeLoans} ödünç`}
@@ -687,7 +688,7 @@ function BackupSection({ active }: { active: boolean }) {
               <strong>{pendingRestore.preview.activeLoans.length}</strong> aktif
               ödünç kaydı geri yüklenecek.
             </p>
-            <p className="rounded-lg bg-secondary/10 p-3 text-secondary">
+            <p className="rounded-lg bg-accent-soft p-3 text-accent">
               Bu işlem mevcut tüm veriyi değiştirecek.
               {electron &&
                 " Değişiklikten önce otomatik bir güvenlik yedeği alınacak."}
@@ -738,11 +739,11 @@ function AboutSection({ initialFocus }: { initialFocus: boolean }) {
 
   return (
     <Section title="Hakkında">
-      <div className="rounded-xl border border-border p-3 flex items-center gap-3">
-        <Info size={18} className="text-primary-ink" />
+      <div className="rounded-xl border border-line p-3 flex items-center gap-3">
+        <Info size={18} className="text-accent" />
         <div className="flex-1">
           <div className="font-medium">Kütüphanem {version}</div>
-          <div className="text-xs text-muted">
+          <div className="text-xs text-mute">
             Veriler cihazınızda saklanır; ağ özellikleri yalnız isteğinizle
             çalışır.
           </div>
@@ -800,12 +801,12 @@ function Segmented<T extends string>({
   options: { value: T; label: string }[];
 }) {
   return (
-    <div className="inline-flex border border-border rounded-lg bg-surface overflow-hidden">
+    <div className="inline-flex border border-line rounded-lg bg-panel overflow-hidden">
       {options.map((o) => (
         <button
           key={o.value}
           onClick={() => onChange(o.value)}
-          className={`px-3 py-1.5 text-sm ${value === o.value ? "bg-primary text-primary-foreground" : "hover:bg-surface2"}`}
+          className={`px-3 py-1.5 text-sm ${value === o.value ? "bg-accent text-white" : "hover:bg-hover"}`}
         >
           {o.label}
         </button>

@@ -104,24 +104,24 @@ export function Topbar({
     section === "books" ? "book" : section === "movies" ? "film" : "tv";
 
   return (
-    <header className="relative z-30 h-14 border-b border-edge bg-panel pr-5 flex items-center shrink-0">
+    <header className="relative z-30 h-14 shrink-0 border-b border-line bg-topbar pr-5 flex items-center">
       {/* Sol — uygulama kimliği. Genişliği kenar çubuğuyla hizalıdır. */}
       <div className="w-64 shrink-0 flex items-center gap-3 pl-5 pr-4 min-w-0">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-elektrik-400 to-elektrik-800 text-white flex items-center justify-center shadow-soft shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-navy text-white flex items-center justify-center shadow-elev1 shrink-0">
           <BrandIcon size={18} />
         </div>
         <div className="min-w-0">
           <div className="font-semibold leading-tight truncate">
             {BRAND_TITLE[section]}
           </div>
-          <div className="text-xs text-muted truncate">{brandCount}</div>
+          <div className="text-xs text-mute truncate">{brandCount}</div>
         </div>
       </div>
       <div className="flex-1 min-w-0" />
 
       {/* Orta — sekmeler, görünüm, sütunlar */}
       <div className="flex items-center gap-2">
-        <div className="flex items-center border border-border rounded-lg bg-surface overflow-hidden">
+        <div className="flex items-center border border-line rounded-lg bg-panel overflow-hidden">
           {SECTIONS.map(({ value, icon: Icon, title }) => (
             <button
               key={value}
@@ -130,8 +130,8 @@ export function Topbar({
               className={cn(
                 "px-3 py-2",
                 section === value
-                  ? "bg-primary/15 text-primary-ink"
-                  : "text-muted hover:bg-surface2",
+                  ? "bg-accent-soft text-accent"
+                  : "text-mute hover:bg-hover",
               )}
             >
               <Icon size={15} />
@@ -141,14 +141,14 @@ export function Topbar({
 
         <div className="w-px h-5 bg-border" />
 
-        <div className="flex items-center border border-border rounded-lg bg-surface overflow-hidden">
+        <div className="flex items-center border border-line rounded-lg bg-panel overflow-hidden">
           <button
             onClick={() => set("view", "table")}
             className={cn(
               "px-3 py-2",
               view === "table"
-                ? "bg-primary/15 text-primary-ink"
-                : "text-muted hover:bg-surface2",
+                ? "bg-accent-soft text-accent"
+                : "text-mute hover:bg-hover",
             )}
             title="Tablo"
           >
@@ -159,8 +159,8 @@ export function Topbar({
             className={cn(
               "px-3 py-2",
               view === "card"
-                ? "bg-primary/15 text-primary-ink"
-                : "text-muted hover:bg-surface2",
+                ? "bg-accent-soft text-accent"
+                : "text-mute hover:bg-hover",
             )}
             title="Kart"
           >
@@ -185,7 +185,7 @@ export function Topbar({
         <PhotoImportIndicator onOpen={onPhotoImport} />
         <MenuButton
           title="Ayarlar"
-          triggerClassName="btn btn-ghost shrink-0 data-[open=true]:bg-surface2"
+          triggerClassName="btn btn-ghost shrink-0 data-[open=true]:bg-hover"
           trigger={<Settings size={15} />}
           items={[
             {
@@ -221,7 +221,7 @@ export function Topbar({
           </button>
           <MenuButton
             title={`${ADD_LABEL[section]} seçenekleri`}
-            triggerClassName="btn btn-primary h-full rounded-l-none border-l border-primary-foreground/25 px-2"
+            triggerClassName="btn btn-primary h-full rounded-l-none border-l border-accent-foreground/25 px-2"
             trigger={<ChevronDown size={15} />}
             items={[
               {
@@ -266,7 +266,7 @@ function PhotoImportIndicator({ onOpen }: { onOpen: () => void }) {
     <button
       className={cn(
         "btn shrink-0",
-        ready ? "btn-primary" : "btn-ghost text-primary-ink",
+        ready ? "btn-primary" : "btn-ghost text-accent",
       )}
       onClick={onOpen}
       title={title}

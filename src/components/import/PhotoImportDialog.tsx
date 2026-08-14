@@ -215,7 +215,7 @@ export function PhotoImportDialog({ onOpenSettings }: Props) {
       {saveError && (
         <div
           role="alert"
-          className="mb-3 rounded-lg border border-bordo-600/35 bg-bordo-600/10 px-3 py-2 text-sm text-bordo-700"
+          className="mb-3 rounded-lg border border-accent bg-accent-soft px-3 py-2 text-sm text-accent"
         >
           {saveError}
         </div>
@@ -294,12 +294,12 @@ function PickStep({
   if (!readiness.ready) {
     return (
       <div className="py-8 text-center">
-        <Sparkles size={28} className="mx-auto mb-3 text-primary-ink" />
+        <Sparkles size={28} className="mx-auto mb-3 text-accent" />
         <div className="font-medium mb-1">Yapay zekâ henüz hazır değil</div>
-        <div className="text-sm text-muted max-w-md mx-auto mb-4">
+        <div className="text-sm text-mute max-w-md mx-auto mb-4">
           {readiness.reason}
         </div>
-        <div className="text-xs text-muted max-w-md mx-auto mb-4">
+        <div className="text-xs text-mute max-w-md mx-auto mb-4">
           Bulut yerine bilgisayarındaki bir modeli de kullanabilirsin; o zaman
           fotoğraf hiç bu bilgisayardan çıkmaz.
         </div>
@@ -313,19 +313,19 @@ function PickStep({
   return (
     <div className="py-4">
       {error && (
-        <div className="mb-3 flex items-start gap-2 rounded-lg border border-bordo-600/35 bg-bordo-600/10 px-3 py-2 text-sm">
-          <AlertTriangle size={16} className="mt-0.5 text-bordo-600 shrink-0" />
-          <div className="text-bordo-700 dark:text-bordo-300">{error}</div>
+        <div className="mb-3 flex items-start gap-2 rounded-lg border border-accent bg-accent-soft px-3 py-2 text-sm">
+          <AlertTriangle size={16} className="mt-0.5 text-accent shrink-0" />
+          <div className="text-accent">{error}</div>
         </div>
       )}
       {notice && (
-        <div className="mb-3 flex items-start gap-2 rounded-lg border border-kemik-600/40 bg-kemik-500/15 px-3 py-2 text-sm">
-          <AlertTriangle size={16} className="mt-0.5 text-kemik-600 shrink-0" />
-          <div className="text-kemik-800 dark:text-kemik-300">{notice}</div>
+        <div className="mb-3 flex items-start gap-2 rounded-lg border border-line-strong bg-accent-soft px-3 py-2 text-sm">
+          <AlertTriangle size={16} className="mt-0.5 text-mute shrink-0" />
+          <div className="text-dim">{notice}</div>
         </div>
       )}
       <label
-        className={`block border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${dragging ? "border-primary bg-primary/10" : "border-border hover:bg-surface2"}`}
+        className={`block border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${dragging ? "border-accent bg-accent-soft" : "border-line hover:bg-hover"}`}
         onDragEnter={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -349,9 +349,9 @@ function PickStep({
           if (files.length) onFiles(files);
         }}
       >
-        <ImagePlus size={28} className="mx-auto mb-3 text-primary-ink" />
+        <ImagePlus size={28} className="mx-auto mb-3 text-accent" />
         <div className="font-medium mb-1">{dropTitle}</div>
-        <div className="text-sm text-muted mb-4">{dropHint}</div>
+        <div className="text-sm text-mute mb-4">{dropHint}</div>
         <input
           type="file"
           multiple
@@ -367,8 +367,8 @@ function PickStep({
           <Upload size={15} /> Fotoğraf Seç
         </span>
       </label>
-      <div className="text-xs text-muted mt-3 flex items-start gap-2">
-        <Sparkles size={14} className="mt-0.5 shrink-0 text-primary-ink" />
+      <div className="text-xs text-mute mt-3 flex items-start gap-2">
+        <Sparkles size={14} className="mt-0.5 shrink-0 text-accent" />
         <span>{enrichHint}</span>
       </div>
     </div>
@@ -393,10 +393,7 @@ function DetectingStep({
   const multiple = queueTotal > 1;
   return (
     <div className="py-16 text-center">
-      <Loader2
-        size={32}
-        className="mx-auto mb-4 text-primary-ink animate-spin"
-      />
+      <Loader2 size={32} className="mx-auto mb-4 text-accent animate-spin" />
       <div className="font-medium mb-1">
         {multiple
           ? `Fotoğraf ${queueDone + 1} / ${queueTotal} inceleniyor…`
@@ -405,7 +402,7 @@ function DetectingStep({
       {multiple && (
         <>
           <div
-            className="mx-auto mt-3 mb-3 h-1.5 w-64 overflow-hidden rounded-full bg-surface2"
+            className="mx-auto mt-3 mb-3 h-1.5 w-64 overflow-hidden rounded-full bg-hover"
             role="progressbar"
             aria-valuenow={queueDone}
             aria-valuemin={0}
@@ -413,23 +410,23 @@ function DetectingStep({
             aria-label="Fotoğraf sırası ilerlemesi"
           >
             <div
-              className="h-full bg-primary transition-[width] duration-300"
+              className="h-full bg-accent transition-[width] duration-300"
               style={{ width: `${(queueDone / queueTotal) * 100}%` }}
             />
           </div>
-          <div className="text-sm text-muted truncate px-4">
+          <div className="text-sm text-mute truncate px-4">
             {fileName}
             {found > 0 && ` · şu ana dek ${found} kayıt bulundu`}
           </div>
         </>
       )}
-      <div className="text-sm text-muted mt-2">
+      <div className="text-sm text-mute mt-2">
         {isBooks ? "Kitaplar" : "Yapımlar"} tanınıyor ve künyeleri tamamlanıyor.{" "}
         {local
           ? "Yerel model kullanılıyor; her fotoğraf yaklaşık yarım dakika sürebilir, ilk çalıştırmada model belleğe yüklenirken daha uzun."
           : "Bu birkaç saniye sürebilir."}
       </div>
-      <div className="text-sm text-muted mt-3">
+      <div className="text-sm text-mute mt-3">
         Bu pencereyi kapatıp uygulamayı kullanmaya devam edebilirsin; iş arka
         planda sürer ve bitince üst çubuktan haber verilir.
       </div>
@@ -452,20 +449,20 @@ function ReviewShell({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-muted">Tümünü şu listeye al:</span>
-          <div className="inline-flex border border-border rounded-lg bg-surface overflow-hidden">
+          <span className="text-mute">Tümünü şu listeye al:</span>
+          <div className="inline-flex border border-line rounded-lg bg-panel overflow-hidden">
             {quickStatus}
           </div>
         </div>
-        <div className="chip bg-turkuaz-500/15 border border-turkuaz-500/25 text-turkuaz-800 dark:text-turkuaz-300">
+        <div className="chip !bg-transparent border-success text-success">
           <CheckCircle2 size={12} /> {selectedCount} seçili
         </div>
       </div>
 
       <div className="card overflow-hidden">{children}</div>
 
-      <div className="text-xs text-muted flex items-start gap-2">
-        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-kemik-600" />
+      <div className="text-xs text-mute flex items-start gap-2">
+        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-mute" />
         <span>{warning}</span>
       </div>
     </div>
@@ -490,13 +487,13 @@ function BookReviewStep({
       quickStatus={
         <>
           <button
-            className="px-3 py-1.5 text-sm hover:bg-surface2"
+            className="px-3 py-1.5 text-sm hover:bg-hover"
             onClick={() => onApplyAll("okunacak")}
           >
             Okunacak
           </button>
           <button
-            className="px-3 py-1.5 text-sm hover:bg-surface2 border-l border-border"
+            className="px-3 py-1.5 text-sm hover:bg-hover border-l border-line"
             onClick={() => onApplyAll("satin-alinacak")}
           >
             Satın Alınacak
@@ -505,7 +502,7 @@ function BookReviewStep({
       }
     >
       <table className="w-full text-sm">
-        <thead className="bg-surface2 text-xs uppercase text-muted">
+        <thead className="bg-hover text-xs uppercase text-mute">
           <tr>
             <th className="px-2 py-2 w-8"></th>
             <th className="px-2 py-2 w-10"></th>
@@ -519,13 +516,13 @@ function BookReviewStep({
           {rows.map((r) => (
             <tr
               key={r.rid}
-              className={`border-t border-border ${r.include ? "" : "opacity-50"}`}
+              className={`border-t border-line ${r.include ? "" : "opacity-50"}`}
             >
               <td className="px-2 py-2 text-center">
                 <input
                   type="checkbox"
                   aria-label={`${r.title} kaydını ekle`}
-                  className="accent-[rgb(var(--primary))] w-4 h-4"
+                  className="row-check accent-[var(--accent)] w-4 h-4"
                   checked={r.include}
                   onChange={(e) =>
                     onPatch(r.rid, { include: e.target.checked })
@@ -534,7 +531,7 @@ function BookReviewStep({
               </td>
               <td className="px-2 py-2">
                 <div
-                  className="grid h-11 w-8 place-items-center rounded border border-border bg-surface2 text-[9px] text-muted"
+                  className="grid h-11 w-8 place-items-center rounded border border-line bg-hover text-[9px] text-mute"
                   title={r.coverUrl ? "Kapak bağlantısı bulundu" : undefined}
                 >
                   {r.coverUrl ? "Kapak" : "—"}
@@ -548,23 +545,19 @@ function BookReviewStep({
                   onChange={(e) => onPatch(r.rid, { title: e.target.value })}
                 />
                 <div className="mt-1 flex items-center gap-2">
-                  {r.duplicate && (
-                    <span className="chip bg-kemik-500/20 border border-kemik-500/30 text-kemik-800 dark:text-kemik-300">
-                      listede var
-                    </span>
-                  )}
+                  {r.duplicate && <span className="chip">listede var</span>}
                   {!r.matched && (
-                    <span className="text-[11px] text-muted">
+                    <span className="text-[11px] text-mute">
                       künye bulunamadı
                     </span>
                   )}
                   {r.publicationYear && (
-                    <span className="text-[11px] text-muted">
+                    <span className="text-[11px] text-mute">
                       {r.publicationYear}
                     </span>
                   )}
                   {multiSource && r.source && (
-                    <span className="text-[11px] text-muted truncate max-w-[10rem]">
+                    <span className="text-[11px] text-mute truncate max-w-[10rem]">
                       {r.source}
                     </span>
                   )}
@@ -579,7 +572,7 @@ function BookReviewStep({
                   onChange={(e) => onPatch(r.rid, { author: e.target.value })}
                 />
                 {r.publisher && (
-                  <div className="text-[11px] text-muted mt-1 truncate">
+                  <div className="text-[11px] text-mute mt-1 truncate">
                     {r.publisher}
                   </div>
                 )}
@@ -602,7 +595,7 @@ function BookReviewStep({
               </td>
               <td className="px-2 py-2 text-center">
                 <button
-                  className="btn btn-ghost p-1.5 text-muted hover:text-bordo-600"
+                  className="btn btn-ghost p-1.5 text-mute hover:text-accent"
                   title="Listeden çıkar"
                   onClick={() => onPatch(r.rid, { include: false })}
                 >
@@ -636,7 +629,7 @@ function MediaReviewStep({
       quickStatus={MEDIA_STATUSES.map((s, index) => (
         <button
           key={s.value}
-          className={`px-3 py-1.5 text-sm hover:bg-surface2 ${index > 0 ? "border-l border-border" : ""}`}
+          className={`px-3 py-1.5 text-sm hover:bg-hover ${index > 0 ? "border-l border-line" : ""}`}
           onClick={() => onApplyAll(s.value)}
         >
           {s.label}
@@ -644,7 +637,7 @@ function MediaReviewStep({
       ))}
     >
       <table className="w-full text-sm">
-        <thead className="bg-surface2 text-xs uppercase text-muted">
+        <thead className="bg-hover text-xs uppercase text-mute">
           <tr>
             <th className="px-2 py-2 w-8"></th>
             <th className="px-3 py-2 text-left">Başlık</th>
@@ -658,13 +651,13 @@ function MediaReviewStep({
           {rows.map((r) => (
             <tr
               key={r.rid}
-              className={`border-t border-border ${r.include ? "" : "opacity-50"}`}
+              className={`border-t border-line ${r.include ? "" : "opacity-50"}`}
             >
               <td className="px-2 py-2 text-center">
                 <input
                   type="checkbox"
                   aria-label={`${r.title} kaydını ekle`}
-                  className="accent-[rgb(var(--primary))] w-4 h-4"
+                  className="row-check accent-[var(--accent)] w-4 h-4"
                   checked={r.include}
                   onChange={(e) =>
                     onPatch(r.rid, { include: e.target.checked })
@@ -679,26 +672,22 @@ function MediaReviewStep({
                   onChange={(e) => onPatch(r.rid, { title: e.target.value })}
                 />
                 <div className="mt-1 flex items-center gap-2">
-                  {r.duplicate && (
-                    <span className="chip bg-kemik-500/20 border border-kemik-500/30 text-kemik-800 dark:text-kemik-300">
-                      listede var
-                    </span>
-                  )}
+                  {r.duplicate && <span className="chip">listede var</span>}
                   {r.genre && (
-                    <span className="text-[11px] text-muted">{r.genre}</span>
+                    <span className="text-[11px] text-mute">{r.genre}</span>
                   )}
                   {type === "film" && r.duration && (
-                    <span className="text-[11px] text-muted">
+                    <span className="text-[11px] text-mute">
                       {r.duration} dk
                     </span>
                   )}
                   {type === "dizi" && r.seasons && (
-                    <span className="text-[11px] text-muted">
+                    <span className="text-[11px] text-mute">
                       {r.seasons} sezon
                     </span>
                   )}
                   {multiSource && r.source && (
-                    <span className="text-[11px] text-muted truncate max-w-[10rem]">
+                    <span className="text-[11px] text-mute truncate max-w-[10rem]">
                       {r.source}
                     </span>
                   )}
@@ -746,7 +735,7 @@ function MediaReviewStep({
               </td>
               <td className="px-2 py-2 text-center">
                 <button
-                  className="btn btn-ghost p-1.5 text-muted hover:text-bordo-600"
+                  className="btn btn-ghost p-1.5 text-mute hover:text-accent"
                   title="Listeden çıkar"
                   onClick={() => onPatch(r.rid, { include: false })}
                 >
