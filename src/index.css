@@ -97,6 +97,8 @@
   --accent-hot: #c8323c; /* bordo, yalnızca hover/aktif */
   --accent-soft: rgba(178, 58, 75, 0.16); /* bordo dolgu */
   --accent-line: rgba(178, 58, 75, 0.35); /* vurgu tonunda kenarlık */
+  /* Karanlık temada işaretler vurguyla aynı ton; ayrı bir parlaklık gerekmiyor. */
+  --accent-mark: #b23a4b;
   --warn: #b23a4b; /* karanlık temada uyarı da bordo */
   --navy: #12243f; /* ikincil dolgu */
   --glow: #3e72b8; /* çelik mavisi — bilgi/bağlantı */
@@ -132,13 +134,16 @@
   --line-strong: rgba(20, 32, 58, 0.3);
 
   /*
-   * Vurgu aydınlık temada turkuaz. Beyaz metin bu tonda 5,6:1 veriyor; daha
-   * açık turkuazlar (#12887E ve üstü) beyazla sınırda kaldığı için kullanılmaz.
+   * Aydınlık temada vurgu iki tona ayrılır. Saf turkuaz (#16A398) üzerinde
+   * beyaz metin 3,1:1 veriyor — grafik bir öğe için yeterli ama okunacak metin
+   * için değil. Bu yüzden beyaz metin taşıyan yüzeyler koyu tonda kalır,
+   * metin taşımayan işaretler saf turkuazı kullanır.
    */
-  --accent: #0e6e66;
-  --accent-hot: #0a5751;
-  --accent-soft: rgba(14, 110, 102, 0.12);
-  --accent-line: rgba(14, 110, 102, 0.35);
+  --accent: #0f7e74; /* beyaz metin taşıyan yüzeyler */
+  --accent-hot: #0b6a61; /* hover / basılı */
+  --accent-mark: #16a398; /* metin taşımayan işaretler */
+  --accent-soft: rgba(22, 163, 152, 0.14);
+  --accent-line: rgba(22, 163, 152, 0.35);
   /* Bordo duruyor ama rolü değişti: artık yalnız durum/uyarı rengi. */
   --warn: #8e2433;
   --navy: #2b3b5e;
@@ -168,9 +173,10 @@ body {
   min-height: 100vh;
 }
 
-/* Odak halkası her yerde aynı: bordo, 2 px, 2 px boşlukla. */
+/* Odak halkası her yerde aynı: 2 px, 2 px boşlukla. Metin taşımadığı için
+   işaret tonunu kullanır. */
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-mark);
   outline-offset: 2px;
 }
 
@@ -224,9 +230,9 @@ body {
     color: var(--text-mute);
   }
   .input:focus {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--accent-mark);
     outline-offset: 2px;
-    border-color: var(--accent);
+    border-color: var(--accent-mark);
   }
   /* Rozetler tek satırda kalsın: tabloda satır yüksekliğini bozmasınlar. */
   .chip {
@@ -263,11 +269,11 @@ body {
       background 140ms;
   }
   .row-check:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-mark);
   }
   .row-check:checked {
-    background: var(--accent);
-    border-color: var(--accent);
+    background: var(--accent-mark);
+    border-color: var(--accent-mark);
   }
   .row-check:checked::after {
     content: "";
@@ -301,7 +307,7 @@ body {
   .filter-item.is-active {
     background: var(--accent-soft);
     color: var(--text);
-    border-left-color: var(--accent);
+    border-left-color: var(--accent-mark);
   }
   .filter-count {
     color: var(--text-mute);

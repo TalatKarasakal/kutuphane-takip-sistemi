@@ -132,7 +132,7 @@ export function Topbar({
               className={cn(
                 "px-3 py-2",
                 section === value
-                  ? "bg-accent-soft text-accent"
+                  ? "bg-accent-soft text-accent-mark"
                   : "text-mute hover:bg-hover",
               )}
             >
@@ -149,7 +149,7 @@ export function Topbar({
             className={cn(
               "px-3 py-2",
               view === "table"
-                ? "bg-accent-soft text-accent"
+                ? "bg-accent-soft text-accent-mark"
                 : "text-mute hover:bg-hover",
             )}
             title="Tablo"
@@ -161,7 +161,7 @@ export function Topbar({
             className={cn(
               "px-3 py-2",
               view === "card"
-                ? "bg-accent-soft text-accent"
+                ? "bg-accent-soft text-accent-mark"
                 : "text-mute hover:bg-hover",
             )}
             title="Kart"

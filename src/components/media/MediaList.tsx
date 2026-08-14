@@ -45,14 +45,6 @@ type MediaVirtualUnit =
     }
   | { key: string; kind: "items"; items: Media[] };
 
-const NEXT_STATUS: Partial<Record<MediaStatus, MediaStatus>> = {
-  izlenecek: "izlendi",
-};
-
-const NEXT_LABEL: Partial<Record<MediaStatus, string>> = {
-  izlenecek: "→ İzlendi ✓",
-};
-
 export function MediaList({ type, onOpen }: Props) {
   const {
     media,
@@ -286,14 +278,13 @@ export function MediaList({ type, onOpen }: Props) {
                       width={COL_WIDTH[col.key]}
                     />
                   ))}
-                  <th className="w-12" />
                 </tr>
               </thead>
               <tbody>
                 {virtualizer.getVirtualItems()[0]?.start > 0 && (
                   <tr aria-hidden="true">
                     <td
-                      colSpan={visibleCols.length + 2}
+                      colSpan={visibleCols.length + 1}
                       style={{ height: virtualizer.getVirtualItems()[0].start }}
                     />
                   </tr>
@@ -308,7 +299,7 @@ export function MediaList({ type, onOpen }: Props) {
                         data-index={virtualRow.index}
                       >
                         <td
-                          colSpan={visibleCols.length + 2}
+                          colSpan={visibleCols.length + 1}
                           className="bg-hover/70 px-3 py-2"
                         >
                           <TagGroupHeader
@@ -355,25 +346,13 @@ export function MediaList({ type, onOpen }: Props) {
                       {visibleCols.map((col) =>
                         renderCell(m, col.key, density),
                       )}
-                      <td className="pr-3" onClick={(e) => e.stopPropagation()}>
-                        {NEXT_STATUS[m.status] && (
-                          <button
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-lg bg-hover hover:bg-accent-soft hover:text-accent whitespace-nowrap"
-                            onClick={() =>
-                              setStatus([m.id], NEXT_STATUS[m.status]!)
-                            }
-                          >
-                            {NEXT_LABEL[m.status]}
-                          </button>
-                        )}
-                      </td>
                     </tr>
                   );
                 })}
                 {virtualizer.getVirtualItems().at(-1) && (
                   <tr aria-hidden="true">
                     <td
-                      colSpan={visibleCols.length + 2}
+                      colSpan={visibleCols.length + 1}
                       style={{
                         height: Math.max(
                           0,
@@ -548,9 +527,9 @@ function ThSort({
         {label}
         {active ? (
           sortDir === "asc" ? (
-            <ArrowUp size={12} className="text-accent" />
+            <ArrowUp size={12} className="text-accent-mark" />
           ) : (
-            <ArrowDown size={12} className="text-accent" />
+            <ArrowDown size={12} className="text-accent-mark" />
           )
         ) : (
           <ArrowUpDown size={12} className="opacity-40" />

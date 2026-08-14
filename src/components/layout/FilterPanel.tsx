@@ -21,8 +21,8 @@ export function FilterCard({
   return (
     <section className="filter-group">
       <div className="flex items-center gap-2 px-2.5 pb-2 pt-1 text-xs font-semibold uppercase tracking-wide text-mute">
-        {/* Bölüm başlığının solundaki çubuk bordodur. */}
-        <span className="h-3 w-0.5 shrink-0 rounded-full bg-accent" />
+        {/* Başlığın solundaki çubuk metin taşımıyor; saf işaret tonunu alır. */}
+        <span className="h-3 w-0.5 shrink-0 rounded-full bg-accent-mark" />
         {icon}
         <span>{title}</span>
       </div>

@@ -36,6 +36,8 @@ export default {
           DEFAULT: "var(--accent)",
           hot: "var(--accent-hot)",
           soft: "var(--accent-soft)",
+          /** Metin taşımayan işaretler; aydınlık temada saf turkuaz. */
+          mark: "var(--accent-mark)",
           line: "var(--accent-line)",
         },
         navy: "var(--navy)",

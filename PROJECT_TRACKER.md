@@ -11,8 +11,8 @@
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
-| Kontrol bekleyen çözüm | 33 |
-| Geliştirme fikri | 34 |
+| Kontrol bekleyen çözüm | 34 |
+| Geliştirme fikri | 35 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -35,6 +35,7 @@
 - Fotoğraftan ekleme bulut yerine bu bilgisayardaki bir modelle de çalışabiliyor; yerel sağlayıcı çevrimdışı modda da kullanılabiliyor ve yalnız loopback adreslerine bağlanıyor.
 - Algılama arka planda sürüyor: diyalog kapatılınca iş devam ediyor, üst çubuktaki gösterge işi izliyor ve sonuç hazır olunca gözden geçirme listesine dönülüyor.
 - Arama kenar çubuğunun tepesine, uygulama kimliği üst çubuğa alındı; yüzey kademeleri (zemin/panel/yüzey) ayrıştırıldı ve CSP'nin engellediği barkod worker'ı açıldı.
+- Aydınlıkta turkuaz iki tonda: beyaz metin taşıyan yüzeyler koyu, metin taşımayan işaretler parlak. Satır hover'ındaki hızlı durum düğmesi kaldırıldı.
 - Vurgu rengi temaya bağlı: aydınlıkta turkuaz, karanlıkta bordo; bordo aydınlıkta yalnız durum/uyarı rengi (`--warn`).
 - Arayüz, `docs/design/arayuz-token-seti.md` içindeki token setine göre yeniden kuruldu: beş yüzey kademesi, sıcak kağıt/soğuk mürekkep aydınlık tema, bordo birincil vurgu, tek tip tür etiketi, 52 px zebra tablo ve özel seçim kutusu.
 - Yerel model artık raf fotoğraflarını okuyabiliyor: istek bağlamı büyütüldü, düşünme adımı kapatıldı ve yanıt iki alandan da çözümleniyor; önceden yalnız tek kitabın karşıdan çekildiği kare çalışıyordu. Aynı anda birden çok fotoğraf sıraya alınıp sırayla işlenebiliyor.
@@ -197,6 +198,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Kontrol listesi tarayıcıda ölçüldü: aydınlık temada DOM taranarak bordo kullanan her öğe bulundu, hepsi "Satın Alınacak" durumuna ait (kenar çubuğu noktası, satır şeridi, rozet) — buton, kenarlık veya seçim kutusu bordo değil. Karanlık temada ekleme düğmesi bordo, kimlik kutucuğu `--accent-soft` zemin + `--accent-line` kenarlık + bordo ikon. Aydınlıkta kimlik kutucuğu lacivert/beyaz olarak değişmedi. Kontrastlar: Kitap Ekle 6,1:1 (aydınlık) ve 5,8:1 (karanlık); rozetlerin tamamı ≥4,6:1.
   - **Bilinen sınır:** Karanlık temada "Satın Alınacak" rozeti dolgusuz kalmak zorunda ama bordo yazı orada 2,85:1 veriyor; renk kenarlıkta ve noktada bırakılıp yazı `--text-dim`e (7,25:1) alındı. Aydınlıkta bordo yazı 8,35:1 verdiği için olduğu gibi duruyor.
   - **Kullanıcı kontrolü:** İki temayı da açıp vurgunun değiştiğini, aydınlıkta bordonun yalnız "Satın Alınacak"ta kaldığını ve sol üstteki simgenin karanlıkta bordo, aydınlıkta lacivert olduğunu doğrulayın.
+- **IMP-035 — Turkuaz iki tona ayrıldı, satır hover eylemi kaldırıldı**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** çalışma ağacında.
+  - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Tarayıcıda ölçüldü: `--accent` #0F7E74 üzerinde beyaz metin 4,93:1, `--accent-mark` #16A398 satır zeminine karşı 3,04:1 (grafik öğe eşiği), başlık çubuğu ve seçim kutusu dolgusu işaret tonunda, tabloda "→" içeren hızlı eylem düğmesi kalmadı. Koyu temanın görünümü değişmedi.
+  - **Bilinen sınır:** Satır çubuğu durum rengini koruyor; spesifikasyondaki liste onu da işaret tonuna alıyordu ama bu satırdaki durum kodlamasını kaldıracaktı, kullanıcı mevcut hâlin kalmasını seçti.
+  - **Kullanıcı kontrolü:** Aydınlık temada turkuazın butonlarda koyu, işaretlerde parlak olduğunu; satır üzerine gelince yalnız zeminin değiştiğini doğrulayın.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:
