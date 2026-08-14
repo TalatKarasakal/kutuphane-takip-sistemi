@@ -81,31 +81,32 @@
  */
 :root {
   /*
-   * Turkuaz 700 ile 800 arasında bir ton. 800 (#0E6E66) koyu yeşile kaçıyordu;
-   * paletin turkuaz dediği referanslar (#14b8a6, #1abc9c) daha açık. 700
-   * (#12887E) üstünde beyaz yazı 4,33:1'de kaldığı için bir tık koyulaştırıldı:
-   * bu ton 5,1:1 veriyor ve gözle turkuaz okunuyor.
+   * Dolgu yüzeyleri (Kitap Ekle gibi) paletin turkuazını olduğu gibi taşır.
+   * Bu parlaklıkta beyaz yazı okunmadığı için (2,3:1) üstündeki yazı koyudur;
+   * yazı ve simge olarak kullanılan turkuaz ise ayrı, koyu bir kademedir.
    */
-  --primary: 16 123 114;
-  --primary-foreground: 255 255 255;
+  --primary: 31 182 166; /* Turkuaz 500 */
+  --primary-foreground: 6 18 26; /* Petrol 950 */
+  --primary-ink: 14 110 102; /* Turkuaz 800 — yazı/simge için */
   /* Bordo 700 — parlak kırmızı kullanılmaz. */
   --secondary: 140 42 34;
   --secondary-foreground: 255 255 255;
-  /* Elektrik Mavi 600: bağlantı, seçili durum, odak halkası. */
+  /* Elektrik Mavi 600: kimlik kutucuğunun mavisi, bağlantı ve odak halkası. */
   --accent: 24 115 196;
 
   /*
-   * Dört yüzey kademesi belirgin aralıklarla ayrılır: zemin < panel < yüzey.
-   * Önceki değerlerde kenar çubuğu da kartlar da beyazdı; üst üste binen aynı
-   * tonlar okumayı zorlaştırıyordu.
+   * Yüzey kademeleri: zemin < panel < yüzey. Panel hem üst çubuğun hem kenar
+   * çubuğunun tonudur, böylece uygulama çerçevesi tek parça okunur ve içerik
+   * alanından ayrışır. Önceki değerler fazla maviydi; Nötr ailesine çekildi.
    */
-  --bg: 225 235 242; /* zemin — içerik alanı */
-  --panel: 211 226 236; /* kenar çubuğu gövdesi, zeminden bir kademe koyu */
-  --surface: 255 255 255; /* kart, tablo, filtre kutusu — en açık kademe */
-  --surface-2: 234 241 246; /* tablo başlığı, üzerine gelme, ikincil dolgu */
-  --border: 191 206 218;
+  --bg: 241 244 247; /* zemin — içerik alanı */
+  --panel: 223 230 236; /* üst çubuk ve kenar çubuğu */
+  --surface: 255 255 255; /* kart, tablo, filtre kutusu */
+  --surface-2: 242 245 248; /* tablo başlığı, üzerine gelme */
+  --border: 211 219 226; /* kutu ve satır kenarlıkları */
+  --edge: 126 143 158; /* çerçeveyi içerikten ayıran ana çizgi; 1 px ayıraç için 3:1 hedefi */
   --text: 22 29 35; /* Nötr 900 */
-  --muted: 90 107 122;
+  --muted: 82 99 115;
 
   --font-app: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-size-app: 15px;
@@ -116,18 +117,19 @@
 }
 
 html[data-theme="dark"] {
-  /* Turkuaz 500 koyu zeminde parlak durduğu için üstündeki yazı koyu olur. */
-  --primary: 31 182 166;
+  --primary: 31 182 166; /* Turkuaz 500 */
   --primary-foreground: 6 18 26;
+  --primary-ink: 69 201 187; /* Turkuaz 400 — koyu zeminde okunur */
   --secondary: 163 43 34; /* Bordo 600 */
   --secondary-foreground: 255 255 255;
   --accent: 79 163 227; /* Elektrik Mavi 400 */
 
-  --bg: 8 22 32; /* zemin — Petrol 900'ün bir tık altı, kartlar ayrışsın */
-  --panel: 10 26 38; /* kenar çubuğu gövdesi */
+  --bg: 6 16 23; /* zemin — içerik alanı */
+  --panel: 18 40 58; /* üst çubuk ve kenar çubuğu, zeminden ayrışır */
   --surface: 20 45 63; /* kart, tablo, filtre kutusu */
   --surface-2: 30 63 86; /* tablo başlığı, üzerine gelme */
   --border: 44 86 114;
+  --edge: 61 110 143; /* çerçeveyi içerikten ayıran ana çizgi */
   --text: 205 222 232;
   /* Palet, koyu zeminde ikincil metin için Petrol 400'ü işaret ediyor; küçük
      puntoda kontrastı yetmediği için bir kademe açığı (300) kullanılıyor. */

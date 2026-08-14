@@ -227,7 +227,7 @@ export function ExportDialog({ open, onClose, section }: Props) {
             <div className="label m-0">Alanlar</div>
             <div className="flex gap-2 text-xs">
               <button
-                className="text-primary hover:underline"
+                className="text-primary-ink hover:underline"
                 onClick={() => {
                   if (isMedia)
                     setMediaFields(MEDIA_EXPORT_FIELDS.map((f) => f.key));
@@ -237,7 +237,7 @@ export function ExportDialog({ open, onClose, section }: Props) {
                 Tümü
               </button>
               <button
-                className="text-primary hover:underline"
+                className="text-primary-ink hover:underline"
                 onClick={() => {
                   if (isMedia) setMediaFields([]);
                   else setBookFields([]);

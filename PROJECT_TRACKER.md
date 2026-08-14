@@ -11,8 +11,8 @@
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
-| Kontrol bekleyen çözüm | 30 |
-| Geliştirme fikri | 31 |
+| Kontrol bekleyen çözüm | 31 |
+| Geliştirme fikri | 32 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -178,6 +178,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Yığın sırası tarayıcıda `elementFromPoint` ile ölçüldü: kart görünümünde menünün üç öğesi de tıklanabilir çıktı ve "Ayarları Aç" gerçekten ayarları açtı; detay paneli üst çubuğun üstünde çiziliyor. Açık ve koyu tema tabloda ve kartta gözden geçirildi.
   - **Bilinen sınır:** Kırmızı, düğme anlamları bozulmadan artırıldı; birincil eylem düğmeleri turkuaz kaldı çünkü aynı anlamı taşıyan diyalog düğmeleriyle tutarlı olmalı. Daha fazlası isteniyorsa birincil/ikincil rollerinin tamamen takas edilmesi gerekir, bu da paletin "bordo seyrek kullanılır" notuyla çelişir.
   - **Kullanıcı kontrolü:** Kart görünümünde ayarlar menüsünden "Ayarları Aç"ı deneyin; tür kartının yalnız tür varken göründüğünü ve arama kutusunun altında ayraç kalmadığını doğrulayın.
+- **IMP-032 — Açık tema yeniden kurgulandı, çerçeve ile içerik ayrıldı**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** çalışma ağacında.
+  - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Kontrast oranları tarayıcıda hesaplandı: Kitap Ekle düğmesi 7,5:1, birincil yazı tonu yüzeyde 6,1:1 (koyuda 7,0), ikincil metin panelde 4,9:1 (koyuda 4,8), ayıraç çizgisi zeminde 3:1 civarı. Açık ve koyu tema tabloda gözden geçirildi.
+  - **Bilinen sınır:** Kitap Ekle düğmesindeki yazı koyu; paletin turkuazı bu parlaklıkta beyaz yazıyı taşımıyor (2,3:1). Beyaz yazı isteniyorsa dolgunun koyulaştırılması gerekir, o da turkuazı yeşile kaydırır.
+  - **Kullanıcı kontrolü:** Açık temada zeminin maviliğinin kalktığını, üst çubuk/kenar çubuğu ile içerik alanının ton farkını ve iki ayıraç çizgisinin aynı ve görünür olduğunu kontrol edin.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:

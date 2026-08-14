@@ -166,7 +166,7 @@ export function MediaList({ type, onOpen }: Props) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center p-10">
-          <div className="w-14 h-14 mx-auto rounded-full bg-primary/15 text-primary flex items-center justify-center mb-4">
+          <div className="w-14 h-14 mx-auto rounded-full bg-primary/15 text-primary-ink flex items-center justify-center mb-4">
             {isFiltered ? <SearchX size={24} /> : <TypeIcon size={24} />}
           </div>
           <h3 className="font-semibold mb-1">
@@ -355,7 +355,7 @@ export function MediaList({ type, onOpen }: Props) {
                       <td className="pr-3" onClick={(e) => e.stopPropagation()}>
                         {NEXT_STATUS[m.status] && (
                           <button
-                            className="opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-lg bg-surface2 hover:bg-primary/15 hover:text-primary whitespace-nowrap"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded-lg bg-surface2 hover:bg-primary/15 hover:text-primary-ink whitespace-nowrap"
                             onClick={() =>
                               setStatus([m.id], NEXT_STATUS[m.status]!)
                             }
@@ -566,7 +566,9 @@ function BulkBar({
 }) {
   return (
     <div className="sticky top-0 z-10 bg-secondary/10 border-b border-secondary/25 px-5 py-2 flex items-center gap-3 text-sm flex-wrap">
-      <span className="font-medium text-primary shrink-0">{count} seçili</span>
+      <span className="font-medium text-primary-ink shrink-0">
+        {count} seçili
+      </span>
 
       <div className="w-px h-4 bg-primary/20 shrink-0" />
 

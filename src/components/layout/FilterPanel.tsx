@@ -10,7 +10,7 @@ import type { StatusTone } from "../../constants/statuses";
 export type CardTone = "primary" | "accent" | "secondary" | "warm";
 
 const CARD_TONE: Record<CardTone, { bar: string; icon: string }> = {
-  primary: { bar: "bg-primary", icon: "text-primary" },
+  primary: { bar: "bg-primary", icon: "text-primary-ink" },
   accent: { bar: "bg-accent", icon: "text-accent" },
   secondary: { bar: "bg-secondary", icon: "text-secondary" },
   warm: { bar: "bg-kemik-600", icon: "text-kemik-700 dark:text-kemik-400" },
@@ -72,7 +72,7 @@ export function FilterRow({
     ? cn(tone.tint, "font-medium")
     : accent === "secondary"
       ? "bg-secondary/10 text-secondary font-medium"
-      : "bg-primary/10 text-primary font-medium";
+      : "bg-primary/10 text-primary-ink font-medium";
   return (
     <button
       onClick={onClick}

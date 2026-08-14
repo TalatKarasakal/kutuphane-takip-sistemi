@@ -294,7 +294,7 @@ function PickStep({
   if (!readiness.ready) {
     return (
       <div className="py-8 text-center">
-        <Sparkles size={28} className="mx-auto mb-3 text-primary" />
+        <Sparkles size={28} className="mx-auto mb-3 text-primary-ink" />
         <div className="font-medium mb-1">Yapay zekâ henüz hazır değil</div>
         <div className="text-sm text-muted max-w-md mx-auto mb-4">
           {readiness.reason}
@@ -349,7 +349,7 @@ function PickStep({
           if (files.length) onFiles(files);
         }}
       >
-        <ImagePlus size={28} className="mx-auto mb-3 text-primary" />
+        <ImagePlus size={28} className="mx-auto mb-3 text-primary-ink" />
         <div className="font-medium mb-1">{dropTitle}</div>
         <div className="text-sm text-muted mb-4">{dropHint}</div>
         <input
@@ -368,7 +368,7 @@ function PickStep({
         </span>
       </label>
       <div className="text-xs text-muted mt-3 flex items-start gap-2">
-        <Sparkles size={14} className="mt-0.5 shrink-0 text-primary" />
+        <Sparkles size={14} className="mt-0.5 shrink-0 text-primary-ink" />
         <span>{enrichHint}</span>
       </div>
     </div>
@@ -393,7 +393,10 @@ function DetectingStep({
   const multiple = queueTotal > 1;
   return (
     <div className="py-16 text-center">
-      <Loader2 size={32} className="mx-auto mb-4 text-primary animate-spin" />
+      <Loader2
+        size={32}
+        className="mx-auto mb-4 text-primary-ink animate-spin"
+      />
       <div className="font-medium mb-1">
         {multiple
           ? `Fotoğraf ${queueDone + 1} / ${queueTotal} inceleniyor…`

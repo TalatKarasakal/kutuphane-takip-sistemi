@@ -410,7 +410,7 @@ function GeminiKeyFields() {
             "https://aistudio.google.com/apikey",
           )
         }
-        className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+        className="inline-flex items-center gap-1.5 text-xs text-primary-ink hover:underline"
       >
         <Sparkles size={13} /> Ücretsiz anahtar al (Google AI Studio){" "}
         <ExternalLink size={12} />
@@ -603,7 +603,7 @@ function BackupSection({ active }: { active: boolean }) {
               <div className="px-3 py-2 flex items-center justify-between bg-surface2 text-xs font-semibold">
                 <span>Yedek geçmişi</span>
                 <button
-                  className="text-primary"
+                  className="text-primary-ink"
                   onClick={refresh}
                   aria-label="Yedek geçmişini yenile"
                 >
@@ -625,7 +625,7 @@ function BackupSection({ active }: { active: boolean }) {
                     >
                       <DatabaseBackup
                         size={15}
-                        className="text-primary shrink-0"
+                        className="text-primary-ink shrink-0"
                       />
                       <div className="min-w-0 flex-1">
                         <div className="font-medium">
@@ -739,7 +739,7 @@ function AboutSection({ initialFocus }: { initialFocus: boolean }) {
   return (
     <Section title="Hakkında">
       <div className="rounded-xl border border-border p-3 flex items-center gap-3">
-        <Info size={18} className="text-primary" />
+        <Info size={18} className="text-primary-ink" />
         <div className="flex-1">
           <div className="font-medium">Kütüphanem {version}</div>
           <div className="text-xs text-muted">

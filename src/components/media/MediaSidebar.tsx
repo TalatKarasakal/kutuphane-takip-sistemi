@@ -56,7 +56,7 @@ export function MediaSidebar({ type, searchRef }: Props) {
     groupByTags;
 
   return (
-    <aside className="w-64 shrink-0 border-r border-border bg-panel flex flex-col">
+    <aside className="w-64 shrink-0 border-r border-edge bg-panel flex flex-col">
       <SidebarSearch
         value={filters[type].search}
         onChange={(value) => setSearch(type, value)}
@@ -100,7 +100,7 @@ export function MediaSidebar({ type, searchRef }: Props) {
                   className={cn(
                     "rounded-lg px-1.5 py-0.5 text-[10px] font-semibold",
                     tagFilterMode === mode
-                      ? "bg-primary text-white"
+                      ? "bg-primary text-primary-foreground"
                       : "bg-surface text-muted",
                   )}
                   onClick={() => setTagFilterMode(type, mode)}
@@ -128,7 +128,7 @@ export function MediaSidebar({ type, searchRef }: Props) {
               className={cn(
                 "mt-1 flex w-full items-center justify-center gap-1.5 rounded-lg border border-border px-2 py-1.5 text-xs",
                 groupByTags
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-primary/10 text-primary-ink"
                   : "hover:bg-surface2",
               )}
               onClick={() => toggleGroupByTags(type)}

@@ -492,7 +492,7 @@ function PickStep({ onFile }: { onFile: (f: File) => void }) {
           if (f) onFile(f);
         }}
       >
-        <Upload size={28} className="mx-auto mb-3 text-primary" />
+        <Upload size={28} className="mx-auto mb-3 text-primary-ink" />
         <div className="font-medium mb-1">
           Dosya seç ya da buraya sürükle-bırak
         </div>

@@ -82,6 +82,8 @@ export default {
         primary: {
           DEFAULT: "rgb(var(--primary) / <alpha-value>)",
           foreground: "rgb(var(--primary-foreground) / <alpha-value>)",
+          /** Yazı ve simge olarak okunur turkuaz; dolgu tonu bunun için fazla açık. */
+          ink: "rgb(var(--primary-ink) / <alpha-value>)",
         },
         secondary: {
           DEFAULT: "rgb(var(--secondary) / <alpha-value>)",
@@ -95,6 +97,8 @@ export default {
         surface: "rgb(var(--surface) / <alpha-value>)",
         surface2: "rgb(var(--surface-2) / <alpha-value>)",
         border: "rgb(var(--border) / <alpha-value>)",
+        /** Üst çubuğu ve kenar çubuğunu içerikten ayıran, kenarlıktan güçlü çizgi. */
+        edge: "rgb(var(--edge) / <alpha-value>)",
         text: "rgb(var(--text) / <alpha-value>)",
         muted: "rgb(var(--muted) / <alpha-value>)",
       },

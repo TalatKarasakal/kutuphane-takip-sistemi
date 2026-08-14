@@ -250,7 +250,7 @@ export function CommandPalette({
               key={command.id}
               role="option"
               aria-selected={index === active}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm ${index === active ? "bg-primary/15 text-primary" : "hover:bg-surface2"}`}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm ${index === active ? "bg-primary/15 text-primary-ink" : "hover:bg-surface2"}`}
               onMouseEnter={() => setActive(index)}
               onClick={() => void run(command)}
             >

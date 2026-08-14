@@ -6,7 +6,7 @@ const ICON = { success: CheckCircle2, error: AlertCircle, info: Info };
 const ICON_CLASS = {
   success: "text-turkuaz-600",
   error: "text-bordo-600",
-  info: "text-primary",
+  info: "text-primary-ink",
 };
 
 export function ToastContainer() {
@@ -34,7 +34,7 @@ export function ToastContainer() {
             <span className="flex-1">{t.message}</span>
             {t.undo && (
               <button
-                className="shrink-0 text-primary hover:underline text-xs font-medium flex items-center gap-1"
+                className="shrink-0 text-primary-ink hover:underline text-xs font-medium flex items-center gap-1"
                 onClick={() => {
                   t.undo!();
                   dismiss(t.id);

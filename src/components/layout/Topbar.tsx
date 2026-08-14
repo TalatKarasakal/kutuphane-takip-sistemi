@@ -104,15 +104,10 @@ export function Topbar({
     section === "books" ? "book" : section === "movies" ? "film" : "tv";
 
   return (
-    <header className="relative z-30 h-14 border-b border-border bg-gradient-to-r from-primary/6 via-surface/80 to-secondary/8 backdrop-blur pr-5 flex items-center shrink-0">
-      {/* Üst çubuğu içerikten ayıran ince renk çizgisi. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/50 via-secondary/45 to-secondary/60"
-      />
+    <header className="relative z-30 h-14 border-b border-edge bg-panel pr-5 flex items-center shrink-0">
       {/* Sol — uygulama kimliği. Genişliği kenar çubuğuyla hizalıdır. */}
       <div className="w-64 shrink-0 flex items-center gap-3 pl-5 pr-4 min-w-0">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center shadow-soft shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-elektrik-400 to-elektrik-800 text-white flex items-center justify-center shadow-soft shrink-0">
           <BrandIcon size={18} />
         </div>
         <div className="min-w-0">
@@ -135,7 +130,7 @@ export function Topbar({
               className={cn(
                 "px-3 py-2",
                 section === value
-                  ? "bg-primary/15 text-primary"
+                  ? "bg-primary/15 text-primary-ink"
                   : "text-muted hover:bg-surface2",
               )}
             >
@@ -152,7 +147,7 @@ export function Topbar({
             className={cn(
               "px-3 py-2",
               view === "table"
-                ? "bg-primary/15 text-primary"
+                ? "bg-primary/15 text-primary-ink"
                 : "text-muted hover:bg-surface2",
             )}
             title="Tablo"
@@ -164,7 +159,7 @@ export function Topbar({
             className={cn(
               "px-3 py-2",
               view === "card"
-                ? "bg-primary/15 text-primary"
+                ? "bg-primary/15 text-primary-ink"
                 : "text-muted hover:bg-surface2",
             )}
             title="Kart"
@@ -271,7 +266,7 @@ function PhotoImportIndicator({ onOpen }: { onOpen: () => void }) {
     <button
       className={cn(
         "btn shrink-0",
-        ready ? "btn-primary" : "btn-ghost text-primary",
+        ready ? "btn-primary" : "btn-ghost text-primary-ink",
       )}
       onClick={onOpen}
       title={title}
