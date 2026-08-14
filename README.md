@@ -132,6 +132,14 @@ Tüm platform hedeflerini sırasıyla üretmek için:
 npm run pack:all
 ```
 
+Uygulamayı doğrudan bu Mac'e kurmak için:
+
+```bash
+./scripts/install-mac.sh
+```
+
+Bu betik makinenin mimarisine göre paketi üretip `/Applications/Kütüphanem.app` olarak kurar. Paketin içindeki adlar (çalıştırılabilir dosya, `CFBundleName`, yardımcı süreçler) ASCII olmak zorundadır — herhangi biri Türkçe karakter içerdiğinde uygulama açılışta ölür — ama paketin klasör adı ve görünen adı Türkçedir.
+
 Paketleme çıktıları `release/` dizinine yazılır. macOS hedefi Universal DMG, Windows hedefi x64 NSIS, Linux hedefi x64 AppImage/deb üretir. İmza ve notarization hazırlığı için [paket imzalama belgesine](docs/signing.md) bakın.
 
 ## Gizlilik

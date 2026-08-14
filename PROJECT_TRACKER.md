@@ -27,7 +27,7 @@
 - `tracker:check`, Prettier, typecheck, ESLint, 23 unit/component testi, 3 Electron E2E senaryosu, build ve npm audit başarılı.
 - Ana JavaScript chunk'ı **392,90 KB**; barkod (**477,93 KB**) ve xlsx (**493,28 KB**) başlangıçtan ayrıldı.
 - 10.000 kayıt fixture'ında filtre/sıralama 300 ms hedefinin altında; sanallaştırılmış listeler DOM'u 200 öğenin altında tutuyor.
-- **Paketlenen uygulama ilk kez açılabiliyor.** Önceki yapıların tamamı (kurulu sürüm dâhil) açılışta SIGTRAP ile ölüyordu; nedenleri ASCII olmayan paket adı ve ad-hoc imzada kitaplık doğrulaması olarak bulundu. Artık paket adı ASCII, görünen ad Türkçe.
+- **Paketlenen uygulama ilk kez açılabiliyor.** Önceki yapıların tamamı (kurulu sürüm dâhil) açılışta SIGTRAP ile ölüyordu; nedenleri ASCII olmayan paket adı ve ad-hoc imzada kitaplık doğrulaması olarak bulundu. Artık paketin içindeki adlar ASCII, klasör adı ve görünen ad Türkçe: `/Applications/Kütüphanem.app`.
 - macOS Universal `.app` ve DMG; `codesign --verify --deep --strict`, Universal mimari, koyu/açık Dock simgeleri ve pakette yinelenen `node_modules` bulunmaması doğrulandı.
 - Özgün logo korunarak uygulama simgesi macOS 26 ızgarasına oturtuldu: saydam zeminli logo katmanı, Apple'ın kendi köşe yuvarlaklığı, kenar boşluğu ve gölgesiyle koyu ve açık zeminli iki 1024×1024 ana görsele basıldı; ICNS ve ICO bunlardan üretildi.
 - Ekleme ve ayarlar butonları açılır menü kazandı; fotoğraftan ekleme ile içe/dışa aktarma ana yüzeyden kaldırılıp bu menülere taşındı, komut paletinden de erişilebilir bırakıldı.
@@ -147,7 +147,7 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Uygulayan:** Claude `[Model: Claude Opus 5]`
   - **Commitler:** `237f545` (macOS), Windows paketleme aynı seride.
   - **Doğrulama:** macOS Universal `.app` ve DMG üretildi, açılışı ve `codesign --verify --deep --strict` doğrulandı. Windows NSIS kurulumu macOS üzerinde üretildi; `.exe` kaynakları (ProductName, CompanyName, FileVersion, 7 boyutlu simge) ve `app.asar` içeriği doğrulandı.
-  - **Bilinen sınır:** Windows kurulumu gerçek bir Windows makinesinde çalıştırılarak denenmedi; yalnız üretilen dosyanın içeriği doğrulandı. Developer ID/notarization ve Windows kod imzası hâlâ anahtar bekliyor.
+  - **Bilinen sınır:** DMG içindeki paket ASCII adla kalır (DMG adımı yeniden adlandırmayı kaldırmıyor); sürükleyip bıraktıktan sonra Finder'da yeniden adlandırmak ya da `scripts/install-mac.sh` kullanmak gerekir. Windows kurulumu gerçek bir Windows makinesinde çalıştırılarak denenmedi; yalnız üretilen dosyanın içeriği doğrulandı. Developer ID/notarization ve Windows kod imzası hâlâ anahtar bekliyor.
   - **Kullanıcı kontrolü:** DMG'den kurup uygulamanın açıldığını ve Dock'ta "Kütüphanem" yazdığını; Windows'ta kurulumun tamamlandığını, kısayolun "Kütüphanem" adıyla ve yeni simgeyle göründüğünü kontrol edin.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
