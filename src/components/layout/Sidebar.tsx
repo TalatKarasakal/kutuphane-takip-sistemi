@@ -1,13 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  BookMarked,
-  Filter,
-  X,
-  Copy,
-  Tags,
-  UserRound,
-  Layers3,
-} from "lucide-react";
+import { Filter, X, Copy, Tags, UserRound, Layers3 } from "lucide-react";
 import { useBooks } from "../../store/booksStore";
 import { useLoans } from "../../store/loansStore";
 import { useTags } from "../../store/tagsStore";
@@ -15,9 +7,13 @@ import { STATUSES } from "../../constants/statuses";
 import { findDuplicateIds } from "../../lib/filters";
 import { cn } from "../../lib/utils";
 import { DuplicateMergeDialog } from "../books/DuplicateMergeDialog";
-import { FilterCard, FilterRow, SidebarHeader } from "./FilterPanel";
+import { FilterCard, FilterRow, SidebarSearch } from "./FilterPanel";
 
-export function Sidebar() {
+export function Sidebar({
+  searchRef,
+}: {
+  searchRef?: React.RefObject<HTMLInputElement>;
+}) {
   const {
     books,
     statusFilter,
@@ -27,6 +23,8 @@ export function Sidebar() {
     groupByTags,
     duplicatesOnly,
     loansOnly,
+    search,
+    setSearch,
     toggleStatusFilter,
     toggleGenreFilter,
     toggleTagFilter,
@@ -77,11 +75,12 @@ export function Sidebar() {
     loansOnly;
 
   return (
-    <aside className="w-64 shrink-0 border-r border-border bg-surface flex flex-col">
-      <SidebarHeader
-        icon={<BookMarked size={18} />}
-        title="Kütüphanem"
-        subtitle={`${books.length} kitap`}
+    <aside className="w-64 shrink-0 border-r border-border bg-panel flex flex-col">
+      <SidebarSearch
+        value={search}
+        onChange={setSearch}
+        placeholder="Başlık, yazar, ISBN, not içinde ara…"
+        inputRef={searchRef}
       />
 
       <div className="px-4 py-4 flex-1 overflow-auto space-y-3">
@@ -114,7 +113,7 @@ export function Sidebar() {
         </FilterCard>
 
         {tags.length > 0 && (
-          <FilterCard title="Etiketler" icon={<Tags size={12} />}>
+          <FilterCard title="Etiketler" icon={<Tags size={12} />} tone="accent">
             <div className="flex justify-end gap-1 px-2 pb-1">
               {(["or", "and"] as const).map((mode) => (
                 <button
@@ -167,7 +166,11 @@ export function Sidebar() {
         )}
 
         {loans.length > 0 && (
-          <FilterCard title="Ödünç Verilenler" icon={<UserRound size={12} />}>
+          <FilterCard
+            title="Ödünç Verilenler"
+            icon={<UserRound size={12} />}
+            tone="warm"
+          >
             <FilterRow
               first
               active={loansOnly}
@@ -179,7 +182,7 @@ export function Sidebar() {
           </FilterCard>
         )}
 
-        <FilterCard title="Tür" icon={<Filter size={12} />}>
+        <FilterCard title="Tür" icon={<Filter size={12} />} tone="secondary">
           {activeGenres.length === 0 ? (
             <div className="px-3 py-2 text-xs text-muted italic">
               Henüz tür eklenmemiş
@@ -203,7 +206,11 @@ export function Sidebar() {
         </FilterCard>
 
         {duplicateCount > 0 && (
-          <FilterCard title="Tekrar Edenler" icon={<Copy size={12} />}>
+          <FilterCard
+            title="Tekrar Edenler"
+            icon={<Copy size={12} />}
+            tone="secondary"
+          >
             <FilterRow
               first
               active={duplicatesOnly}

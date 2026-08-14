@@ -90,6 +90,8 @@ export default {
         /** Elektrik Mavi: bağlantı, seçili durum ve odak halkası. */
         accent: "rgb(var(--accent) / <alpha-value>)",
         bg: "rgb(var(--bg) / <alpha-value>)",
+        /** Kenar çubuğu gövdesi; zemin ile kart arasındaki kademe. */
+        panel: "rgb(var(--panel) / <alpha-value>)",
         surface: "rgb(var(--surface) / <alpha-value>)",
         surface2: "rgb(var(--surface-2) / <alpha-value>)",
         border: "rgb(var(--border) / <alpha-value>)",

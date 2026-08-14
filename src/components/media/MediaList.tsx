@@ -282,9 +282,10 @@ export function MediaList({ type, onOpen }: Props) {
                           ? "right"
                           : undefined
                       }
+                      width={NARROW_COLS[col.key]}
                     />
                   ))}
-                  <th className="w-0" />
+                  <th className="w-12" />
                 </tr>
               </thead>
               <tbody>
@@ -490,6 +491,23 @@ function renderCell(m: Media, key: string, density: string) {
   }
 }
 
+/**
+ * Sayı ve rozet sütunları içeriklerinden daha fazlasına ihtiyaç duymuyor;
+ * genişlikleri sabitlenince geniş ekranda artan alan başlık ve yazar
+ * sütunlarına akıyor. Aksi hâlde fazlalık sondaki eylem sütununda birikiyordu.
+ */
+const NARROW_COLS: Record<string, string> = {
+  pageCount: "w-28",
+  publicationYear: "w-28",
+  rating: "w-32",
+  releaseYear: "w-28",
+  duration: "w-28",
+  seasons: "w-28",
+  episodeDuration: "w-32",
+  watchYear: "w-28",
+  status: "w-44",
+};
+
 function ThSort({
   label,
   k,
@@ -497,6 +515,7 @@ function ThSort({
   sortDir,
   onClick,
   align,
+  width,
 }: {
   label: string;
   k: MediaSortKey;
@@ -504,12 +523,14 @@ function ThSort({
   sortDir: "asc" | "desc";
   onClick: (k: MediaSortKey) => void;
   align?: "right";
+  width?: string;
 }) {
   const active = sortKey === k;
   return (
     <th
       className={cn(
         "px-4 py-3.5 font-semibold",
+        width,
         align === "right" ? "text-right" : "text-left",
       )}
     >

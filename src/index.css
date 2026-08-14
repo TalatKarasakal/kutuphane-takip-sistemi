@@ -89,12 +89,18 @@
   /* Elektrik Mavi 600: bağlantı, seçili durum, odak halkası. */
   --accent: 24 115 196;
 
-  --bg: 230 238 244; /* Petrol 50 */
-  --surface: 255 255 255;
-  --surface-2: 220 232 240;
-  --border: 201 211 218; /* Nötr 200 */
+  /*
+   * Dört yüzey kademesi belirgin aralıklarla ayrılır: zemin < panel < yüzey.
+   * Önceki değerlerde kenar çubuğu da kartlar da beyazdı; üst üste binen aynı
+   * tonlar okumayı zorlaştırıyordu.
+   */
+  --bg: 225 235 242; /* zemin — içerik alanı */
+  --panel: 211 226 236; /* kenar çubuğu gövdesi, zeminden bir kademe koyu */
+  --surface: 255 255 255; /* kart, tablo, filtre kutusu — en açık kademe */
+  --surface-2: 234 241 246; /* tablo başlığı, üzerine gelme, ikincil dolgu */
+  --border: 191 206 218;
   --text: 22 29 35; /* Nötr 900 */
-  --muted: 102 119 133; /* Nötr 500 */
+  --muted: 90 107 122;
 
   --font-app: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-size-app: 15px;
@@ -112,11 +118,12 @@ html[data-theme="dark"] {
   --secondary-foreground: 255 255 255;
   --accent: 79 163 227; /* Elektrik Mavi 400 */
 
-  --bg: 12 30 43; /* Petrol 900 */
-  --surface: 18 41 58; /* Petrol 800 */
-  --surface-2: 26 56 77; /* Petrol 700 */
-  --border: 36 74 99; /* Petrol 600 */
-  --text: 196 215 227; /* Petrol 100 */
+  --bg: 8 22 32; /* zemin — Petrol 900'ün bir tık altı, kartlar ayrışsın */
+  --panel: 10 26 38; /* kenar çubuğu gövdesi */
+  --surface: 20 45 63; /* kart, tablo, filtre kutusu */
+  --surface-2: 30 63 86; /* tablo başlığı, üzerine gelme */
+  --border: 44 86 114;
+  --text: 205 222 232;
   /* Palet, koyu zeminde ikincil metin için Petrol 400'ü işaret ediyor; küçük
      puntoda kontrastı yetmediği için bir kademe açığı (300) kullanılıyor. */
   --muted: 110 151 176;

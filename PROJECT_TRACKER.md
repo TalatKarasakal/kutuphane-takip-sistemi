@@ -11,8 +11,8 @@
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
-| Kontrol bekleyen çözüm | 28 |
-| Geliştirme fikri | 29 |
+| Kontrol bekleyen çözüm | 29 |
+| Geliştirme fikri | 30 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -34,6 +34,7 @@
 - Fotoğraftan ekleme kitapların yanı sıra film ve dizilerde de çalışıyor; künye modelden gelir ve gözden geçirme tablosunda onaylanır.
 - Fotoğraftan ekleme bulut yerine bu bilgisayardaki bir modelle de çalışabiliyor; yerel sağlayıcı çevrimdışı modda da kullanılabiliyor ve yalnız loopback adreslerine bağlanıyor.
 - Algılama arka planda sürüyor: diyalog kapatılınca iş devam ediyor, üst çubuktaki gösterge işi izliyor ve sonuç hazır olunca gözden geçirme listesine dönülüyor.
+- Arama kenar çubuğunun tepesine, uygulama kimliği üst çubuğa alındı; yüzey kademeleri (zemin/panel/yüzey) ayrıştırıldı ve CSP'nin engellediği barkod worker'ı açıldı.
 - Arayüz renkleri kişisel tasarım paletine (Petrol/Turkuaz/Bordo/Elektrik Mavi/Nötr/Kemik) taşındı; vurgu rengi seçimi kaldırıldı, durum renkleri korunup palete oturtuldu.
 - Yerel model artık raf fotoğraflarını okuyabiliyor: istek bağlamı büyütüldü, düşünme adımı kapatıldı ve yanıt iki alandan da çözümleniyor; önceden yalnız tek kitabın karşıdan çekildiği kare çalışıyordu. Aynı anda birden çok fotoğraf sıraya alınıp sırayla işlenebiliyor.
 - Bütün ekranlar Electron'da açık/koyu tema ve dar pencerede tarandı; konsol hatası yok. Kart başlıklarını örten onay kutusu, koyu temada açık kalan tarayıcı denetimleri ve iki satıra taşan durum rozetleri düzeltildi.
@@ -164,6 +165,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Tarayıcı önizlemesinde 12 kitaplık veriyle açık ve koyu tema, tablo ve kart görünümü, durum filtresi seçili/seçisiz hâli ve ayarlar penceresi kontrol edildi; renk sınıflarının ürettiği değerler hesaplanmış stilden okunarak doğrulandı. Arayüzde Tailwind'in hazır renk adlarından hiçbiri kalmadı.
   - **Bilinen sınır:** Palet A'nın vurgu rolleri bilinçli olarak ters çevrildi ve kontrast için iki kademe sapması yapıldı (bkz. IMP-029 kaydı). Renk körlüğü için durum ayrımı yalnız renge değil, rozetlerdeki simgeye de dayanıyor; ayrıca bir kontrast denetimi (otomatik) kurulmadı.
   - **Kullanıcı kontrolü:** Açık ve koyu temada kitap listesini, kart görünümünü ve kenar çubuğunu gözden geçirin; durum renklerinin (turkuaz/mavi/kemik/bordo) ayırt edilebilir olduğunu ve Ayarlar'da vurgu rengi seçiminin kalkmış olduğunu doğrulayın.
+- **IMP-030 — CSP worker engeli, geniş ekran tablosu ve renk ayrımı**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** çalışma ağacında.
+  - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. CSP düzeltmesi tarayıcıda blob'dan worker açılarak doğrulandı (önce engelleniyordu, sonra çalıştı). Sütun genişlikleri 1500 px pencerede ölçülerek karşılaştırıldı. Arama/kimlik yer değişimi ile yüzey kademeleri açık ve koyu temada gözden geçirildi.
+  - **Bilinen sınır:** Satır eylem sütunu, üzerine gelince çıkan "→ Okundu ✓" düğmesi için ~95 px ayırmayı sürdürüyor; bu alan boş değil, düğmenin kendisi için gerekli. Barkod taramasının uçtan uca çalıştığı kamerayla denenmedi; yalnız engelin kalktığı doğrulandı.
+  - **Kullanıcı kontrolü:** Kitap ekleme formunda ISBN alanındaki barkod taramasını kamerayla deneyin. Geniş pencerede tablo sütunlarının uzun başlıkları daha iyi taşıdığını, kenar çubuğunun gövdesi ile içindeki kutuların ayrıştığını kontrol edin.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:

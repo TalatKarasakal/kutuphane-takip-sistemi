@@ -10,7 +10,6 @@ import {
   Loader2,
   Pencil,
   Plus,
-  Search,
   Settings,
   SlidersHorizontal,
   Table,
@@ -33,7 +32,6 @@ import type { Section } from "./AppShell";
 interface Props {
   section: Section;
   onSection: (s: Section) => void;
-  searchRef?: React.RefObject<HTMLInputElement>;
   onAdd: () => void;
   onImport: () => void;
   onExport: () => void;
@@ -57,10 +55,10 @@ const ADD_LABEL: Record<Section, string> = {
   tv: "Dizi Ekle",
 };
 
-const SEARCH_PLACEHOLDER: Record<Section, string> = {
-  books: "Başlık, yazar, ISBN, not içinde ara…",
-  movies: "Başlık, yönetmen, not içinde ara…",
-  tv: "Başlık, yönetmen, not içinde ara…",
+const BRAND_TITLE: Record<Section, string> = {
+  books: "Kütüphanem",
+  movies: "Filmlerim",
+  tv: "Dizilerim",
 };
 
 const PHOTO_LABEL: Record<Section, string> = {
@@ -72,7 +70,6 @@ const PHOTO_LABEL: Record<Section, string> = {
 export function Topbar({
   section,
   onSection,
-  searchRef,
   onAdd,
   onImport,
   onExport,
@@ -85,12 +82,11 @@ export function Topbar({
     useSettings();
 
   const mediaType = section === "movies" ? "film" : "dizi";
-  const search =
-    section === "books" ? books.search : media.filters[mediaType].search;
-  const setSearch = (value: string) =>
+  const BrandIcon = SECTIONS.find((s) => s.value === section)!.icon;
+  const brandCount =
     section === "books"
-      ? books.setSearch(value)
-      : media.setSearch(mediaType, value);
+      ? `${books.books.length} kitap`
+      : `${media.media.filter((m) => m.type === mediaType).length} ${mediaType}`;
 
   const colConfig =
     section === "books"
@@ -108,28 +104,25 @@ export function Topbar({
     section === "books" ? "book" : section === "movies" ? "film" : "tv";
 
   return (
-    <header className="relative h-14 border-b border-border bg-gradient-to-r from-primary/5 via-surface/80 to-accent/5 backdrop-blur px-5 flex items-center shrink-0">
+    <header className="relative h-14 border-b border-border bg-gradient-to-r from-primary/5 via-surface/80 to-accent/5 backdrop-blur pr-5 flex items-center shrink-0">
       {/* Üst çubuğu içerikten ayıran ince renk çizgisi. */}
       <span
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/50 via-accent/30 to-secondary/40"
       />
-      {/* Sol — arama */}
-      <div className="flex-1 flex items-center min-w-0">
-        <div className="relative w-full max-w-96 min-w-0">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-            size={15}
-          />
-          <input
-            ref={searchRef}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={SEARCH_PLACEHOLDER[section]}
-            className="input pl-9 text-sm"
-          />
+      {/* Sol — uygulama kimliği. Genişliği kenar çubuğuyla hizalıdır. */}
+      <div className="w-64 shrink-0 flex items-center gap-3 pl-5 pr-4 min-w-0">
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary via-accent to-secondary text-white flex items-center justify-center shadow-soft shrink-0">
+          <BrandIcon size={18} />
+        </div>
+        <div className="min-w-0">
+          <div className="font-semibold leading-tight truncate">
+            {BRAND_TITLE[section]}
+          </div>
+          <div className="text-xs text-muted truncate">{brandCount}</div>
         </div>
       </div>
+      <div className="flex-1 min-w-0" />
 
       {/* Orta — sekmeler, görünüm, sütunlar */}
       <div className="flex items-center gap-2">

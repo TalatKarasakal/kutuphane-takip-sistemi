@@ -1,17 +1,18 @@
 import { useMemo } from "react";
-import { Film, Filter, Layers3, Tags, Tv2, X } from "lucide-react";
+import { Filter, Layers3, Tags, X } from "lucide-react";
 import { useMedia } from "../../store/mediaStore";
 import { useTags } from "../../store/tagsStore";
 import { MEDIA_STATUSES } from "../../constants/mediaStatuses";
 import type { MediaType } from "../../types/media";
 import { cn } from "../../lib/utils";
-import { FilterCard, FilterRow, SidebarHeader } from "../layout/FilterPanel";
+import { FilterCard, FilterRow, SidebarSearch } from "../layout/FilterPanel";
 
 interface Props {
   type: MediaType;
+  searchRef?: React.RefObject<HTMLInputElement>;
 }
 
-export function MediaSidebar({ type }: Props) {
+export function MediaSidebar({ type, searchRef }: Props) {
   const {
     media,
     filters,
@@ -20,6 +21,7 @@ export function MediaSidebar({ type }: Props) {
     toggleTagFilter,
     setTagFilterMode,
     toggleGroupByTags,
+    setSearch,
     clearFilters,
   } = useMedia();
   const tags = useTags((state) => state.tags);
@@ -52,15 +54,14 @@ export function MediaSidebar({ type }: Props) {
     genreFilter.length > 0 ||
     tagFilter.length > 0 ||
     groupByTags;
-  const typeLabel = type === "film" ? "film" : "dizi";
-  const TypeIcon = type === "film" ? Film : Tv2;
 
   return (
-    <aside className="w-64 shrink-0 border-r border-border bg-surface flex flex-col">
-      <SidebarHeader
-        icon={<TypeIcon size={18} />}
-        title={typeLabel === "film" ? "Filmlerim" : "Dizilerim"}
-        subtitle={`${items.length} ${typeLabel}`}
+    <aside className="w-64 shrink-0 border-r border-border bg-panel flex flex-col">
+      <SidebarSearch
+        value={filters[type].search}
+        onChange={(value) => setSearch(type, value)}
+        placeholder="Başlık, yönetmen, not içinde ara…"
+        inputRef={searchRef}
       />
 
       <div className="px-4 py-4 flex-1 overflow-auto space-y-3">
@@ -91,7 +92,7 @@ export function MediaSidebar({ type }: Props) {
         </FilterCard>
 
         {tags.length > 0 && (
-          <FilterCard title="Etiketler" icon={<Tags size={12} />}>
+          <FilterCard title="Etiketler" icon={<Tags size={12} />} tone="accent">
             <div className="flex justify-end gap-1 px-2 pb-1">
               {(["or", "and"] as const).map((mode) => (
                 <button
@@ -138,7 +139,7 @@ export function MediaSidebar({ type }: Props) {
           </FilterCard>
         )}
 
-        <FilterCard title="Tür" icon={<Filter size={12} />}>
+        <FilterCard title="Tür" icon={<Filter size={12} />} tone="secondary">
           {activeGenres.length === 0 ? (
             <div className="px-3 py-2 text-xs text-muted italic">
               Henüz tür eklenmemiş

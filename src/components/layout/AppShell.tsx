@@ -242,7 +242,6 @@ export function AppShell() {
         <Topbar
           section={section}
           onSection={setSection}
-          searchRef={searchRef}
           onAdd={() => {
             if (section === "books") {
               setEditing(undefined);
@@ -263,9 +262,9 @@ export function AppShell() {
 
         <div className="flex-1 flex min-h-0">
           {section === "books" ? (
-            <Sidebar />
+            <Sidebar searchRef={searchRef} />
           ) : (
-            <MediaSidebar type={mediaType} />
+            <MediaSidebar type={mediaType} searchRef={searchRef} />
           )}
           <div className="flex-1 flex flex-col min-w-0">
             {section === "books" ? (

@@ -1,3 +1,4 @@
+import { Search } from "lucide-react";
 import { cn } from "../../lib/utils";
 import type { StatusTone } from "../../constants/statuses";
 
@@ -5,19 +6,35 @@ import type { StatusTone } from "../../constants/statuses";
  * Kitap ve medya kenar çubuklarının ortak filtre kabuğu. İki çubuk aynı
  * görünümü kopyalıyordu; renk düzeni tek yerde tutulsun diye ayrıldı.
  */
+/** Filtre kutusunun renk kimliği; başlıktaki çubuk ve simgeyi boyar. */
+export type CardTone = "primary" | "accent" | "secondary" | "warm";
+
+const CARD_TONE: Record<CardTone, { bar: string; icon: string }> = {
+  primary: { bar: "bg-primary", icon: "text-primary" },
+  accent: { bar: "bg-accent", icon: "text-accent" },
+  secondary: { bar: "bg-secondary", icon: "text-secondary" },
+  warm: { bar: "bg-kemik-600", icon: "text-kemik-700 dark:text-kemik-400" },
+};
+
 export function FilterCard({
   title,
   icon,
+  tone = "primary",
   children,
 }: {
   title: string;
   icon?: React.ReactNode;
+  tone?: CardTone;
   children: React.ReactNode;
 }) {
+  const t = CARD_TONE[tone];
   return (
-    <section className="rounded-xl border border-border bg-surface2/40 overflow-hidden">
-      <div className="px-3 pt-2.5 pb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted">
-        {icon}
+    <section className="rounded-xl border border-border bg-surface overflow-hidden shadow-soft">
+      <div className="px-3 pt-2.5 pb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
+        {/* Her kutunun kendi renk çubuğu var; kenar çubuğu tek tonlu bir yığın
+            olmaktan çıkıyor ve kutular göz gezdirirken ayrışıyor. */}
+        <span className={cn("h-3 w-0.5 rounded-full shrink-0", t.bar)} />
+        {icon && <span className={t.icon}>{icon}</span>}
         <span>{title}</span>
       </div>
       <div className="border-t border-border/70" />
@@ -117,24 +134,35 @@ export function FilterRow({
   );
 }
 
-/** Kenar çubuğu başlığı: paletin iki vurgu ailesinden geçen ince renk alanı. */
-export function SidebarHeader({
-  icon,
-  title,
-  subtitle,
+/**
+ * Kenar çubuğunun tepesindeki arama alanı. Arama, filtrelerin hemen üstünde
+ * durması için üst çubuktan buraya alındı; uygulama kimliği üst çubuğa geçti.
+ */
+export function SidebarSearch({
+  value,
+  onChange,
+  placeholder,
+  inputRef,
 }: {
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  inputRef?: React.RefObject<HTMLInputElement>;
 }) {
   return (
-    <div className="px-5 py-4 border-b border-border flex items-center gap-3 bg-gradient-to-br from-primary/10 via-transparent to-accent/10">
-      <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-accent text-white flex items-center justify-center shadow-soft shrink-0">
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <div className="font-semibold leading-tight truncate">{title}</div>
-        <div className="text-xs text-muted truncate">{subtitle}</div>
+    <div className="px-4 py-3 border-b border-border bg-gradient-to-br from-primary/12 via-transparent to-secondary/12">
+      <div className="relative">
+        <Search
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+          size={15}
+        />
+        <input
+          ref={inputRef}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          className="input pl-9 text-sm"
+        />
       </div>
     </div>
   );
