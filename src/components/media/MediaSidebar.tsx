@@ -5,6 +5,7 @@ import { useTags } from "../../store/tagsStore";
 import { MEDIA_STATUSES } from "../../constants/mediaStatuses";
 import type { MediaType } from "../../types/media";
 import { cn } from "../../lib/utils";
+import { FilterCard, FilterRow, SidebarHeader } from "../layout/FilterPanel";
 
 interface Props {
   type: MediaType;
@@ -56,19 +57,11 @@ export function MediaSidebar({ type }: Props) {
 
   return (
     <aside className="w-64 shrink-0 border-r border-border bg-surface flex flex-col">
-      <div className="px-5 py-4 border-b border-border flex items-center gap-2">
-        <div className="w-9 h-9 rounded-lg bg-primary/15 text-primary flex items-center justify-center">
-          <TypeIcon size={18} />
-        </div>
-        <div>
-          <div className="font-semibold leading-tight capitalize">
-            {typeLabel === "film" ? "Filmlerim" : "Dizilerim"}
-          </div>
-          <div className="text-xs text-muted">
-            {items.length} {typeLabel}
-          </div>
-        </div>
-      </div>
+      <SidebarHeader
+        icon={<TypeIcon size={18} />}
+        title={typeLabel === "film" ? "Filmlerim" : "Dizilerim"}
+        subtitle={`${items.length} ${typeLabel}`}
+      />
 
       <div className="px-4 py-4 flex-1 overflow-auto space-y-3">
         {hasActive && (
@@ -83,20 +76,18 @@ export function MediaSidebar({ type }: Props) {
         )}
 
         <FilterCard title="Durum">
-          {MEDIA_STATUSES.map((s, i) => {
-            const active = statusFilter.includes(s.value);
-            return (
-              <FilterRow
-                key={s.value}
-                first={i === 0}
-                active={active}
-                accent="primary"
-                onClick={() => toggleStatusFilter(type, s.value)}
-                label={s.label}
-                count={counts[s.value] ?? 0}
-              />
-            );
-          })}
+          {MEDIA_STATUSES.map((s, i) => (
+            <FilterRow
+              key={s.value}
+              first={i === 0}
+              active={statusFilter.includes(s.value)}
+              tone={s.tone}
+              onClick={() => toggleStatusFilter(type, s.value)}
+              label={s.label}
+              count={counts[s.value] ?? 0}
+              share={items.length ? (counts[s.value] ?? 0) / items.length : 0}
+            />
+          ))}
         </FilterCard>
 
         {tags.length > 0 && (
@@ -168,70 +159,5 @@ export function MediaSidebar({ type }: Props) {
         </FilterCard>
       </div>
     </aside>
-  );
-}
-
-function FilterCard({
-  title,
-  icon,
-  children,
-}: {
-  title: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-xl border border-border bg-surface2/40 overflow-hidden">
-      <div className="px-3 pt-2.5 pb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted">
-        {icon}
-        <span>{title}</span>
-      </div>
-      <div className="border-t border-border/70" />
-      <div className="p-1">{children}</div>
-    </section>
-  );
-}
-
-function FilterRow({
-  first,
-  active,
-  accent,
-  onClick,
-  label,
-  count,
-  color,
-}: {
-  first?: boolean;
-  active: boolean;
-  accent: "primary" | "secondary";
-  onClick: () => void;
-  label: string;
-  count: number;
-  color?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "w-full flex items-center justify-between px-3 py-2 text-sm transition-colors",
-        !first && "border-t border-border/60",
-        active
-          ? accent === "primary"
-            ? "bg-primary/10 text-primary font-medium"
-            : "bg-secondary/10 text-secondary font-medium"
-          : "hover:bg-surface2 text-text",
-      )}
-    >
-      <span className="flex items-center gap-2">
-        {color && (
-          <span
-            className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: color }}
-          />
-        )}
-        {label}
-      </span>
-      <span className="text-xs text-muted">{count}</span>
-    </button>
   );
 }

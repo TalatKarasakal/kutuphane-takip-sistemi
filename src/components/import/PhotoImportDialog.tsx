@@ -215,7 +215,7 @@ export function PhotoImportDialog({ onOpenSettings }: Props) {
       {saveError && (
         <div
           role="alert"
-          className="mb-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-700"
+          className="mb-3 rounded-lg border border-bordo-600/35 bg-bordo-600/10 px-3 py-2 text-sm text-bordo-700"
         >
           {saveError}
         </div>
@@ -313,15 +313,15 @@ function PickStep({
   return (
     <div className="py-4">
       {error && (
-        <div className="mb-3 flex items-start gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm">
-          <AlertTriangle size={16} className="mt-0.5 text-rose-500 shrink-0" />
-          <div className="text-rose-800 dark:text-rose-200">{error}</div>
+        <div className="mb-3 flex items-start gap-2 rounded-lg border border-bordo-600/35 bg-bordo-600/10 px-3 py-2 text-sm">
+          <AlertTriangle size={16} className="mt-0.5 text-bordo-600 shrink-0" />
+          <div className="text-bordo-700 dark:text-bordo-300">{error}</div>
         </div>
       )}
       {notice && (
-        <div className="mb-3 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm">
-          <AlertTriangle size={16} className="mt-0.5 text-amber-500 shrink-0" />
-          <div className="text-amber-800 dark:text-amber-200">{notice}</div>
+        <div className="mb-3 flex items-start gap-2 rounded-lg border border-kemik-600/40 bg-kemik-500/15 px-3 py-2 text-sm">
+          <AlertTriangle size={16} className="mt-0.5 text-kemik-600 shrink-0" />
+          <div className="text-kemik-800 dark:text-kemik-300">{notice}</div>
         </div>
       )}
       <label
@@ -454,7 +454,7 @@ function ReviewShell({
             {quickStatus}
           </div>
         </div>
-        <div className="chip bg-emerald-500/15 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300">
+        <div className="chip bg-turkuaz-500/15 border border-turkuaz-500/25 text-turkuaz-800 dark:text-turkuaz-300">
           <CheckCircle2 size={12} /> {selectedCount} seçili
         </div>
       </div>
@@ -462,7 +462,7 @@ function ReviewShell({
       <div className="card overflow-hidden">{children}</div>
 
       <div className="text-xs text-muted flex items-start gap-2">
-        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-amber-500" />
+        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-kemik-600" />
         <span>{warning}</span>
       </div>
     </div>
@@ -546,7 +546,7 @@ function BookReviewStep({
                 />
                 <div className="mt-1 flex items-center gap-2">
                   {r.duplicate && (
-                    <span className="chip bg-amber-500/15 border border-amber-500/20 text-amber-700 dark:text-amber-300">
+                    <span className="chip bg-kemik-500/20 border border-kemik-500/30 text-kemik-800 dark:text-kemik-300">
                       listede var
                     </span>
                   )}
@@ -599,7 +599,7 @@ function BookReviewStep({
               </td>
               <td className="px-2 py-2 text-center">
                 <button
-                  className="btn btn-ghost p-1.5 text-muted hover:text-rose-500"
+                  className="btn btn-ghost p-1.5 text-muted hover:text-bordo-600"
                   title="Listeden çıkar"
                   onClick={() => onPatch(r.rid, { include: false })}
                 >
@@ -677,7 +677,7 @@ function MediaReviewStep({
                 />
                 <div className="mt-1 flex items-center gap-2">
                   {r.duplicate && (
-                    <span className="chip bg-amber-500/15 border border-amber-500/20 text-amber-700 dark:text-amber-300">
+                    <span className="chip bg-kemik-500/20 border border-kemik-500/30 text-kemik-800 dark:text-kemik-300">
                       listede var
                     </span>
                   )}
@@ -743,7 +743,7 @@ function MediaReviewStep({
               </td>
               <td className="px-2 py-2 text-center">
                 <button
-                  className="btn btn-ghost p-1.5 text-muted hover:text-rose-500"
+                  className="btn btn-ghost p-1.5 text-muted hover:text-bordo-600"
                   title="Listeden çıkar"
                   onClick={() => onPatch(r.rid, { include: false })}
                 >

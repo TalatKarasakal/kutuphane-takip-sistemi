@@ -15,6 +15,7 @@ import { STATUSES } from "../../constants/statuses";
 import { findDuplicateIds } from "../../lib/filters";
 import { cn } from "../../lib/utils";
 import { DuplicateMergeDialog } from "../books/DuplicateMergeDialog";
+import { FilterCard, FilterRow, SidebarHeader } from "./FilterPanel";
 
 export function Sidebar() {
   const {
@@ -77,15 +78,11 @@ export function Sidebar() {
 
   return (
     <aside className="w-64 shrink-0 border-r border-border bg-surface flex flex-col">
-      <div className="px-5 py-4 border-b border-border flex items-center gap-2">
-        <div className="w-9 h-9 rounded-lg bg-primary/15 text-primary flex items-center justify-center">
-          <BookMarked size={18} />
-        </div>
-        <div>
-          <div className="font-semibold leading-tight">Kütüphanem</div>
-          <div className="text-xs text-muted">{books.length} kitap</div>
-        </div>
-      </div>
+      <SidebarHeader
+        icon={<BookMarked size={18} />}
+        title="Kütüphanem"
+        subtitle={`${books.length} kitap`}
+      />
 
       <div className="px-4 py-4 flex-1 overflow-auto space-y-3">
         {hasActive && (
@@ -100,20 +97,20 @@ export function Sidebar() {
         )}
 
         <FilterCard title="Durum">
-          {STATUSES.map((s, i) => {
-            const active = statusFilter.includes(s.value);
-            return (
-              <FilterRow
-                key={s.value}
-                first={i === 0}
-                active={active}
-                accent="primary"
-                onClick={() => toggleStatusFilter(s.value)}
-                label={s.label}
-                count={counts[s.value] ?? 0}
-              />
-            );
-          })}
+          {STATUSES.map((s, i) => (
+            <FilterRow
+              key={s.value}
+              first={i === 0}
+              active={statusFilter.includes(s.value)}
+              // Durum satırları kendi renkleriyle işaretlenir; listedeki ve
+              // karttaki renk şeridiyle aynı dili konuşurlar.
+              tone={s.tone}
+              onClick={() => toggleStatusFilter(s.value)}
+              label={s.label}
+              count={counts[s.value] ?? 0}
+              share={books.length ? (counts[s.value] ?? 0) / books.length : 0}
+            />
+          ))}
         </FilterCard>
 
         {tags.length > 0 && (
@@ -230,73 +227,5 @@ export function Sidebar() {
         onClose={() => setMergeOpen(false)}
       />
     </aside>
-  );
-}
-
-function FilterCard({
-  title,
-  icon,
-  children,
-}: {
-  title: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-xl border border-border bg-surface2/40 overflow-hidden">
-      <div className="px-3 pt-2.5 pb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted">
-        {icon}
-        <span>{title}</span>
-      </div>
-      <div className="border-t border-border/70" />
-      <div className="p-1">{children}</div>
-    </section>
-  );
-}
-
-function FilterRow({
-  first,
-  active,
-  accent,
-  onClick,
-  label,
-  count,
-  title,
-  color,
-}: {
-  first?: boolean;
-  active: boolean;
-  accent: "primary" | "secondary";
-  onClick: () => void;
-  label: string;
-  count: number;
-  title?: string;
-  color?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      className={cn(
-        "w-full flex items-center justify-between px-3 py-2 text-sm transition-colors",
-        !first && "border-t border-border/60",
-        active
-          ? accent === "primary"
-            ? "bg-primary/10 text-primary font-medium"
-            : "bg-secondary/10 text-secondary font-medium"
-          : "hover:bg-surface2 text-text",
-      )}
-    >
-      <span className="flex items-center gap-2">
-        {color && (
-          <span
-            className="h-2 w-2 rounded-full"
-            style={{ backgroundColor: color }}
-          />
-        )}
-        {label}
-      </span>
-      <span className="text-xs text-muted">{count}</span>
-    </button>
   );
 }

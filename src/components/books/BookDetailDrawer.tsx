@@ -98,7 +98,7 @@ export function BookDetailDrawer({ book, onClose, onEdit, onDelete }: Props) {
                     size={17}
                     className={
                       index < book.rating!
-                        ? "fill-amber-400 text-amber-400"
+                        ? "fill-kemik-500 text-kemik-500"
                         : "text-border"
                     }
                   />

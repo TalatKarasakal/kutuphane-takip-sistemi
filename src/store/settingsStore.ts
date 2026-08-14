@@ -49,12 +49,18 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "kutuphanem-settings",
-      version: 2,
+      version: 3,
       migrate: (persisted) => {
         const raw = (persisted ?? {}) as Partial<AppSettings> & {
           geminiApiKey?: string;
+          /** Vurgu rengi seçimi kaldırıldı; renkler artık tek paletten gelir. */
+          accent?: string;
         };
-        const { geminiApiKey: _legacySecret, ...s } = raw;
+        const {
+          geminiApiKey: _legacySecret,
+          accent: _legacyAccent,
+          ...s
+        } = raw;
         return {
           ...DEFAULT_SETTINGS,
           ...s,

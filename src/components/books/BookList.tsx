@@ -16,7 +16,7 @@ import { useLoans } from "../../store/loansStore";
 import { useSettings } from "../../store/settingsStore";
 import { useTags } from "../../store/tagsStore";
 import { applyFilters } from "../../lib/filters";
-import { STATUSES } from "../../constants/statuses";
+import { STATUSES, STATUS_TONE } from "../../constants/statuses";
 import { BOOK_COLUMN_LABELS } from "../../constants/columns";
 import { StatusBadge, GenreChip } from "../ui/Badge";
 import { BookCard } from "./BookCard";
@@ -41,13 +41,6 @@ type BookVirtualUnit =
       count: number;
     }
   | { key: string; kind: "items"; items: Book[] };
-
-const STATUS_DOT: Record<BookStatus, string> = {
-  okundu: "bg-emerald-500",
-  okunacak: "bg-sky-500",
-  mevcut: "bg-amber-500",
-  "satin-alinacak": "bg-rose-500",
-};
 
 const NEXT_STATUS: Partial<Record<BookStatus, BookStatus>> = {
   "satin-alinacak": "mevcut",
@@ -485,7 +478,7 @@ function renderCell(b: Book, key: string, density: string) {
             <div
               className={cn(
                 "w-[3px] h-4 rounded-full shrink-0",
-                STATUS_DOT[b.status],
+                STATUS_TONE[b.status].dot,
               )}
             />
             {b.title}
@@ -527,7 +520,7 @@ function renderCell(b: Book, key: string, density: string) {
         <td key={key} className={cn("px-4", py)}>
           {b.rating ? (
             <span className="inline-flex items-center gap-1">
-              <Star size={12} className="fill-amber-400 text-amber-400" />
+              <Star size={12} className="fill-kemik-500 text-kemik-500" />
               {b.rating}
             </span>
           ) : (

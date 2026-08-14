@@ -1,14 +1,10 @@
 import { Film, Tv2 } from "lucide-react";
-import type { Media, MediaStatus } from "../../types/media";
+import type { Media } from "../../types/media";
 import { MediaStatusBadge } from "../ui/Badge";
 import { useArtwork } from "../../lib/artwork";
 import { useSettings } from "../../store/settingsStore";
 import { useTags } from "../../store/tagsStore";
-
-const STATUS_STRIPE: Record<MediaStatus, string> = {
-  izlendi: "bg-emerald-500",
-  izlenecek: "bg-sky-500",
-};
+import { MEDIA_STATUS_TONE } from "../../constants/mediaStatuses";
 
 export function MediaCard({
   item,
@@ -46,7 +42,9 @@ export function MediaCard({
           />
         </div>
       ) : (
-        <div className={`h-1 w-full shrink-0 ${STATUS_STRIPE[item.status]}`} />
+        <div
+          className={`h-1 w-full shrink-0 ${MEDIA_STATUS_TONE[item.status].dot}`}
+        />
       )}
       <div className="p-3 flex flex-col gap-2 flex-1">
         <div className="flex items-start gap-2">

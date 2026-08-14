@@ -30,7 +30,6 @@ export function applyTheme(settings: AppSettings) {
         : "light"
       : settings.theme;
   html.dataset.theme = mode;
-  html.dataset.accent = settings.accent;
   html.dataset.density = settings.density;
   const font =
     FONT_OPTIONS.find((f) => f.value === settings.fontFamily) ??

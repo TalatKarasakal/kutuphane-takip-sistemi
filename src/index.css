@@ -67,25 +67,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Renkler kişisel tasarım paletinden gelir (kariyer-vault,
+ * 08-Tercihler/tasarim-tercihleri.md — "Palet A"). Ham rampalar
+ * tailwind.config.ts içinde; burada yalnız temaya göre değişen anlamsal
+ * belirteçler tanımlanır.
+ *
+ * Palet A vurguyu Bordo'ya, ikincil vurguyu Turkuaz'a verir. Burada roller
+ * ters çevrildi: bir uygulama arayüzünde birincil vurgu düğme, sekme ve odak
+ * halkası gibi çok sayıda yerde görünür, palet notu ise bordoyu "seyrek
+ * kullanılır" diye işaretler. Turkuaz "kırmızıdan daha serbest kullanılabilir"
+ * dendiği için birincil, bordo seyrek vurgu olarak ikincil oldu.
+ */
 :root {
-  --accent-turkuaz: 20 184 166;
-  --accent-turkuaz-soft: 153 246 228;
-  --accent-kirmizi: 220 38 38;
-  --accent-kirmizi-soft: 254 202 202;
-
-  --primary: var(--accent-turkuaz);
-  --primary-soft: var(--accent-turkuaz-soft);
+  /* Turkuaz 800: hem beyaz üstünde hem beyaz zeminde okunur kalıyor. */
+  --primary: 14 110 102;
   --primary-foreground: 255 255 255;
-  --secondary: var(--accent-kirmizi);
-  --secondary-soft: var(--accent-kirmizi-soft);
+  /* Bordo 700 — parlak kırmızı kullanılmaz. */
+  --secondary: 140 42 34;
   --secondary-foreground: 255 255 255;
+  /* Elektrik Mavi 600: bağlantı, seçili durum, odak halkası. */
+  --accent: 24 115 196;
 
-  --bg: 248 250 252;
+  --bg: 230 238 244; /* Petrol 50 */
   --surface: 255 255 255;
-  --surface-2: 241 245 249;
-  --border: 226 232 240;
-  --text: 15 23 42;
-  --muted: 100 116 139;
+  --surface-2: 220 232 240;
+  --border: 201 211 218; /* Nötr 200 */
+  --text: 22 29 35; /* Nötr 900 */
+  --muted: 102 119 133; /* Nötr 500 */
 
   --font-app: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-size-app: 15px;
@@ -96,21 +105,23 @@
 }
 
 html[data-theme="dark"] {
-  --bg: 9 14 26;
-  --surface: 17 24 39;
-  --surface-2: 30 41 59;
-  --border: 51 65 85;
-  --text: 226 232 240;
-  --muted: 148 163 184;
+  /* Turkuaz 500 koyu zeminde parlak durduğu için üstündeki yazı koyu olur. */
+  --primary: 31 182 166;
+  --primary-foreground: 6 18 26;
+  --secondary: 163 43 34; /* Bordo 600 */
+  --secondary-foreground: 255 255 255;
+  --accent: 79 163 227; /* Elektrik Mavi 400 */
+
+  --bg: 12 30 43; /* Petrol 900 */
+  --surface: 18 41 58; /* Petrol 800 */
+  --surface-2: 26 56 77; /* Petrol 700 */
+  --border: 36 74 99; /* Petrol 600 */
+  --text: 196 215 227; /* Petrol 100 */
+  /* Palet, koyu zeminde ikincil metin için Petrol 400'ü işaret ediyor; küçük
+     puntoda kontrastı yetmediği için bir kademe açığı (300) kullanılıyor. */
+  --muted: 110 151 176;
 
   color-scheme: dark;
-}
-
-html[data-accent="kirmizi"] {
-  --primary: var(--accent-kirmizi);
-  --primary-soft: var(--accent-kirmizi-soft);
-  --secondary: var(--accent-turkuaz);
-  --secondary-soft: var(--accent-turkuaz-soft);
 }
 
 html {

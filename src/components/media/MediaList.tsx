@@ -16,7 +16,10 @@ import {
 } from "../../store/mediaStore";
 import { useSettings } from "../../store/settingsStore";
 import { useTags } from "../../store/tagsStore";
-import { MEDIA_STATUSES } from "../../constants/mediaStatuses";
+import {
+  MEDIA_STATUSES,
+  MEDIA_STATUS_TONE,
+} from "../../constants/mediaStatuses";
 import { FILM_COLUMN_LABELS, TV_COLUMN_LABELS } from "../../constants/columns";
 import { MediaStatusBadge, GenreChip } from "../ui/Badge";
 import { MediaCard } from "./MediaCard";
@@ -41,11 +44,6 @@ type MediaVirtualUnit =
       count: number;
     }
   | { key: string; kind: "items"; items: Media[] };
-
-const MEDIA_STATUS_DOT: Record<MediaStatus, string> = {
-  izlendi: "bg-emerald-500",
-  izlenecek: "bg-sky-500",
-};
 
 const NEXT_STATUS: Partial<Record<MediaStatus, MediaStatus>> = {
   izlenecek: "izlendi",
@@ -432,7 +430,7 @@ function renderCell(m: Media, key: string, density: string) {
             <div
               className={cn(
                 "w-[3px] h-4 rounded-full shrink-0",
-                MEDIA_STATUS_DOT[m.status],
+                MEDIA_STATUS_TONE[m.status].dot,
               )}
             />
             {m.title}

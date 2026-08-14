@@ -4,8 +4,8 @@ import { cn } from "../../lib/utils";
 
 const ICON = { success: CheckCircle2, error: AlertCircle, info: Info };
 const ICON_CLASS = {
-  success: "text-emerald-500",
-  error: "text-rose-500",
+  success: "text-turkuaz-600",
+  error: "text-bordo-600",
   info: "text-primary",
 };
 

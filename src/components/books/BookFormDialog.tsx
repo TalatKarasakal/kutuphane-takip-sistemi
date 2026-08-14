@@ -382,7 +382,7 @@ export function BookFormDialog({ open, onClose, onSave, initial }: Props) {
                   size={20}
                   className={
                     rating <= (form.rating ?? 0)
-                      ? "fill-amber-400 text-amber-400"
+                      ? "fill-kemik-500 text-kemik-500"
                       : "text-muted"
                   }
                 />

@@ -39,7 +39,6 @@ export function SettingsDialog({
 }) {
   const {
     theme,
-    accent,
     fontFamily,
     fontSize,
     density,
@@ -88,29 +87,6 @@ export function SettingsDialog({
               { value: "system", label: "Sistem" },
             ]}
           />
-        </Section>
-
-        <Section title="Vurgu Rengi">
-          <div className="flex gap-2">
-            <AccentChip
-              active={accent === "turkuaz"}
-              color="bg-[#14b8a6]"
-              onClick={() => set("accent", "turkuaz")}
-            >
-              Turkuaz
-            </AccentChip>
-            <AccentChip
-              active={accent === "kirmizi"}
-              color="bg-[#dc2626]"
-              onClick={() => set("accent", "kirmizi")}
-            >
-              Kırmızı
-            </AccentChip>
-          </div>
-          <div className="text-xs text-muted mt-2">
-            Her iki renk de palette yer alır; seçtiğin birincil vurgu olur,
-            diğeri ikincil.
-          </div>
         </Section>
 
         <Section title="Yazı Tipi">
@@ -333,13 +309,13 @@ function LocalAiFields() {
 
       {error && <div className="text-xs text-secondary">{error}</div>}
       {selected && !selected.vision && (
-        <div className="text-xs text-amber-600">
+        <div className="text-xs text-kemik-700">
           Bu model görseli okuyamaz; fotoğraftan ekleme çalışmaz. Görsel
           destekli bir model seç.
         </div>
       )}
       {!window.kutuphanem && (
-        <div className="text-xs text-amber-600">
+        <div className="text-xs text-kemik-700">
           Yerel model yalnız masaüstü uygulamasında kullanılabilir.
         </div>
       )}
@@ -423,7 +399,7 @@ function GeminiKeyFields() {
         )}
       </div>
       {!window.kutuphanem && (
-        <div className="text-xs text-amber-600">
+        <div className="text-xs text-kemik-700">
           Güvenli anahtar yönetimi yalnız masaüstü uygulamasında kullanılabilir.
         </div>
       )}
@@ -835,27 +811,5 @@ function Segmented<T extends string>({
         </button>
       ))}
     </div>
-  );
-}
-
-function AccentChip({
-  active,
-  color,
-  children,
-  onClick,
-}: {
-  active: boolean;
-  color: string;
-  children: React.ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition-colors ${active ? "border-text" : "border-border hover:bg-surface2"}`}
-    >
-      <span className={`w-4 h-4 rounded-full ${color}`} />
-      {children}
-    </button>
   );
 }

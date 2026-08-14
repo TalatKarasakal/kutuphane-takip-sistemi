@@ -1,16 +1,10 @@
 import { Star } from "lucide-react";
-import type { Book, BookStatus } from "../../types/book";
+import type { Book } from "../../types/book";
 import { StatusBadge, GenreChip } from "../ui/Badge";
 import { useArtwork } from "../../lib/artwork";
 import { useSettings } from "../../store/settingsStore";
 import { useTags } from "../../store/tagsStore";
-
-const STATUS_STRIPE: Record<BookStatus, string> = {
-  okundu: "bg-emerald-500",
-  okunacak: "bg-sky-500",
-  mevcut: "bg-amber-500",
-  "satin-alinacak": "bg-rose-500",
-};
+import { STATUS_TONE } from "../../constants/statuses";
 
 export function BookCard({
   book,
@@ -53,7 +47,9 @@ export function BookCard({
           />
         </div>
       ) : (
-        <div className={`h-1 w-full shrink-0 ${STATUS_STRIPE[book.status]}`} />
+        <div
+          className={`h-1 w-full shrink-0 ${STATUS_TONE[book.status].dot}`}
+        />
       )}
       <div className="p-3 flex flex-col gap-2 flex-1">
         <div className="flex items-start gap-2">
@@ -75,7 +71,7 @@ export function BookCard({
               <Star
                 key={index}
                 size={12}
-                className="fill-amber-400 text-amber-400"
+                className="fill-kemik-500 text-kemik-500"
               />
             ))}
           </div>

@@ -108,7 +108,12 @@ export function Topbar({
     section === "books" ? "book" : section === "movies" ? "film" : "tv";
 
   return (
-    <header className="h-14 border-b border-border bg-surface/80 backdrop-blur px-5 flex items-center shrink-0">
+    <header className="relative h-14 border-b border-border bg-gradient-to-r from-primary/5 via-surface/80 to-accent/5 backdrop-blur px-5 flex items-center shrink-0">
+      {/* Üst çubuğu içerikten ayıran ince renk çizgisi. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/50 via-accent/30 to-secondary/40"
+      />
       {/* Sol — arama */}
       <div className="flex-1 flex items-center min-w-0">
         <div className="relative w-full max-w-96 min-w-0">

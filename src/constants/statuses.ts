@@ -1,15 +1,61 @@
 import type { BookStatus } from "../types/book";
 
-export const STATUSES: { value: BookStatus; label: string; color: string }[] = [
-  { value: "okundu", label: "Okundu", color: "emerald" },
-  { value: "okunacak", label: "Okunacak", color: "sky" },
-  { value: "mevcut", label: "Elimde Mevcut", color: "amber" },
-  { value: "satin-alinacak", label: "Satın Alınacak", color: "rose" },
+/**
+ * Durumun renk kimliği. `dot` listedeki/karttaki renk şeridi ve kenar
+ * çubuğundaki nokta için, `tint` seçili filtre satırı için kullanılır.
+ * Renkler kişisel paletin ailelerinden gelir (bkz. `src/index.css`).
+ */
+export interface StatusTone {
+  dot: string;
+  tint: string;
+}
+
+export const STATUSES: {
+  value: BookStatus;
+  label: string;
+  tone: StatusTone;
+}[] = [
+  {
+    value: "okundu",
+    label: "Okundu",
+    tone: {
+      dot: "bg-turkuaz-500",
+      tint: "bg-turkuaz-500/15 text-turkuaz-800 dark:text-turkuaz-300",
+    },
+  },
+  {
+    value: "okunacak",
+    label: "Okunacak",
+    tone: {
+      dot: "bg-elektrik-500",
+      tint: "bg-elektrik-500/15 text-elektrik-800 dark:text-elektrik-300",
+    },
+  },
+  {
+    value: "mevcut",
+    label: "Elimde Mevcut",
+    tone: {
+      dot: "bg-kemik-500",
+      tint: "bg-kemik-500/20 text-kemik-800 dark:text-kemik-300",
+    },
+  },
+  {
+    value: "satin-alinacak",
+    label: "Satın Alınacak",
+    tone: {
+      dot: "bg-bordo-600",
+      tint: "bg-bordo-600/15 text-bordo-700 dark:text-bordo-300",
+    },
+  },
 ];
 
 export const STATUS_LABEL: Record<BookStatus, string> = Object.fromEntries(
   STATUSES.map((s) => [s.value, s.label]),
 ) as Record<BookStatus, string>;
+
+export const STATUS_TONE: Record<BookStatus, StatusTone> = Object.fromEntries(
+  STATUSES.map((s) => [s.value, s.tone]),
+) as Record<BookStatus, StatusTone>;
 
 export function normalizeStatus(raw: unknown): BookStatus | undefined {
   if (!raw) return undefined;

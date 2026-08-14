@@ -11,8 +11,8 @@
 | Açık sorun | 13 |
 | P0 / P1 / P2 | 3 / 8 / 2 |
 | Önerilen çözüm | 12 |
-| Kontrol bekleyen çözüm | 27 |
-| Geliştirme fikri | 28 |
+| Kontrol bekleyen çözüm | 28 |
+| Geliştirme fikri | 29 |
 | Reddedilen öneri | 3 |
 
 ### Ayrıntı Belgeleri
@@ -34,6 +34,7 @@
 - Fotoğraftan ekleme kitapların yanı sıra film ve dizilerde de çalışıyor; künye modelden gelir ve gözden geçirme tablosunda onaylanır.
 - Fotoğraftan ekleme bulut yerine bu bilgisayardaki bir modelle de çalışabiliyor; yerel sağlayıcı çevrimdışı modda da kullanılabiliyor ve yalnız loopback adreslerine bağlanıyor.
 - Algılama arka planda sürüyor: diyalog kapatılınca iş devam ediyor, üst çubuktaki gösterge işi izliyor ve sonuç hazır olunca gözden geçirme listesine dönülüyor.
+- Arayüz renkleri kişisel tasarım paletine (Petrol/Turkuaz/Bordo/Elektrik Mavi/Nötr/Kemik) taşındı; vurgu rengi seçimi kaldırıldı, durum renkleri korunup palete oturtuldu.
 - Yerel model artık raf fotoğraflarını okuyabiliyor: istek bağlamı büyütüldü, düşünme adımı kapatıldı ve yanıt iki alandan da çözümleniyor; önceden yalnız tek kitabın karşıdan çekildiği kare çalışıyordu. Aynı anda birden çok fotoğraf sıraya alınıp sırayla işlenebiliyor.
 - Bütün ekranlar Electron'da açık/koyu tema ve dar pencerede tarandı; konsol hatası yok. Kart başlıklarını örten onay kutusu, koyu temada açık kalan tarayıcı denetimleri ve iki satıra taşan durum rozetleri düzeltildi.
 - Tarayıcı ve Electron kontrollerinde kitap/medya CRUD, boş yazarın `Bilinmiyor` olması, mükerrer birleştirme, ödünç/iade, komut paleti ve yedek geri yükleme doğrulandı.
@@ -157,6 +158,12 @@ Tüm bulgular ve kabul kriterleri: [ISSUES.md](docs/project-tracker/ISSUES.md)
   - **Model karşılaştırması:** `qwen3-vl:8b` kurulup aynı ölçütte denendi ve kullanıcının kurulu `qwen3.5:9b` modelinden geride kaldı (Türkçe karakterlerde ve kapsamda). Model değiştirilmedi; `qwen3.5:9b` öneri olarak kalıyor.
   - **Bilinen sınır:** Yerel modelde her fotoğraf yaklaşık 30–100 saniye sürüyor, sıra bu süreleri toplar. OCR hataları (harf sapmaları) sürüyor; gözden geçirme tablosu bunun için var.
   - **Kullanıcı kontrolü:** Fotoğraftan ekleme penceresinden birden çok raf fotoğrafı seçip sıranın ilerlediğini, sonuçların tek listede toplandığını ve satırlarda kaynak fotoğraf adının göründüğünü kontrol edin.
+- **IMP-029 — Kişisel palete geçiş ve arayüz cilası**
+  - **Uygulayan:** Claude `[Model: Claude Opus 5]`
+  - **Commitler:** çalışma ağacında.
+  - **Doğrulama:** `tracker:check`, Prettier, typecheck, ESLint, 46 unit/component testi, 3 Electron E2E ve build başarılı. Tarayıcı önizlemesinde 12 kitaplık veriyle açık ve koyu tema, tablo ve kart görünümü, durum filtresi seçili/seçisiz hâli ve ayarlar penceresi kontrol edildi; renk sınıflarının ürettiği değerler hesaplanmış stilden okunarak doğrulandı. Arayüzde Tailwind'in hazır renk adlarından hiçbiri kalmadı.
+  - **Bilinen sınır:** Palet A'nın vurgu rolleri bilinçli olarak ters çevrildi ve kontrast için iki kademe sapması yapıldı (bkz. IMP-029 kaydı). Renk körlüğü için durum ayrımı yalnız renge değil, rozetlerdeki simgeye de dayanıyor; ayrıca bir kontrast denetimi (otomatik) kurulmadı.
+  - **Kullanıcı kontrolü:** Açık ve koyu temada kitap listesini, kart görünümünü ve kenar çubuğunu gözden geçirin; durum renklerinin (turkuaz/mavi/kemik/bordo) ayırt edilebilir olduğunu ve Ayarlar'da vurgu rengi seçiminin kalkmış olduğunu doğrulayın.
 - **ISS-001 dış bağımlılık notu:** Ad-hoc macOS imzası ve paket yapısı doğrulandı. Gerçek Developer ID/notarization ile Windows imza doğrulaması anahtar bekliyor.
 
 Bir kayıt buraya taşınırken şu bilgiler zorunludur:

@@ -36,7 +36,6 @@ export type AiProvider = "gemini" | "local";
 
 export interface AppSettings {
   theme: "light" | "dark" | "system";
-  accent: "turkuaz" | "kirmizi";
   fontFamily: string;
   fontSize: number;
   density: "comfortable" | "compact";
@@ -92,7 +91,6 @@ export const DEFAULT_TV_COLS: ColumnConfig[] = [
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: "light",
-  accent: "turkuaz",
   fontFamily: "Inter",
   fontSize: 15,
   density: "comfortable",

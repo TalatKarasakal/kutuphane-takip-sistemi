@@ -401,9 +401,9 @@ export function ImportDialog({ open, onClose, section }: Props) {
       {step === "pick" && <PickStep onFile={onFile} />}
       {step === "sheet" && <SheetStep sheets={sheets} onPick={onPickSheet} />}
       {notice && step !== "pick" && (
-        <div className="mb-3 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm">
-          <AlertTriangle size={16} className="mt-0.5 text-amber-500 shrink-0" />
-          <div className="text-amber-800 dark:text-amber-200">{notice}</div>
+        <div className="mb-3 flex items-start gap-2 rounded-lg border border-kemik-600/40 bg-kemik-500/15 px-3 py-2 text-sm">
+          <AlertTriangle size={16} className="mt-0.5 text-kemik-600 shrink-0" />
+          <div className="text-kemik-800 dark:text-kemik-300">{notice}</div>
         </div>
       )}
       {step === "map" && (
@@ -723,11 +723,11 @@ function PreviewStep({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3">
-        <div className="chip bg-emerald-500/15 border-emerald-500/20 text-emerald-700 dark:text-emerald-300">
+        <div className="chip bg-turkuaz-500/15 border-turkuaz-500/25 text-turkuaz-800 dark:text-turkuaz-300">
           <CheckCircle2 size={12} /> {rows.length} geçerli
         </div>
         {errors.length > 0 && (
-          <div className="chip bg-rose-500/15 border-rose-500/20 text-rose-700 dark:text-rose-300">
+          <div className="chip bg-bordo-600/15 border-bordo-600/25 text-bordo-700 dark:text-bordo-300">
             <AlertTriangle size={12} /> {errors.length} hatalı
           </div>
         )}
