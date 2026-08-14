@@ -8,12 +8,18 @@ import type { BookStatus } from "../types/book";
  * `dot` listedeki/karttaki renk şeridi ve kenar çubuğundaki nokta içindir.
  */
 export interface StatusTone {
-  /** Renk şeridi ve nokta için arka plan sınıfı. */
+  /** Liste/kart renk şeridi ve kenar çubuğundaki nokta. */
   dot: string;
   /**
-   * Rozetin kenarlığı ve yazısı. Koyu temada vurgu ve çelik mavisi yazı olarak
-   * AA'nın altında kaldığı için (2,85 ve 3,41) orada renk kenarlıkta ve noktada
-   * kalır, yazı `--text-dim`e düşer; aydınlıkta renkli yazı eşiği geçiyor.
+   * Rozetin tamamı. "Okundu" ve "Okunacak" dolguludur; "Elimde Mevcut" ve
+   * "Satın Alınacak" yalnız kenarlıklıdır — bordo dolgu, karanlık temada
+   * birincil eylem düğmesiyle yarışıyor.
+   *
+   * Dolgulu rozetlerde yazı rengi zemine göre seçilir: aydınlık temanın koyu
+   * dolgularında beyaz, karanlık temanın parlak yeşilinde koyu mürekkep
+   * (beyaz orada 2,8:1'de kalıyor). "Satın Alınacak" karanlık temada dolgusuz
+   * kalmak zorunda ama bordo yazı orada 2,85:1 veriyor; renk kenarlıkta
+   * bırakılıp yazı okunur tona alındı.
    */
   badge: string;
 }
@@ -28,7 +34,7 @@ export const STATUSES: {
     label: "Okundu",
     tone: {
       dot: "bg-success",
-      badge: "border-success text-success dark:text-dim",
+      badge: "border-success bg-success text-white dark:text-app",
     },
   },
   {
@@ -36,24 +42,23 @@ export const STATUSES: {
     label: "Okunacak",
     tone: {
       dot: "bg-glow",
-      badge: "border-glow text-glow dark:text-dim",
+      badge: "border-glow bg-glow text-white",
     },
   },
   {
-    // Dolgusuz, yalnız kenarlıklı: elde bulunmak bir aşama değil, nötr bir not.
     value: "mevcut",
     label: "Elimde Mevcut",
     tone: {
       dot: "bg-mute",
-      badge: "border-line-strong text-mute",
+      badge: "border-line-strong !bg-transparent text-mute",
     },
   },
   {
     value: "satin-alinacak",
     label: "Satın Alınacak",
     tone: {
-      dot: "bg-accent",
-      badge: "border-accent text-accent dark:text-dim",
+      dot: "bg-warn",
+      badge: "border-warn !bg-transparent text-warn dark:text-dim",
     },
   },
 ];

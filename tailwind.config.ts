@@ -36,10 +36,13 @@ export default {
           DEFAULT: "var(--accent)",
           hot: "var(--accent-hot)",
           soft: "var(--accent-soft)",
+          line: "var(--accent-line)",
         },
         navy: "var(--navy)",
         glow: "var(--glow)",
         success: "var(--success)",
+        /** Bordo. Karanlık temada vurguyla aynı, aydınlıkta yalnız durum rengi. */
+        warn: "var(--warn)",
       },
       borderColor: {
         DEFAULT: "var(--line)",

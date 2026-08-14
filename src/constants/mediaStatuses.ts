@@ -11,13 +11,16 @@ export const MEDIA_STATUSES: {
     label: "İzlendi",
     tone: {
       dot: "bg-success",
-      badge: "border-success text-success dark:text-dim",
+      badge: "border-success bg-success text-white dark:text-app",
     },
   },
   {
     value: "izlenecek",
     label: "İzlenecek",
-    tone: { dot: "bg-glow", badge: "border-glow text-glow dark:text-dim" },
+    tone: {
+      dot: "bg-glow",
+      badge: "border-glow bg-glow text-white",
+    },
   },
 ];
 

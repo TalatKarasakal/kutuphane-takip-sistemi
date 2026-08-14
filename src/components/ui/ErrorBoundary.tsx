@@ -21,7 +21,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
     return (
       <main className="h-screen grid place-items-center bg-app text-text p-8">
         <div className="card max-w-lg p-6 text-center">
-          <AlertTriangle className="mx-auto mb-3 text-accent" size={32} />
+          <AlertTriangle className="mx-auto mb-3 text-warn" size={32} />
           <h1 className="text-lg font-semibold">
             Uygulama beklenmeyen bir hatayla karşılaştı
           </h1>

@@ -96,6 +96,8 @@
   --accent: #b23a4b; /* bordo — birincil vurgu */
   --accent-hot: #c8323c; /* bordo, yalnızca hover/aktif */
   --accent-soft: rgba(178, 58, 75, 0.16); /* bordo dolgu */
+  --accent-line: rgba(178, 58, 75, 0.35); /* vurgu tonunda kenarlık */
+  --warn: #b23a4b; /* karanlık temada uyarı da bordo */
   --navy: #12243f; /* ikincil dolgu */
   --glow: #3e72b8; /* çelik mavisi — bilgi/bağlantı */
   --success: #3dae7a;
@@ -129,12 +131,19 @@
   --line: rgba(20, 32, 58, 0.16);
   --line-strong: rgba(20, 32, 58, 0.3);
 
-  --accent: #8e2433;
-  --accent-hot: #a3202c;
-  --accent-soft: rgba(142, 36, 51, 0.12);
+  /*
+   * Vurgu aydınlık temada turkuaz. Beyaz metin bu tonda 5,6:1 veriyor; daha
+   * açık turkuazlar (#12887E ve üstü) beyazla sınırda kaldığı için kullanılmaz.
+   */
+  --accent: #0e6e66;
+  --accent-hot: #0a5751;
+  --accent-soft: rgba(14, 110, 102, 0.12);
+  --accent-line: rgba(14, 110, 102, 0.35);
+  /* Bordo duruyor ama rolü değişti: artık yalnız durum/uyarı rengi. */
+  --warn: #8e2433;
   --navy: #2b3b5e;
   --glow: #2a5a9e;
-  --success: #1e7f52;
+  --success: #2f7d32; /* turkuaz vurgudan ayrışan düz yeşil */
 
   /* Aydınlık temada derinlik gölgeyle kurulur, parlamayla değil. */
   --elev-1: 0 1px 2px rgba(20, 32, 58, 0.07), 0 2px 8px rgba(20, 32, 58, 0.06);

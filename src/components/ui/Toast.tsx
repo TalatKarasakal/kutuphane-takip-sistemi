@@ -5,7 +5,7 @@ import { cn } from "../../lib/utils";
 const ICON = { success: CheckCircle2, error: AlertCircle, info: Info };
 const ICON_CLASS = {
   success: "text-success",
-  error: "text-accent",
+  error: "text-warn",
   info: "text-accent",
 };
 

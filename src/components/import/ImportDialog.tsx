@@ -727,7 +727,7 @@ function PreviewStep({
           <CheckCircle2 size={12} /> {rows.length} geçerli
         </div>
         {errors.length > 0 && (
-          <div className="chip !bg-transparent border-accent text-accent">
+          <div className="chip !bg-transparent border-warn text-warn">
             <AlertTriangle size={12} /> {errors.length} hatalı
           </div>
         )}

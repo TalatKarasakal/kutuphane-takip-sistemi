@@ -30,13 +30,13 @@ const MEDIA_STATUS_ICON: Record<
 };
 
 /*
- * Durum rozetleri dolgusuz, yalnız kenarlık ve yazı renginde. Renk burada
- * anlam taşıdığı için korunur; tür etiketleri ise tek tip nötr görünür.
+ * Durum rozetlerinde renk anlam taşıdığı için korunur; tür etiketleri tek tip
+ * nötr görünür. Dolgulu mu kenarlıklı mı olduğu durumun kendi tonundan gelir.
  */
 export function StatusBadge({ status }: { status: BookStatus }) {
   const Icon = BOOK_STATUS_ICON[status];
   return (
-    <span className={cn("chip !bg-transparent", STATUS_TONE[status].badge)}>
+    <span className={cn("chip", STATUS_TONE[status].badge)}>
       <Icon size={11} />
       {STATUS_LABEL[status]}
     </span>
@@ -46,9 +46,7 @@ export function StatusBadge({ status }: { status: BookStatus }) {
 export function MediaStatusBadge({ status }: { status: MediaStatus }) {
   const Icon = MEDIA_STATUS_ICON[status];
   return (
-    <span
-      className={cn("chip !bg-transparent", MEDIA_STATUS_TONE[status].badge)}
-    >
+    <span className={cn("chip", MEDIA_STATUS_TONE[status].badge)}>
       <Icon size={11} />
       {MEDIA_STATUS_LABEL[status]}
     </span>

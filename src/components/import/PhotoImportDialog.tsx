@@ -215,7 +215,7 @@ export function PhotoImportDialog({ onOpenSettings }: Props) {
       {saveError && (
         <div
           role="alert"
-          className="mb-3 rounded-lg border border-accent bg-accent-soft px-3 py-2 text-sm text-accent"
+          className="mb-3 rounded-lg border border-warn px-3 py-2 text-sm text-warn"
         >
           {saveError}
         </div>
@@ -313,9 +313,9 @@ function PickStep({
   return (
     <div className="py-4">
       {error && (
-        <div className="mb-3 flex items-start gap-2 rounded-lg border border-accent bg-accent-soft px-3 py-2 text-sm">
-          <AlertTriangle size={16} className="mt-0.5 text-accent shrink-0" />
-          <div className="text-accent">{error}</div>
+        <div className="mb-3 flex items-start gap-2 rounded-lg border border-warn px-3 py-2 text-sm">
+          <AlertTriangle size={16} className="mt-0.5 text-warn shrink-0" />
+          <div className="text-warn">{error}</div>
         </div>
       )}
       {notice && (
@@ -595,7 +595,7 @@ function BookReviewStep({
               </td>
               <td className="px-2 py-2 text-center">
                 <button
-                  className="btn btn-ghost p-1.5 text-mute hover:text-accent"
+                  className="btn btn-ghost p-1.5 text-mute hover:text-warn"
                   title="Listeden çıkar"
                   onClick={() => onPatch(r.rid, { include: false })}
                 >
@@ -735,7 +735,7 @@ function MediaReviewStep({
               </td>
               <td className="px-2 py-2 text-center">
                 <button
-                  className="btn btn-ghost p-1.5 text-mute hover:text-accent"
+                  className="btn btn-ghost p-1.5 text-mute hover:text-warn"
                   title="Listeden çıkar"
                   onClick={() => onPatch(r.rid, { include: false })}
                 >

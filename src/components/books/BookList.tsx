@@ -668,7 +668,7 @@ function BulkBar({
             <UserRound size={14} /> Ödünç Ver
           </button>
         )}
-        <button className="btn btn-ghost text-accent" onClick={onDelete}>
+        <button className="btn btn-ghost text-warn" onClick={onDelete}>
           <Trash2 size={14} /> Sil
         </button>
         <button className="btn btn-ghost" onClick={onClear}>

@@ -431,7 +431,7 @@ function Field({
         {describedChild}
       </label>
       {error && (
-        <span id={resolvedErrorId} className="text-xs text-accent mt-1 block">
+        <span id={resolvedErrorId} className="text-xs text-warn mt-1 block">
           {error}
         </span>
       )}

@@ -591,7 +591,7 @@ function BulkBar({
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <button className="btn btn-ghost text-accent" onClick={onDelete}>
+        <button className="btn btn-ghost text-warn" onClick={onDelete}>
           <Trash2 size={14} /> Sil
         </button>
         <button className="btn btn-ghost" onClick={onClear}>

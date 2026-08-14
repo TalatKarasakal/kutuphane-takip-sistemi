@@ -107,7 +107,9 @@ export function Topbar({
     <header className="relative z-30 h-14 shrink-0 border-b border-line bg-topbar pr-5 flex items-center">
       {/* Sol — uygulama kimliği. Genişliği kenar çubuğuyla hizalıdır. */}
       <div className="w-64 shrink-0 flex items-center gap-3 pl-5 pr-4 min-w-0">
-        <div className="w-9 h-9 rounded-lg bg-navy text-white flex items-center justify-center shadow-elev1 shrink-0">
+        {/* Aydınlıkta lacivert zemin/beyaz ikon; karanlıkta vurgu tonunda
+            yumuşak dolgu, kenarlık ve bordo ikon. */}
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-navy text-white shadow-elev1 dark:border-accent-line dark:bg-accent-soft dark:text-accent dark:shadow-none">
           <BrandIcon size={18} />
         </div>
         <div className="min-w-0">

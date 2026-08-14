@@ -308,7 +308,7 @@ function LocalAiFields() {
         />
       )}
 
-      {error && <div className="text-xs text-accent">{error}</div>}
+      {error && <div className="text-xs text-warn">{error}</div>}
       {selected && !selected.vision && (
         <div className="text-xs text-mute">
           Bu model görseli okuyamaz; fotoğraftan ekleme çalışmaz. Görsel
@@ -612,7 +612,7 @@ function BackupSection({ active }: { active: boolean }) {
                 </button>
               </div>
               {historyError ? (
-                <div className="p-3 text-xs text-accent">{historyError}</div>
+                <div className="p-3 text-xs text-warn">{historyError}</div>
               ) : history.length === 0 ? (
                 <div className="p-3 text-xs text-mute">
                   Henüz uygulama içi yedek yok.
